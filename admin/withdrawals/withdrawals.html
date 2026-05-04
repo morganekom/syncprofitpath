@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="...">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawal Approvals — SyncProfitPath Admin</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../admin.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../index.html" class="nav_logo">
+                <img src="../../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" id="adminSearch" placeholder="Search by name, reference, method…">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn">
+                    <i class="uil uil-moon"></i>
+                </button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../../assets/profile-1.jpg" alt="Admin">
+                    </div>
+                    <h5 id="navName">Admin</h5>
+                    <span class="admin-badge">Admin</span>
+                </div>
+                <button class="nav_menu-btn">
+                    <i class="uil uil-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../index.html">
+            <i class="uil uil-create-dashboard"></i>
+            <h5>Overview</h5>
+        </a>
+        <a href="../user/user.html">
+            <i class="uil uil-users-alt"></i>
+            <h5>Users</h5>
+        </a>
+        <a href="../deposit/deposit.html">
+            <i class="uil uil-arrow-circle-down"></i>
+            <h5>Deposits</h5>
+        </a>
+        <a href="./withdrawals.html" class="active">
+            <i class="uil uil-arrow-circle-up"></i>
+            <h5>Withdrawals</h5>
+        </a>
+        <a href="../kyc/kyc.html">
+            <i class="uil uil-shield-check"></i>
+            <h5>KYC</h5>
+        </a>
+        <a href="../chat/chat.html">
+            <i class="uil uil-comments-alt"></i>
+            <h5>Messages</h5>
+        </a>
+        <div class="sidebar-divider"></div>
+        <a href="../../index.html" class="sidebar-user-link">
+            <i class="uil uil-exit"></i>
+            <h5>User View</h5>
+        </a>
+        <button class="sidebar_close-btn">
+            <i class="uil uil-multiply"></i>
+        </button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i>
+            <h5>Logout</h5>
+        </button>
+    </menu>
+
+
+    <!--==================== MAIN ====================-->
+    <main class="admin-main">
+
+        <header class="admin-header">
+            <div>
+                <h1>Withdrawal Approvals</h1>
+                <p class="admin-subtitle">Review and process pending withdrawal requests.</p>
+            </div>
+            <button class="refresh-btn" id="refreshBtn" onclick="loadWithdrawals()">
+                <i class="uil uil-refresh"></i> Refresh
+            </button>
+        </header>
+
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-tab active" data-status="pending">Pending</button>
+                <button class="filter-tab" data-status="completed">Processed</button>
+                <button class="filter-tab" data-status="failed">Rejected</button>
+                <button class="filter-tab" data-status="all">All</button>
+            </div>
+            <div class="search-wrap">
+                <i class="uil uil-search"></i>
+                <input type="search" id="wdrSearch" placeholder="Name, reference, method…">
+            </div>
+        </div>
+
+
+        <!-- Table -->
+        <div class="admin-table-wrap">
+            <div id="wdrLoading" class="admin-loading">
+                <i class="uil uil-spinner-alt spin"></i> Loading withdrawals…
+            </div>
+            <div id="wdrEmpty" class="admin-empty" style="display:none;">
+                <i class="uil uil-arrow-circle-up"></i>
+                <p>No withdrawals found.</p>
+            </div>
+            <table class="admin-table" id="wdrTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Reference</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="wdrBody"></tbody>
+            </table>
+        </div>
+
+    </main>
+
+
+    <!-- ── DETAIL MODAL ── -->
+    <div class="admin-modal-overlay" id="wdrModal" onclick="closeWdrModal(event)">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h3>Withdrawal Details</h3>
+                <button class="admin-modal-close" onclick="closeWdrModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">User</span>
+                <span class="modal-detail-value" id="mwUser">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Email</span>
+                <span class="modal-detail-value" id="mwEmail">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Reference</span>
+                <span class="modal-detail-value" id="mwReference">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Method</span>
+                <span class="modal-detail-value" id="mwMethod">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Amount</span>
+                <span class="modal-detail-value" id="mwAmount">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">User Balance</span>
+                <span class="modal-detail-value" id="mwBalance">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Requested</span>
+                <span class="modal-detail-value" id="mwDate">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Status</span>
+                <span class="modal-detail-value" id="mwStatus">—</span>
+            </div>
+
+            <!-- Destination details pulled from user's saved settings -->
+            <div class="withdrawal-destination" id="mwDestination" style="display:none;">
+                <p class="modal-detail-label" style="margin-bottom:0.6rem;">Destination</p>
+                <div class="destination-box" id="mwDestinationBox"></div>
+            </div>
+
+            <!-- Admin note -->
+            <div class="modal-note-wrap" id="mwNoteWrap">
+                <label class="modal-note-label">Note (optional)</label>
+                <textarea id="mwNote" class="modal-note" placeholder="e.g. Payment sent via bank transfer."></textarea>
+            </div>
+
+            <div class="modal-actions" id="mwActions">
+                <button class="action-btn reject" id="mwRejectBtn" onclick="handleWdrAction('failed')">
+                    <i class="uil uil-times-circle"></i> Reject
+                </button>
+                <button class="action-btn approve" id="mwApproveBtn" onclick="handleWdrAction('completed')">
+                    <i class="uil uil-check-circle"></i> Mark as Processed
+                </button>
+            </div>
+
+            <div id="mwResolved" class="modal-resolved" style="display:none;">
+                <i class="uil uil-check-circle success"></i>
+                <p id="mwResolvedMsg">Action completed.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../supabase.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../admin.js"></script>
+    <script src="./withdrawals.js"></script>
+</body>
+
+</html>

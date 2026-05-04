@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="...">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refer & Earn - SyncProfitPath</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./refer.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../index.html" class="nav_logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="search">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn">
+                    <i class="uil uil-moon"></i>
+                </button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../assets/profile-1.jpg" alt="Profile Photo" id="navPhoto">
+                    </div>
+                    <h5 id="navName">User Name</h5>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <button class="nav_menu-btn">
+                    <i class="uil uil-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../index.html">
+            <i class="uil uil-create-dashboard"></i>
+            <h5>Dashboard</h5>
+        </a>
+        <a href="../deposit/deposit.html">
+            <i class="uil uil-arrow-circle-down"></i>
+            <h5>Deposit</h5>
+        </a>
+        <a href="../invest/invest.html">
+            <i class="uil uil-diamond"></i>
+            <h5>Invest</h5>
+        </a>
+        <a href="../withdraw/withdraw.html">
+            <i class="uil uil-arrow-circle-up"></i>
+            <h5>Withdraw</h5>
+        </a>
+        <a href="../transactions/transactions.html">
+            <i class="uil uil-history"></i>
+            <h5>Transactions</h5>
+        </a>
+        <a href="./refer.html" class="active">
+            <i class="uil uil-user-plus"></i>
+            <h5>Refer & Earn</h5>
+        </a>
+        <a href="../settings/settings.html">
+            <i class="uil uil-setting"></i>
+            <h5>Settings</h5>
+        </a>
+        <button class="sidebar_close-btn">
+            <i class="uil uil-multiply"></i>
+        </button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i>
+            <h5>Logout</h5>
+        </button>
+    </menu>
+
+
+    <!--==================== REFER MAIN ====================-->
+    <main class="refer-section">
+
+        <h1>Refer &amp; Earn</h1>
+        <p class="refer-subtitle">Invite friends to SyncProfitPath and earn rewards for every successful signup.</p>
+
+
+        <!-- ── HOW IT WORKS ── -->
+        <div class="how-it-works">
+            <div class="how-step">
+                <div class="how-icon bg-primary-light">
+                    <i class="uil uil-share-alt primary"></i>
+                </div>
+                <h5>Share your link</h5>
+                <p>Send your unique referral link or code to friends.</p>
+            </div>
+            <div class="how-divider"><i class="uil uil-angle-right"></i></div>
+            <div class="how-step">
+                <div class="how-icon bg-success-light">
+                    <i class="uil uil-user-check success"></i>
+                </div>
+                <h5>Friend signs up</h5>
+                <p>They create an account using your referral link.</p>
+            </div>
+            <div class="how-divider"><i class="uil uil-angle-right"></i></div>
+            <div class="how-step">
+                <div class="how-icon" style="background:rgba(160,99,245,0.15)">
+                    <i class="uil uil-dollar-sign purple"></i>
+                </div>
+                <h5>You both earn</h5>
+                <p>You earn a bonus. Your friend gets a welcome reward too.</p>
+            </div>
+        </div>
+
+
+        <!-- ── STATS ROW ── -->
+        <div class="refer-stats">
+            <div class="refer-stat-card">
+                <div class="stat-icon bg-primary-light">
+                    <i class="uil uil-users-alt primary"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 id="statReferrals">0</h2>
+                    <p>Total Referrals</p>
+                </div>
+            </div>
+            <div class="refer-stat-card">
+                <div class="stat-icon bg-success-light">
+                    <i class="uil uil-money-bill success"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 id="statEarnings">$0.00</h2>
+                    <p>Total Earned</p>
+                </div>
+            </div>
+            <div class="refer-stat-card">
+                <div class="stat-icon bg-danger-light">
+                    <i class="uil uil-clock danger"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 id="statPending">0</h2>
+                    <p>Pending</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ── MAIN CONTENT ROW ── -->
+        <div class="refer-grid">
+
+            <!-- LEFT: code + share -->
+            <div class="refer-left">
+
+                <!-- Referral Code card -->
+                <div class="refer-card">
+                    <h3 class="card-title">Your Referral Code</h3>
+                    <p class="card-subtitle">Share this code with anyone — they enter it at signup.</p>
+
+                    <div class="code-display">
+                        <span id="referralCode" class="code-value">—</span>
+                        <button class="copy-btn" id="copyCodeBtn" title="Copy code">
+                            <i class="uil uil-copy"></i> Copy
+                        </button>
+                    </div>
+
+                    <div id="copyCodeMsg" class="copy-feedback"></div>
+                </div>
+
+                <!-- Referral Link card -->
+                <div class="refer-card">
+                    <h3 class="card-title">Your Referral Link</h3>
+                    <p class="card-subtitle">Send this link directly — it takes your friend straight to signup.</p>
+
+                    <div class="link-row">
+                        <input id="referralLink" class="refer-input" readonly />
+                        <button class="copy-btn" id="copyLinkBtn">
+                            <i class="uil uil-link"></i> Copy Link
+                        </button>
+                    </div>
+
+                    <div id="copyLinkMsg" class="copy-feedback"></div>
+
+                    <div class="share-label">Share on</div>
+                    <div class="share-actions">
+                        <button class="share-btn whatsapp" id="whatsappShare">
+                            <i class="uil uil-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn twitter" id="twitterShare">
+                            <i class="uil uil-twitter"></i> Twitter
+                        </button>
+                        <button class="share-btn email" id="emailShare">
+                            <i class="uil uil-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT: activity -->
+            <div class="refer-right">
+                <div class="refer-card refer-activity-card">
+                    <h3 class="card-title">Referral Activity</h3>
+                    <p class="card-subtitle">People who signed up using your referral link or code.</p>
+
+                    <!-- empty state -->
+                    <div id="referEmptyState" class="refer-empty">
+                        <i class="uil uil-users-alt"></i>
+                        <p>No referrals yet.</p>
+                        <small>Share your link above to get started.</small>
+                    </div>
+
+                    <!-- populated list — hidden until there are referrals -->
+                    <ul id="referHistoryList" class="refer-history" style="display:none;"></ul>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <script src="../auth.js"></script>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase.js"></script>
+    <script src="../main.js"></script>
+    <script src="../chat-widget.js"></script>
+    <script src="./refer.js"></script>
+</body>
+
+</html>

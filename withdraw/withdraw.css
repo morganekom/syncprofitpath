@@ -1,0 +1,582 @@
+/* withdraw.css
+   Follows the same variable system and patterns as deposit.css
+   Desktop first → tablet → mobile
+*/
+
+body {
+    grid-template-columns: 17rem auto;
+}
+
+
+/* ========================= WITHDRAW SECTION ========================= */
+.withdraw-section {
+    margin-top: 7rem;
+    margin-right: 2vw;
+    padding-bottom: 5rem;
+}
+
+.withdraw-section>h1 {
+    color: var(--color-dark);
+    margin-bottom: 1.7rem;
+}
+
+
+/* ========================= SHARED FORM CARD ========================= */
+/* Matches .form-card pattern from deposit.css */
+.form-card {
+    margin-bottom: 1.5rem;
+}
+
+.form-card h3 {
+    color: var(--color-dark);
+    margin-bottom: 1rem;
+}
+
+
+/* ========================= EMPTY STATE ========================= */
+/* Shown when user has no withdrawal details in settings */
+.withdraw-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.2rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 5rem var(--card-padding);
+}
+
+.empty-icon {
+    font-size: 5rem;
+    color: var(--color-gray-light);
+    line-height: 1;
+    background: var(--color-light);
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon i {
+    font-size: 3.5rem;
+    color: var(--color-gray-light);
+}
+
+.withdraw-empty h2 {
+    color: var(--color-dark);
+}
+
+.withdraw-empty p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    max-width: 34rem;
+    line-height: 1.7;
+}
+
+/* Button linking to settings */
+.empty-settings-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    padding: 1.2rem 2.5rem;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: var(--radius-2);
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.empty-settings-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+.empty-settings-btn i {
+    font-size: 1.5rem;
+}
+
+
+/* ========================= BALANCE CARD ========================= */
+.balance-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-primary);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    margin-bottom: 1.5rem;
+}
+
+.balance-card * {
+    color: var(--color-dark);
+}
+
+.balance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.balance-info p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.balance-info h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+}
+
+.balance-icon {
+    background: rgba(0, 0, 0, 0.12);
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-icon i {
+    font-size: 2.4rem;
+    color: var(--color-dark);
+}
+
+
+/* ========================= METHOD SELECTOR ========================= */
+.method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.method-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.method-option:hover {
+    border-color: var(--color-gray-light);
+}
+
+/* Selected state — green border */
+.method-option.selected {
+    border-color: var(--color-primary);
+}
+
+/* Disabled state — when method has no saved details */
+.method-option.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.method-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.method-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.method-icon i {
+    font-size: 2rem;
+}
+
+.method-detail {
+    color: var(--color-gray-light);
+    margin-top: 0.3rem;
+    font-size: 1.1rem;
+}
+
+/* Radio circle on the right of each method */
+.method-radio {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-gray-light);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+/* Filled radio when selected */
+.method-option.selected .method-radio {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 226, 123, 0.2);
+}
+
+/* Warning shown if selected method has no saved details */
+.method-warning {
+    font-size: 1.1rem;
+    color: var(--color-warning);
+    margin-top: 0.8rem;
+    min-height: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+/* ========================= AMOUNT INPUT ========================= */
+/* Matches deposit.css pattern exactly */
+.amount-wrapper {
+    position: relative;
+}
+
+.amount-wrapper span {
+    position: absolute;
+    left: 1.6rem;
+    top: 50%;
+    transform: translateY(-51%);
+    color: var(--color-gray-dark);
+    font-size: 2rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.amount-input {
+    width: 100%;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 1.6rem 1.8rem 1.6rem 3rem;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    outline: none;
+    border: 2px solid transparent;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.amount-input::placeholder {
+    color: var(--color-gray-dark);
+}
+
+.amount-input:focus {
+    border-color: var(--color-primary);
+}
+
+/* Error state — red border */
+.amount-input.input-error {
+    border-color: var(--color-danger);
+}
+
+.amount-hints {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.6rem;
+    padding: 0 0.4rem;
+}
+
+.field-error {
+    font-size: 1.1rem;
+    color: var(--color-danger);
+    min-height: 1.4rem;
+}
+
+.amount-max {
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+}
+
+
+/* ========================= SUBMIT BUTTON ========================= */
+.submit-btn {
+    background: var(--color-primary);
+    color: var(--color-dark);
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+    margin-bottom: 5rem;
+    width: 100%;
+    font-family: "Poppins", sans-serif;
+}
+
+.submit-btn:hover:not(:disabled) {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+/* Disabled state */
+.submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* ========================= SUCCESS STATE ========================= */
+.withdraw-success {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.2rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 4rem var(--card-padding);
+    margin-bottom: 5rem;
+}
+
+.withdraw-success.show {
+    display: flex;
+}
+
+.success-icon {
+    font-size: 5rem;
+    color: var(--color-success);
+    line-height: 1;
+}
+
+.withdraw-success h2 {
+    color: var(--color-dark);
+}
+
+.withdraw-success p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    max-width: 34rem;
+    line-height: 1.7;
+}
+
+.success-btn {
+    margin-top: 1rem;
+    padding: 1.2rem 3rem;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.success-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+
+/* ========================= CONFIRMATION MODAL ========================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    place-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.modal-overlay.open {
+    display: grid;
+}
+
+.modal {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    width: 100%;
+    max-width: 42rem;
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    animation: slideUp 250ms ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(2rem);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Global close button style — matches across all pages */
+.modal-close-btn {
+    background: var(--color-light);
+    border: none;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.modal-close-btn i {
+    color: inherit;
+}
+
+.modal-close-btn:hover {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.modal-summary {
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.modal-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.modal-summary-row span:first-child {
+    color: var(--color-gray-light);
+}
+
+.modal-summary-row span:last-child {
+    color: var(--color-dark);
+    font-weight: 600;
+}
+
+/* Info note above footer buttons */
+.modal-note {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+    background: var(--color-light);
+    border-radius: var(--radius-1);
+    padding: 0.8rem 1rem;
+}
+
+.modal-note i {
+    font-size: 1.4rem;
+    color: var(--color-warning);
+    flex-shrink: 0;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+}
+
+.modal-cancel-btn {
+    flex: 1;
+    padding: 1.2rem;
+    border-radius: var(--radius-2);
+    background: var(--color-light);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.modal-cancel-btn:hover {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.modal-confirm-btn {
+    flex: 2;
+    padding: 1.2rem;
+    border-radius: var(--radius-2);
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.modal-confirm-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+
+/* ========================= MEDIA QUERIES (tablet) ========================= */
+@media screen and (max-width: 1024px) {
+    body {
+        grid-template-columns: 1fr;
+    }
+
+    .withdraw-section {
+        margin-right: 1rem;
+        padding: 0 1rem 5rem;
+    }
+}
+
+
+/* ========================= MEDIA QUERIES (mobile) ========================= */
+@media screen and (max-width: 600px) {
+    .withdraw-section {
+        margin-left: 2.9vw;
+    }
+    .withdraw-section {
+        margin-top: 6rem;
+    }
+
+    .balance-info h1 {
+        font-size: 2rem;
+    }
+
+    .modal {
+        margin: 0 1rem;
+        max-width: 100%;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .amount-hints {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+}

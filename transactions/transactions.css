@@ -1,0 +1,349 @@
+/* transactions.css
+   Desktop first → tablet → mobile
+   Matches variable system from style.css
+*/
+
+body {
+    grid-template-columns: 17rem auto;
+}
+
+
+/* ========================= TRANSACTIONS SECTION ========================= */
+.transactions-section {
+    margin-top: 7rem;
+    margin-right: 2vw;
+    padding-bottom: 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+
+/* ========================= HEADER ROW ========================= */
+.transactions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.transactions-header h1 {
+    color: var(--color-dark);
+}
+
+
+/* ========================= FILTER TABS ========================= */
+.filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-2);
+    padding: 0.4rem;
+}
+
+.filter-tab {
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius-1);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    white-space: nowrap;
+}
+
+.filter-tab:hover {
+    background: var(--color-light);
+    color: var(--color-dark);
+}
+
+.filter-tab.active {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+
+/* ========================= LOADING SKELETONS ========================= */
+.trans-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+@keyframes shimmer {
+    0%   { background-position: -60rem 0; }
+    100% { background-position:  60rem 0; }
+}
+
+.loading-row {
+    height: 5rem;
+    border-radius: var(--radius-2);
+    background: linear-gradient(90deg,
+        var(--color-white) 25%,
+        var(--color-light) 50%,
+        var(--color-white) 75%);
+    background-size: 120rem 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+
+/* ========================= EMPTY STATE ========================= */
+.trans-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.2rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 5rem var(--card-padding);
+}
+
+.trans-empty .empty-icon {
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trans-empty .empty-icon i {
+    font-size: 3rem;
+    color: var(--color-gray-light);
+}
+
+.trans-empty h2 { color: var(--color-dark); }
+
+.trans-empty p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    max-width: 32rem;
+    line-height: 1.7;
+}
+
+.empty-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    padding: 1.2rem 2.5rem;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: var(--radius-2);
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+}
+
+.empty-action-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+
+/* ========================= ERROR STATE ========================= */
+.trans-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 4rem var(--card-padding);
+    text-align: center;
+}
+
+.trans-error i {
+    font-size: 4rem;
+    color: var(--color-warning);
+}
+
+.trans-error p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+}
+
+.retry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 2rem;
+    background: var(--color-light);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.retry-btn:hover {
+    background: var(--color-primary);
+}
+
+
+/* ========================= TABLE ========================= */
+.table-wrapper {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    overflow-x: auto; /* horizontal scroll on small screens */
+}
+
+.transactionsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactionsTable thead {
+    background: var(--color-light);
+}
+
+.transactionsTable th {
+    text-align: left;
+    padding: 1.4rem 1.6rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-gray-dark);
+    white-space: nowrap;
+}
+
+.transactionsTable td {
+    padding: 1.4rem 1.6rem;
+    font-size: 1.2rem;
+    color: var(--color-dark);
+    border-bottom: 1px solid var(--color-light);
+    white-space: nowrap;
+}
+
+.transactionsTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transactionsTable tbody tr {
+    transition: var(--transition);
+}
+
+.transactionsTable tbody tr:hover {
+    background: var(--color-light);
+}
+
+/* Reference — monospace, slightly muted */
+.td-reference {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+/* Type badge */
+.type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 1rem;
+    border-radius: 99px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.type-badge.deposit {
+    background: rgba(0, 226, 123, 0.12);
+    color: var(--color-success);
+}
+
+.type-badge.withdrawal {
+    background: rgba(255, 67, 54, 0.1);
+    color: var(--color-danger);
+}
+
+.type-badge.investment {
+    background: rgba(160, 99, 245, 0.12);
+    color: var(--color-purple);
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 99px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.completed {
+    background: rgba(0, 226, 123, 0.12);
+    color: var(--color-success);
+}
+
+.status-badge.pending {
+    background: rgba(234, 181, 7, 0.15);
+    color: var(--color-warning);
+}
+
+.status-badge.failed {
+    background: rgba(255, 67, 54, 0.1);
+    color: var(--color-danger);
+}
+
+/* Amount — green for deposit, red for withdrawal */
+.amount-positive { color: var(--color-success); font-weight: 700; }
+.amount-negative { color: var(--color-danger);  font-weight: 700; }
+.amount-neutral  { color: var(--color-purple);  font-weight: 700; }
+
+/* Note — truncate if too long */
+.td-note {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+}
+
+
+/* ========================= MEDIA QUERIES (tablet) ========================= */
+@media screen and (max-width: 1024px) {
+    body { grid-template-columns: 1fr; }
+
+    .transactions-section {
+        margin-right: 1rem;
+        padding: 0 1rem 6rem;
+    }
+}
+
+
+/* ========================= MEDIA QUERIES (mobile) ========================= */
+@media screen and (max-width: 600px) {
+    .transactions-section { margin-top: 6rem; }
+
+    .transactions-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0.4rem;
+    }
+
+    .filter-tab {
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+    }
+
+    /* Hide less important columns on mobile */
+    .transactionsTable .hide-mobile {
+        display: none;
+    }
+}

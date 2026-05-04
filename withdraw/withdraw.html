@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="...">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - SyncProfitPath</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./withdraw.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../index.html" class="nav_logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="search">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn">
+                    <i class="uil uil-moon"></i>
+                </button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../assets/profile-1.jpg" alt="Profile Photo">
+                    </div>
+                    <h5 id="navName">Divine Godwin</h5>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <button class="nav_menu-btn">
+                    <i class="uil uil-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../index.html">
+            <i class="uil uil-create-dashboard"></i>
+            <h5>Dashboard</h5>
+        </a>
+        <a href="../deposit/deposit.html">
+            <i class="uil uil-arrow-circle-down"></i>
+            <h5>Deposit</h5>
+        </a>
+        <a href="../invest/invest.html">
+            <i class="uil uil-diamond"></i>
+            <h5>Invest</h5>
+        </a>
+        <a href="./withdraw.html" class="active">
+            <i class="uil uil-arrow-circle-up"></i>
+            <h5>Withdraw</h5>
+        </a>
+        <a href="../transactions/transactions.html">
+            <i class="uil uil-history"></i>
+            <h5>Transactions</h5>
+        </a>
+        <a href="../refer/refer.html">
+            <i class="uil uil-user-plus"></i>
+            <h5>Refer & Earn</h5>
+        </a>
+        <a href="../settings/settings.html">
+            <i class="uil uil-setting"></i>
+            <h5>Settings</h5>
+        </a>
+        <button class="sidebar_close-btn">
+            <i class="uil uil-multiply"></i>
+        </button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i>
+            <h5>Logout</h5>
+        </button>
+    </menu>
+
+
+    <!--==================== WITHDRAW SECTION ====================-->
+    <section class="withdraw-section">
+        <h1>Withdraw</h1>
+
+        <!-- ══ EMPTY STATE ══
+             Shown when user has no withdrawal details saved in settings.
+             JS checks localStorage for saved details on page load. -->
+        <div class="withdraw-empty" id="withdrawEmpty">
+            <div class="empty-icon">
+                <i class="uil uil-arrow-circle-up"></i>
+            </div>
+            <h2>No Withdrawal Method Found</h2>
+            <p>You need to add your bank account or crypto wallet details in Settings before you can make a withdrawal.
+            </p>
+            <a href="../settings/settings.html#withdrawal" class="empty-settings-btn">
+                <i class="uil uil-setting"></i>
+                Go to Settings
+            </a>
+        </div>
+
+
+        <!-- ══ WITHDRAW FORM ══
+             Hidden on load if no details exist. Shown when details are found. -->
+        <div id="withdrawForm" style="display:none;">
+
+            <!-- Balance display -->
+            <div class="balance-card">
+                <div class="balance-info">
+                    <p>Available Balance</p>
+                    <h1 id="availableBalance">$24,500.00</h1>
+                </div>
+                <div class="balance-icon">
+                    <i class="uil uil-wallet"></i>
+                </div>
+            </div>
+
+            <!-- ── METHOD SELECTOR ── -->
+            <div class="form-card">
+                <h3>Withdrawal Method</h3>
+                <div class="method-list">
+
+                    <!-- Bank Account option -->
+                    <div class="method-option" id="methodBank" onclick="selectMethod('bank')">
+                        <div class="method-left">
+                            <div class="method-icon bg-primary-light">
+                                <i class="uil uil-building primary"></i>
+                            </div>
+                            <div>
+                                <h4>Bank Account</h4>
+                                <!-- Filled by JS from localStorage -->
+                                <p class="method-detail" id="bankDetail">No bank details saved</p>
+                            </div>
+                        </div>
+                        <div class="method-radio" id="radioBank"></div>
+                    </div>
+
+                    <!-- Crypto Wallet option -->
+                    <div class="method-option" id="methodCrypto" onclick="selectMethod('crypto')">
+                        <div class="method-left">
+                            <div class="method-icon bg-purple-light">
+                                <i class="uil uil-bitcoin-circle purple"></i>
+                            </div>
+                            <div>
+                                <h4>Crypto Wallet</h4>
+                                <!-- Filled by JS from localStorage -->
+                                <p class="method-detail" id="cryptoDetail">No crypto details saved</p>
+                            </div>
+                        </div>
+                        <div class="method-radio" id="radioCrypto"></div>
+                    </div>
+
+                </div>
+
+                <!-- Shown if selected method has no saved details -->
+                <p class="method-warning" id="methodWarning"></p>
+            </div>
+
+
+            <!-- ── AMOUNT ── -->
+            <div class="form-card">
+                <h3>Amount (USD)</h3>
+                <div class="amount-wrapper">
+                    <span>$</span>
+                    <input class="amount-input" id="withdrawAmount" type="number" min="0" placeholder="0.00" />
+                </div>
+                <div class="amount-hints">
+                    <p class="field-error" id="amountError"></p>
+                    <p class="amount-max" id="amountMax">Max: $24,500.00</p>
+                </div>
+            </div>
+
+
+            <!-- ── SUBMIT ── -->
+            <!-- Disabled until method is selected and valid amount is entered -->
+            <button class="submit-btn" id="submitBtn" disabled>
+                Request Withdrawal
+            </button>
+
+        </div><!-- end #withdrawForm -->
+
+
+        <!-- ══ SUCCESS STATE ══ shown after confirmed withdrawal -->
+        <div class="withdraw-success" id="withdrawSuccess">
+            <div class="success-icon">
+                <i class="uil uil-check-circle"></i>
+            </div>
+            <h2>Withdrawal Requested!</h2>
+            <p>Your withdrawal request has been submitted. Processing takes 1–3 business days.</p>
+            <button class="success-btn" onclick="resetWithdraw()">Make Another Withdrawal</button>
+        </div>
+
+    </section>
+
+
+    <!-- ══ CONFIRMATION MODAL ══ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal">
+
+            <div class="modal-header">
+                <h3>Confirm Withdrawal</h3>
+                <button class="modal-close-btn" onclick="closeWithdrawModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <!-- Summary of what user is about to submit -->
+            <div class="modal-summary">
+                <div class="modal-summary-row">
+                    <span>Method</span>
+                    <span id="confirmMethod">—</span>
+                </div>
+                <div class="modal-summary-row">
+                    <span>Destination</span>
+                    <span id="confirmDestination">—</span>
+                </div>
+                <div class="modal-summary-row">
+                    <span>Amount</span>
+                    <span id="confirmAmount">—</span>
+                </div>
+            </div>
+
+            <p class="modal-note">
+                <i class="uil uil-info-circle"></i>
+                Withdrawals are reviewed and processed within 1–3 business days.
+            </p>
+
+            <div class="modal-footer">
+                <button class="modal-cancel-btn" onclick="closeWithdrawModal()">Cancel</button>
+                <button class="modal-confirm-btn" id="modalConfirmBtn" onclick="confirmWithdrawal()">
+                    Confirm
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    
+    <script src="../auth.js"></script>
+    <!-- Supabase CDN — must load before supabase.js and withdraw.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase.js"></script>
+    <script src="../main.js"></script>
+    <script src="../chat-widget.js"></script>
+    <script src="./withdraw.js"></script>
+</body>
+
+</html>

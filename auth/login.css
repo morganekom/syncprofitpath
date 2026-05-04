@@ -1,0 +1,221 @@
+/* login.css
+   Inherits everything from signup.css
+   Only adds login-specific styles
+*/
+
+
+/* ========================= LOGIN BOX ========================= */
+.login-box {
+    width: 100%;
+    max-width: 42rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.login-header h2 {
+    font-size: 2.2rem;
+    color: var(--color-dark);
+    margin-bottom: 0.4rem;
+}
+
+.login-header p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+}
+
+
+/* ========================= SAVED ACCOUNTS ========================= */
+.saved-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    margin-bottom: 0.8rem;
+}
+
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+/* Each saved account card */
+.saved-account-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-white);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: var(--transition);
+    gap: 1rem;
+}
+
+.saved-account-card:hover {
+    border-color: var(--color-primary);
+}
+
+.saved-account-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+/* Avatar circle with initials */
+.saved-avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    flex-shrink: 0;
+}
+
+.saved-account-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.saved-account-email {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    margin-top: 0.2rem;
+}
+
+.saved-account-card i {
+    font-size: 1.6rem;
+    color: var(--color-gray-light);
+    transition: var(--transition);
+}
+
+.saved-account-card:hover i {
+    color: var(--color-primary);
+}
+
+/* "Use a different account" button */
+.use-different-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.use-different-btn:hover {
+    opacity: 0.75;
+}
+
+.use-different-btn i {
+    font-size: 1.4rem;
+}
+
+
+/* ========================= LOGIN OPTIONS ROW ========================= */
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.remember-check {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+}
+
+.remember-check input[type="checkbox"] {
+    width: 1.5rem;
+    height: 1.5rem;
+    appearance: auto;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.forgot-link {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+
+/* ========================= DIVIDER ========================= */
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.login-divider span {
+    flex: 1;
+    height: 1px;
+    background: var(--color-light);
+}
+
+.login-divider p {
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+
+/* ========================= FORGOT PASSWORD MESSAGE ========================= */
+.forgot-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    animation: fadeIn 300ms ease;
+}
+
+.forgot-icon {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.forgot-icon i {
+    font-size: 2.8rem;
+    color: var(--color-primary);
+}
+
+.forgot-msg h3 {
+    font-size: 1.6rem;
+    color: var(--color-dark);
+}
+
+.forgot-msg p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    max-width: 30rem;
+    line-height: 1.6;
+}

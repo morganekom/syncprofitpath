@@ -1,0 +1,535 @@
+/* refer.css
+   Follows the same variable system, card style, and layout patterns as settings.css
+*/
+
+body {
+    grid-template-columns: 17rem auto;
+}
+
+
+/* ========================= REFER SECTION ========================= */
+.refer-section {
+    margin-top: 7rem;
+    margin-right: 2.9vw;
+    padding-bottom: 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.refer-section>h1 {
+    color: var(--color-dark);
+    margin-bottom: 0;
+}
+
+.refer-subtitle {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    margin-top: -1.4rem;
+}
+
+
+/* ========================= HOW IT WORKS ========================= */
+.how-it-works {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding) 2rem;
+}
+
+.how-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.8rem;
+    padding: 1rem;
+}
+
+.how-icon {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.how-icon i {
+    font-size: 2.2rem;
+}
+
+.how-step h5 {
+    font-size: 1.2rem;
+    color: var(--color-dark);
+}
+
+.how-step p {
+    color: var(--color-gray-light);
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+.how-divider {
+    color: var(--color-gray-light);
+    font-size: 2.4rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+
+/* ========================= STATS ROW ========================= */
+.refer-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.refer-stat-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    transition: var(--transition);
+}
+
+.refer-stat-card:hover {
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+    width: 5rem;
+    height: 5rem;
+    border-radius: var(--radius-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon i {
+    font-size: 2.2rem;
+}
+
+.stat-info h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-dark);
+    line-height: 1.1;
+}
+
+.stat-info p {
+    color: var(--color-gray-light);
+    font-size: 1.05rem;
+    margin-top: 0.2rem;
+}
+
+
+/* ========================= MAIN GRID ========================= */
+.refer-grid {
+    display: grid;
+    grid-template-columns: 1fr 38rem;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.refer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+
+/* ========================= REFER CARD (shared) ========================= */
+.refer-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.card-title {
+    color: var(--color-dark);
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.card-subtitle {
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+    margin-top: -0.6rem;
+}
+
+
+/* ========================= CODE DISPLAY ========================= */
+.code-display {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.6rem;
+}
+
+.code-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: 0.2rem;
+    flex: 1;
+}
+
+
+/* ========================= LINK ROW ========================= */
+.link-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.refer-input {
+    flex: 1;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    font-family: "Poppins", sans-serif;
+    border: 2px solid transparent;
+    transition: var(--transition);
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+
+/* ========================= COPY BUTTON ========================= */
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-dark);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-2);
+    padding: 1.1rem 1.6rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.copy-btn i {
+    font-size: 1.4rem;
+    color: inherit;
+}
+
+.copy-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.copy-btn.copied {
+    background: var(--color-success);
+    color: white;
+}
+
+.copy-feedback {
+    font-size: 1.1rem;
+    color: var(--color-success);
+    min-height: 1.4rem;
+}
+
+
+/* ========================= SHARE ACTIONS ========================= */
+.share-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.share-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.6rem;
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.share-btn i {
+    font-size: 1.5rem;
+    color: inherit;
+}
+
+.share-btn.whatsapp {
+    background: rgba(37, 211, 102, 0.12);
+    color: #128c5e;
+}
+
+.share-btn.whatsapp:hover {
+    background: rgba(37, 211, 102, 0.25);
+}
+
+.share-btn.twitter {
+    background: rgba(29, 161, 242, 0.12);
+    color: #1da1f2;
+}
+
+.share-btn.twitter:hover {
+    background: rgba(29, 161, 242, 0.25);
+}
+
+.share-btn.email {
+    background: var(--color-light);
+    color: var(--color-gray-dark);
+}
+
+.share-btn.email:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+
+/* ========================= ACTIVITY CARD ========================= */
+.refer-activity-card {
+    gap: 1rem;
+}
+
+/* Empty state */
+.refer-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    gap: 0.6rem;
+    text-align: center;
+    color: var(--color-gray-light);
+}
+
+.refer-empty i {
+    font-size: 4rem;
+    color: var(--color-gray-light);
+    opacity: 0.4;
+}
+
+.refer-empty p {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.refer-empty small {
+    color: var(--color-gray-light);
+    font-size: 1.05rem;
+}
+
+
+/* ========================= HISTORY LIST ========================= */
+.refer-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    list-style: none;
+}
+
+.refer-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--color-light);
+    transition: var(--transition);
+}
+
+.refer-history-item:last-child {
+    border-bottom: none;
+}
+
+.refer-history-item:hover {
+    background: var(--color-light);
+    border-radius: var(--radius-1);
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+}
+
+.history-avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--color-dark);
+    flex-shrink: 0;
+}
+
+.history-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-date {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    margin-top: 0.2rem;
+}
+
+.history-status {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.history-status.active {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.history-status.pending {
+    background: rgba(234, 181, 7, 0.15);
+    color: var(--color-warning);
+}
+
+
+/* ========================= MEDIA QUERIES (tablet) ========================= */
+@media screen and (max-width: 1024px) {
+    body {
+        grid-template-columns: 1fr;
+    }
+
+    .refer-section {
+        margin-right: 2.9vw;
+    }
+
+    .refer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .refer-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .how-it-works {
+        gap: 0;
+        padding: var(--card-padding) 1rem;
+    }
+}
+
+
+/* ========================= MEDIA QUERIES (mobile) ========================= */
+@media screen and (max-width: 600px) {
+    .refer-section {
+        margin-top: 6rem;
+        margin-left: 2.9vw;
+    }
+
+    .refer-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .refer-stat-card {
+        gap: 1rem;
+    }
+
+    .how-it-works {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .how-step {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+        padding: 0.6rem 0;
+    }
+
+    .how-icon {
+        width: 4rem;
+        height: 4rem;
+        flex-shrink: 0;
+    }
+
+    .how-divider {
+        transform: rotate(90deg);
+        margin-left: 1.8rem;
+        font-size: 1.8rem;
+    }
+
+    .link-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .refer-input {
+        width: 100%;
+    }
+
+    .copy-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .code-display {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .code-display .copy-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .share-actions {
+        flex-direction: column;
+    }
+
+    .share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
