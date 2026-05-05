@@ -1,3 +1,5 @@
+const AUTH_FUNCTION_URL = 'https://syqdwottzrhpclnvzdmz.supabase.co/functions/v1/auth-handler';
+
 // ================================================================
 // SIGNUP.JS — Connected to Supabase
 // ================================================================
@@ -247,7 +249,7 @@ async function submitSignup() {
             state:            val('state'),
             city:             val('city'),
             postal_code:      val('postalCode'),
-            password,
+            password: hashedPassword,
             referral_code:    val('referralCode'),  // code they USED to sign up
             my_referral_code: myReferralCode,        // code they SHARE with others
             role:             'user',
