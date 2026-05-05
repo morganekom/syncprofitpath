@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="...">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncProfitPath</title>
+    <!-- ICONSCOUT CDN -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <!-- CUSTOM CSS -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./settings.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../index.html" class="nav_logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="search">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn">
+                    <i class="uil uil-moon"></i>
+                </button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../assets/profile-1.jpg" alt="Profile Photo" data-fallback="../assets/profile-1.jpg">
+                    </div>
+                    <h5 id="navName">User Name</h5>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <button class="nav_menu-btn">
+                    <i class="uil uil-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../index.html">
+            <i class="uil uil-create-dashboard"></i>
+            <h5>Dashboard</h5>
+        </a>
+        <a href="../deposit/deposit.html">
+            <i class="uil uil-arrow-circle-down"></i>
+            <h5>Deposit</h5>
+        </a>
+        <a href="../invest/invest.html">
+            <i class="uil uil-diamond"></i>
+            <h5>Invest</h5>
+        </a>
+        <a href="../withdraw/withdraw.html">
+            <i class="uil uil-arrow-circle-up"></i>
+            <h5>Withdraw</h5>
+        </a>
+        <a href="../transactions/transactions.html">
+            <i class="uil uil-history"></i>
+            <h5>Transactions</h5>
+        </a>
+        <a href="../refer/refer.html">
+            <i class="uil uil-user-plus"></i>
+            <h5>Refer & Earn</h5>
+        </a>
+        <a href="./settings.html" class="active">
+            <i class="uil uil-setting"></i>
+            <h5>Settings</h5>
+        </a>
+        <button class="sidebar_close-btn">
+            <i class="uil uil-multiply"></i>
+        </button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i>
+            <h5>Logout</h5>
+        </button>
+    </menu>
+
+    <!--==================== SETTINGS MAIN ====================-->
+    <section class="settings-section">
+        <h1>Settings</h1>
+
+        <!-- ── TAB NAV ── -->
+        <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="profile">
+                <i class="uil uil-user-circle"></i> Profile
+            </button>
+            <button class="tab-btn" data-tab="security">
+                <i class="uil uil-lock"></i> Security
+            </button>
+            <button class="tab-btn" data-tab="kyc">
+                <i class="uil uil-shield-check"></i> KYC
+            </button>
+            <button class="tab-btn" data-tab="withdrawal" id="withdrawalTab">
+                <i class="uil uil-money-withdraw"></i> Withdrawal
+            </button>
+        </div>
+
+
+        <!-- ══════════════════════════════════════
+             TAB 1 — PROFILE
+        ══════════════════════════════════════ -->
+        <div class="tab-content active" id="tab-profile">
+
+            <!-- Profile photo -->
+            <div class="settings-card">
+                <div class="profile-photo-section">
+                    <div class="profile-photo-wrap">
+                        <img src="../assets/profile-1.jpg" alt="Profile" id="profilePhotoPreview">
+                        <label class="photo-edit-btn" for="profilePhotoInput" title="Change photo">
+                            <i class="uil uil-camera"></i>
+                        </label>
+                        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none">
+                    </div>
+                    <div class="profile-photo-info">
+                        <h3 id="profileDisplayName">Divine Godwin</h3>
+                        <p id="profileDisplayEmail">divine@example.com</p>
+                        <!-- KYC verified badge — green when admin approves -->
+                        <span class="kyc-badge" id="kycBadge">
+                            <i class="uil uil-shield-check"></i>
+                            <span id="kycBadgeText">Unverified</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile form -->
+            <div class="settings-card" id="profileForm">
+                <h3 class="card-title">Personal Information</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="firstName" class="settings-input" placeholder="First name">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="lastName" class="settings-input" placeholder="Last name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="profileEmail" class="settings-input" placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="profilePhone" class="settings-input" placeholder="+1 234 567 8900">
+                </div>
+
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" id="profileCountry" class="settings-input" placeholder="Your country">
+                </div>
+
+                <p class="form-error" id="profileError"></p>
+                <p class="form-success" id="profileSuccess"></p>
+
+                <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ══════════════════════════════════════
+             TAB 2 — SECURITY
+        ══════════════════════════════════════ -->
+        <div class="tab-content" id="tab-security">
+
+            <!-- Change Password -->
+            <div class="settings-card">
+                <h3 class="card-title">Change Password</h3>
+
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <div class="input-password-wrap">
+                        <input type="password" id="currentPassword" class="settings-input"
+                            placeholder="Enter current password">
+                        <button class="toggle-pw-btn" onclick="togglePassword('currentPassword', this)">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>New Password</label>
+                    <div class="input-password-wrap">
+                        <input type="password" id="newPassword" class="settings-input"
+                            placeholder="At least 8 characters">
+                        <button class="toggle-pw-btn" onclick="togglePassword('newPassword', this)">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                    </div>
+                    <!-- Password strength bar -->
+                    <div class="strength-bar-wrap" id="strengthWrap">
+                        <div class="strength-bar" id="strengthBar"></div>
+                    </div>
+                    <p class="strength-label" id="strengthLabel"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <div class="input-password-wrap">
+                        <input type="password" id="confirmPassword" class="settings-input"
+                            placeholder="Repeat new password">
+                        <button class="toggle-pw-btn" onclick="togglePassword('confirmPassword', this)">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="form-error" id="passwordError"></p>
+                <p class="form-success" id="passwordSuccess"></p>
+
+                <button class="save-btn" onclick="savePassword()">Update Password</button>
+            </div>
+
+            <!-- 2FA -->
+            <div class="settings-card">
+                <div class="toggle-row">
+                    <div>
+                        <h3 class="card-title">Two-Factor Authentication</h3>
+                        <p class="card-subtitle">Add an extra layer of security to your account</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="twoFAToggle" onchange="toggle2FA(this)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <p class="form-success" id="twoFAMsg"></p>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════════════════════
+             TAB 3 — KYC
+        ══════════════════════════════════════ -->
+        <div class="tab-content" id="tab-kyc">
+
+            <!-- KYC status banner -->
+            <div class="kyc-status-banner" id="kycStatusBanner">
+                <div class="kyc-status-icon" id="kycStatusIcon">
+                    <i class="uil uil-clock" id="kycStatusIconEl"></i>
+                </div>
+                <div>
+                    <h3 id="kycStatusTitle">Verification Pending</h3>
+                    <p id="kycStatusDesc">Submit your documents below to verify your identity.</p>
+                </div>
+            </div>
+
+            <!-- KYC form -->
+            <div class="settings-card" id="kycFormCard">
+                <h3 class="card-title">Identity Verification</h3>
+                <p class="card-subtitle">Upload a government-issued ID and proof of address to verify your account.</p>
+
+                <!-- ID Type -->
+                <div class="form-group" style="margin-top:1.4rem;">
+                    <label>ID Type</label>
+                    <select id="idType" class="settings-input settings-select">
+                        <option value="">Select ID type</option>
+                        <option value="passport">Passport</option>
+                        <option value="national_id">National ID Card</option>
+                        <option value="drivers_license">Driver's License</option>
+                    </select>
+                </div>
+
+                <!-- ID Upload -->
+                <div class="form-group">
+                    <label>Upload Government ID <span class="required">*</span></label>
+                    <label class="file-upload-label" for="kycIdFile">
+                        <i class="uil uil-id-card" style="font-size:2.4rem; color:var(--color-primary);"></i>
+                        <div class="upload-text">
+                            <strong>Click to upload ID</strong>
+                            <small>PNG, JPG or PDF — max 5MB</small>
+                        </div>
+                    </label>
+                    <input type="file" id="kycIdFile" accept="image/*,.pdf" style="display:none"
+                        onchange="showKycFileName(this, 'kycIdName')">
+                    <p class="file-chosen" id="kycIdName"></p>
+                </div>
+
+                <!-- Address proof Upload -->
+                <div class="form-group">
+                    <label>Upload Proof of Address <span class="required">*</span></label>
+                    <label class="file-upload-label" for="kycAddressFile">
+                        <i class="uil uil-map-marker" style="font-size:2.4rem; color:var(--color-primary);"></i>
+                        <div class="upload-text">
+                            <strong>Click to upload address proof</strong>
+                            <small>Utility bill, bank statement — max 5MB</small>
+                        </div>
+                    </label>
+                    <input type="file" id="kycAddressFile" accept="image/*,.pdf" style="display:none"
+                        onchange="showKycFileName(this, 'kycAddressName')">
+                    <p class="file-chosen" id="kycAddressName"></p>
+                </div>
+
+                <p class="form-error" id="kycError"></p>
+                <p class="form-success" id="kycFormSuccess"></p>
+
+                <button class="save-btn" id="kycSubmitBtn" onclick="submitKyc()">
+                    Submit for Verification
+                </button>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════════════════════
+             TAB 4 — WITHDRAWAL DETAILS
+             id="withdrawal" allows direct link from withdraw page
+        ══════════════════════════════════════ -->
+        <div class="tab-content" id="tab-withdrawal">
+
+            <!-- Bank Account -->
+            <div class="settings-card">
+                <div class="card-title-row">
+                    <h3 class="card-title">Bank Account</h3>
+                    <span class="detail-saved-badge" id="bankSavedBadge" style="display:none;">
+                        <i class="uil uil-check-circle"></i> Saved
+                    </span>
+                </div>
+                <p class="card-subtitle">This account will be used for bank withdrawal requests.</p>
+
+                <div class="form-group" style="margin-top:1.4rem;">
+                    <label>Account Name</label>
+                    <input type="text" id="bankAccountName" class="settings-input" placeholder="Full name on account">
+                </div>
+
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" id="bankName" class="settings-input" placeholder="e.g. Chase, Barclays">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" id="bankAccountNumber" class="settings-input" placeholder="Account number">
+                </div>
+
+                <div class="form-group">
+                    <label>Routing / Sort Code</label>
+                    <input type="text" id="bankRoutingCode" class="settings-input" placeholder="Routing or sort code">
+                </div>
+
+                <p class="form-error" id="bankError"></p>
+                <p class="form-success" id="bankSuccess"></p>
+
+                <button class="save-btn" id="saveBankBtn" onclick="saveBankDetails()">Save Bank Details</button>
+            </div>
+
+
+            <!-- Crypto Wallet -->
+            <div class="settings-card">
+                <div class="card-title-row">
+                    <h3 class="card-title">Crypto Withdrawal Wallet</h3>
+                    <span class="detail-saved-badge" id="cryptoSavedBadge" style="display:none;">
+                        <i class="uil uil-check-circle"></i> Saved
+                    </span>
+                </div>
+                <p class="card-subtitle">Withdrawals via crypto will be sent to this wallet.</p>
+
+                <div class="form-group" style="margin-top:1.4rem;">
+                    <label>Coin / Network</label>
+                    <select id="withdrawCoin" class="settings-input settings-select" onchange="updateCoinName()">
+                        <option value="">Select coin</option>
+                        <option value="btc">Bitcoin (BTC)</option>
+                        <option value="eth">Ethereum (ETH)</option>
+                        <option value="usdt">Tether (USDT)</option>
+                        <option value="bnb">BNB (BNB)</option>
+                        <option value="sol">Solana (SOL)</option>
+                        <option value="ltc">Litecoin (LTC)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Wallet Address</label>
+                    <input type="text" id="cryptoWalletAddress" class="settings-input"
+                        placeholder="Your wallet address">
+                </div>
+
+                <p class="form-error" id="cryptoError"></p>
+                <p class="form-success" id="cryptoSuccess"></p>
+
+                <button class="save-btn" id="saveCryptoBtn" onclick="saveCryptoDetails()">Save Crypto Details</button>
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../main.js"></script>
+    <script src="../chat-widget.js"></script>
+    <script src="./settings.js"></script>
+</body>
+
+</html>
