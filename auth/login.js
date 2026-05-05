@@ -142,22 +142,22 @@ async function submitLogin() {
     btn.disabled  = true;
 
     const loginRes = await fetch(AUTH_FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'login', email, password })
-});
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password })
+    });
 const loginData = await loginRes.json();
 
 if (!loginRes.ok || !loginData.success) {
-    document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
-    document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
-    document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
-    btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
-    btn.disabled  = false;
-    return;
+        document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
+        document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
+        document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
+        btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+        btn.disabled  = false;
+        return;
     }
 
-const user = loginData.user;
+    const user = loginData.user;
 
     // Update last login timestamp
     await db
