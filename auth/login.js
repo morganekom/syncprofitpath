@@ -1,3 +1,5 @@
+const AUTH_FUNCTION_URL = 'https://syqdwottzrhpclnvzdmz.supabase.co/functions/v1/auth-handler';
+
 // ================================================================
 // LOGIN.JS — Connected to Supabase
 // ================================================================
@@ -159,12 +161,7 @@ if (!loginRes.ok || !loginData.success) {
 
     const user = loginData.user;
 
-    // Update last login timestamp
-    await db
-        .from('users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', user.id);
-
+    // Update last login timestamp
     saveSession(user);
 
     if (remember) {
