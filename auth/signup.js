@@ -235,6 +235,21 @@ async function submitSignup() {
     // referral_code    = the code they typed in at signup (someone else's code)
     const myReferralCode = generateMyReferralCode(firstName);
 
+    // Hash password via Edge Function
+    const hashRes = await fetch(AUTH_FUNCTION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'signup', password })
+});
+    const hashData = await hashRes.json();
+    if (!hashRes.ok || !hashData.hashedPassword) {
+   document.getElementById('signupError').textContent = 'Could not process your account. Please try again.';
+    submitBtn.innerHTML = 'Create Account <i class="uil uil-check"></i>';
+    submitBtn.disabled = false;
+    return;
+}
+const hashedPassword = hashData.hashedPassword;
+
     // ── INSERT INTO SUPABASE ──
     const { data, error } = await db
         .from('users')
