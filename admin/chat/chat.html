@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="...">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat — SyncProfitPath Admin</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../admin.css">
+    <link rel="stylesheet" href="./chat.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../index.html" class="nav_logo">
+                <img src="../../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" id="chatSearch" placeholder="Search conversations…" oninput="filterConversations()">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn"><i class="uil uil-moon"></i></button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../../assets/profile-1.jpg" alt="Admin">
+                    </div>
+                    <h5 id="navName">Admin</h5>
+                    <span class="admin-badge">Admin</span>
+                </div>
+                <button class="nav_menu-btn"><i class="uil uil-bars"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../index.html">
+            <i class="uil uil-create-dashboard"></i><h5>Overview</h5>
+        </a>
+        <a href="../users/users.html">
+            <i class="uil uil-users-alt"></i><h5>Users</h5>
+        </a>
+        <a href="../deposit/deposit.html">
+            <i class="uil uil-arrow-circle-down"></i><h5>Deposits</h5>
+        </a>
+        <a href="../withdrawals/withdrawals.html">
+            <i class="uil uil-arrow-circle-up"></i><h5>Withdrawals</h5>
+        </a>
+                <a href="../investments/investments.html">
+            <i class="uil uil-diamond"></i>
+            <h5>Investments</h5>
+        </a>
+<a href="../kyc/kyc.html">
+            <i class="uil uil-shield-check"></i><h5>KYC</h5>
+        </a>
+        <a href="./chat.html" class="active">
+            <i class="uil uil-comments-alt"></i><h5>Messages</h5>
+        </a>
+        <div class="sidebar-divider"></div>
+        <a href="../../index.html" class="sidebar-user-link">
+            <i class="uil uil-exit"></i><h5>User View</h5>
+        </a>
+        <button class="sidebar_close-btn"><i class="uil uil-multiply"></i></button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i><h5>Logout</h5>
+        </button>
+    </menu>
+
+    <!--==================== CHAT LAYOUT ====================-->
+    <main class="admin-main chat-layout">
+
+        <!-- Left: conversation list -->
+        <aside class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <h2>Conversations</h2>
+                <span class="unread-total" id="unreadTotal"></span>
+            </div>
+
+            <!-- Loading -->
+            <div id="convoLoading" class="admin-loading">
+                <div class="admin-skeleton"></div>
+                <div class="admin-skeleton"></div>
+                <div class="admin-skeleton"></div>
+            </div>
+
+            <!-- Empty -->
+            <div class="admin-empty" id="convoEmpty" style="display:none;">
+                <i class="uil uil-comment-slash"></i>
+                <p>No conversations yet.</p>
+            </div>
+
+            <!-- List -->
+            <ul class="convo-list" id="convoList" style="display:none;"></ul>
+        </aside>
+
+        <!-- Right: message thread -->
+        <section class="chat-thread" id="chatThread">
+
+            <!-- Placeholder when no convo selected -->
+            <div class="chat-placeholder" id="chatPlaceholder">
+                <i class="uil uil-comments-alt"></i>
+                <h3>Select a conversation</h3>
+                <p>Choose a user from the list to view and reply to their messages.</p>
+            </div>
+
+            <!-- Active thread (hidden until convo selected) -->
+            <div class="chat-thread-inner" id="chatThreadInner" style="display:none;">
+
+                <!-- Thread header -->
+                <div class="chat-thread-header">
+                    <div class="chat-thread-user">
+                        <div class="admin-item-avatar" id="threadAvatar">?</div>
+                        <div>
+                            <h3 id="threadName">—</h3>
+                            <p id="threadEmail">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Reply box -->
+                <div class="chat-reply-box">
+                    <textarea
+                        id="replyInput"
+                        class="chat-reply-input"
+                        placeholder="Type your reply…"
+                        rows="2"
+                        onkeydown="handleReplyKey(event)">
+                    </textarea>
+                    <button class="chat-send-btn" onclick="sendReply()">
+                        <i class="uil uil-message"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../supabase.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../admin.js"></script>
+    <script src="./chat.js"></script>
+</body>
+</html>
