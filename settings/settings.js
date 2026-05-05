@@ -82,14 +82,14 @@ function loadAllSavedData() {
 
     // Helper: apply a photo URL (or clear to blank avatar) everywhere on this page
     function applyPhoto(url) {
-    const preview  = document.getElementById('profilePhotoPreview');
-    const navPhoto = document.querySelector('.nav_profile-photo img');
-    const fallback = '../assets/profile-1.jpg';
-    const src      = url || fallback;
+        const preview  = document.getElementById('profilePhotoPreview');
+        const navPhoto = document.querySelector('.nav_profile-photo img');
+        const fallback = '../assets/profile-1.jpg';
+        const src      = url || fallback;
 
-    if (preview)  { preview.src  = src; preview.style.display  = ''; }
-    if (navPhoto) { navPhoto.src = src; navPhoto.style.display = ''; }
-}
+        if (preview)  { preview.src  = src; preview.style.display  = ''; }
+        if (navPhoto) { navPhoto.src = src; navPhoto.style.display = ''; }
+    }
 
     // Show cached photo instantly (avoids flash of dummy image)
     const _photoKey   = _currentUser.id ? `profilePhoto_${_currentUser.id}` : null;
