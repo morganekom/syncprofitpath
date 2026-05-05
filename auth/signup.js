@@ -237,8 +237,8 @@ async function submitSignup() {
 
     // Hash password via Edge Function
     const hashRes = await fetch(AUTH_FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'signup', password })
 });
     const hashData = await hashRes.json();
