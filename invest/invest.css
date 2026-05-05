@@ -623,9 +623,8 @@ body {
 
 /* ========================= MEDIA QUERIES (mobile) ========================= */
 @media screen and (max-width: 600px) {
-    .invest-section {
-        margin-top: 6rem;
-        margin-left: 2;
+    .invest-section {
+        margin-left: 2vw;
     }
 
     .plans-grid {
