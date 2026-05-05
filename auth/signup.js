@@ -243,12 +243,12 @@ async function submitSignup() {
     });
     const hashData = await hashRes.json();
     if (!hashRes.ok || !hashData.hashedPassword) {
-   document.getElementById('signupError').textContent = 'Could not process your account. Please try again.';
-    submitBtn.innerHTML = 'Create Account <i class="uil uil-check"></i>';
-    submitBtn.disabled = false;
-    return;
-}
-const hashedPassword = hashData.hashedPassword;
+           document.getElementById('signupError').textContent = 'Could not process your account. Please try again.';
+        submitBtn.innerHTML = 'Create Account <i class="uil uil-check"></i>';
+        submitBtn.disabled = false;
+        return;
+    }
+    const hashedPassword = hashData.hashedPassword;
 
     // ── INSERT INTO SUPABASE ──
     const { data, error } = await db
