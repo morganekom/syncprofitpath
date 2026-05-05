@@ -613,8 +613,9 @@ body {
     }
 
     .invest-section {
-        margin-right: 1rem;
-        padding: 0 1rem 5rem;
+        margin-right: 2.9vw;
+        padding-bottom: 5rem;
+        /* Remove horizontal padding — margin handles spacing */
     }
 
     .plans-grid {
@@ -625,13 +626,29 @@ body {
 
 /* ========================= MEDIA QUERIES (mobile) ========================= */
 @media screen and (max-width: 600px) {
-    .invest-section {
-        margin-left: 2vw;
-        gap: 1rem;
+    .invest-section {
+        margin-top: 6rem;
+        margin-left: 2.9vw;
+        margin-right: 2.9vw;
+        padding-bottom: 5rem;
+        /* No horizontal padding — margins do the job */
     }
 
     .plans-grid {
         grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+        /* Prevent card content from pushing wider than viewport */
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .plan-row {
+        /* Allow right-side values to wrap if very long */
+        flex-wrap: wrap;
+        gap: 0.4rem;
     }
 
     .calculator-card {
@@ -640,14 +657,14 @@ body {
 
     .modal {
         margin: 0 1rem;
-        max-width: 100%;
+        max-width: calc(100vw - 2rem);
+        box-sizing: border-box;
     }
 
     .modal-footer {
         flex-direction: column;
     }
 
-    /* Slightly smaller coin icons on mobile */
     .modal-coin-icon {
         width: 2.6rem;
         height: 2.6rem;
