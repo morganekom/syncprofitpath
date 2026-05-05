@@ -239,8 +239,8 @@ async function submitSignup() {
     const hashRes = await fetch(AUTH_FUNCTION_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'signup', password })
-});
+        body: JSON.stringify({ action: 'signup', password })
+    });
     const hashData = await hashRes.json();
     if (!hashRes.ok || !hashData.hashedPassword) {
    document.getElementById('signupError').textContent = 'Could not process your account. Please try again.';
