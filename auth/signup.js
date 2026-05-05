@@ -242,6 +242,7 @@ async function submitSignup() {
         body: JSON.stringify({ action: 'signup', password })
     });
     const hashData = await hashRes.json();
+    console.log('Hash response:', hashRes.status, hashData);
     if (!hashRes.ok || !hashData.hashedPassword) {
         document.getElementById('signupError').textContent = 'Could not process your account. Please try again.';
         submitBtn.innerHTML = 'Create Account <i class="uil uil-check"></i>';
