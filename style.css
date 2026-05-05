@@ -54,6 +54,11 @@
     box-sizing: border-box;
 }
 
+html,body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
 html {
     font-size: 12px;
 }
