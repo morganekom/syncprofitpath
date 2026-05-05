@@ -141,21 +141,23 @@ async function submitLogin() {
     btn.innerHTML = 'Signing in... <i class="uil uil-spinner"></i>';
     btn.disabled  = true;
 
-    const { data: user, error } = await db
-        .from('users')
-        .select('*')
-        .eq('email', email.toLowerCase())
-        .eq('password', password)
-        .maybeSingle();
+    const loginRes = await fetch(AUTH_FUNCTION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'login', email, password })
+});
+const loginData = await loginRes.json();
 
-    if (error || !user) {
-        document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
-        document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
-        document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
-        btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
-        btn.disabled  = false;
-        return;
+if (!loginRes.ok || !loginData.success) {
+    document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
+    document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
+    document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
+    btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+    btn.disabled  = false;
+    return;
     }
+
+const user = loginData.user;
 
     // Update last login timestamp
     await db
