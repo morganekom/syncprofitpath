@@ -627,6 +627,7 @@ body {
 @media screen and (max-width: 600px) {
     .invest-section {
         margin-left: 2vw;
+        gap: 1rem;
     }
 
     .plans-grid {
