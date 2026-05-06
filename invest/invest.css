@@ -634,7 +634,10 @@ body {
     }
 
     .plans-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* grid-template-columns: 1fr; */
     }
 
     .plan-card {
