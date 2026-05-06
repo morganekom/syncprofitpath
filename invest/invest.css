@@ -631,7 +631,8 @@ body {
     }
 
     .plans-grid {
-        grid-template-columns: 1fr;
+        /* grid-template-columns: 1fr; */
+        flex-direction: column;
     }
 
     .calculator-card {
