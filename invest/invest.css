@@ -234,10 +234,15 @@ body {
     font-weight: 600;
 }
 
+#calcAmountDisplay {
+    display: none;
+}
+
 .calc-input {
     flex: 1;
     background: transparent;
     font-size: 1.3rem;
+    font-weight: 700;
     color: var(--color-dark);
     font-family: "Poppins", sans-serif;
     border: none;
