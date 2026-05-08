@@ -700,7 +700,6 @@ canvas {
         display: none;
         padding-top: 5rem;
         padding-bottom: 2rem;
-        height: 100vh;
         overflow-y: auto;
     }
 
