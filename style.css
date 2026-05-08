@@ -762,6 +762,10 @@ canvas {
     .nav_profile-wrapper span {
         display: none;
     }
+    
+    .nav_logo {
+        margin-left: 3rem;
+    }
 
     .main_cards {
         grid-template-columns: 1fr;
