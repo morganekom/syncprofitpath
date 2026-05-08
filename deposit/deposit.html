@@ -303,15 +303,50 @@
             </div><!-- end form-card 1 -->
 
 
-            <!-- ── CONTAINER 2: Amount ── -->
+            <!-- ── CONTAINER 2: Local Currency + Amount ── -->
             <div class="form-card">
-                <h3>Enter Amount (USD)</h3>
+                <h3>Enter Deposit Amount</h3>
+
+                <!-- Step 1: pick local currency -->
+                <div class="local-currency-row">
+                    <label class="local-currency-label" for="localCurrencySelect">
+                        Your currency
+                    </label>
+                    <div class="local-currency-wrap">
+                        <select id="localCurrencySelect" class="local-currency-select" onchange="onCurrencyChange()">
+                            <option value="USD" data-symbol="$">🇺🇸 USD — US Dollar</option>
+                            <option value="EUR" data-symbol="€">🇪🇺 EUR — Euro</option>
+                            <option value="GBP" data-symbol="£">🇬🇧 GBP — British Pound</option>
+                            <option value="NGN" data-symbol="₦">🇳🇬 NGN — Nigerian Naira</option>
+                            <option value="GHS" data-symbol="₵">🇬🇭 GHS — Ghanaian Cedi</option>
+                            <option value="KES" data-symbol="KSh">🇰🇪 KES — Kenyan Shilling</option>
+                            <option value="ZAR" data-symbol="R">🇿🇦 ZAR — South African Rand</option>
+                            <option value="CAD" data-symbol="C$">🇨🇦 CAD — Canadian Dollar</option>
+                            <option value="AUD" data-symbol="A$">🇦🇺 AUD — Australian Dollar</option>
+                            <option value="INR" data-symbol="₹">🇮🇳 INR — Indian Rupee</option>
+                            <option value="AED" data-symbol="د.إ">🇦🇪 AED — UAE Dirham</option>
+                            <option value="EGP" data-symbol="E£">🇪🇬 EGP — Egyptian Pound</option>
+                            <option value="TZS" data-symbol="TSh">🇹🇿 TZS — Tanzanian Shilling</option>
+                            <option value="UGX" data-symbol="USh">🇺🇬 UGX — Ugandan Shilling</option>
+                            <option value="XOF" data-symbol="CFA">🌍 XOF — West African CFA</option>
+                        </select>
+                        <!-- Rate fetch status -->
+                        <span class="rate-status" id="rateStatus"></span>
+                    </div>
+                </div>
+
+                <!-- Step 2: enter amount in local currency -->
                 <div class="amount-wrapper">
-                    <span>$</span>
-                    <!-- id="amountInput" connects this to deposit.js validation -->
+                    <span id="currencySymbol">$</span>
                     <input class="amount-input" id="amountInput" type="number" min="0" placeholder="0.00" />
                 </div>
-                <!-- Error message shown under amount when invalid -->
+
+                <!-- Live USD conversion preview -->
+                <div class="usd-preview" id="usdPreview" style="display:none;">
+                    <i class="uil uil-exchange"></i>
+                    <span>≈ <strong id="usdEquivalent">$0.00</strong> USD will be credited to your account</span>
+                </div>
+
                 <p class="field-error" id="amountError"></p>
             </div>
 
