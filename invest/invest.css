@@ -5,6 +5,7 @@
 
 body {
     grid-template-columns: 17rem auto;
+    overflow-x: hidden;
 }
 
 
