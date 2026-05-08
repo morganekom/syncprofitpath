@@ -696,7 +696,7 @@ canvas {
         left: -100%;
         z-index: 3;
         background: var(--color-white);
-        width: 22rem;
+        width: 17rem;
         max-width: 75vw;
         border-radius: 0 var(--radius-3) var(--radius-3) 0;
         box-shadow: 2rem 0 4rem rgba(0, 0, 0, 0.18);
