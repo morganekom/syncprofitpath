@@ -770,6 +770,13 @@ canvas {
         align-items: flex-start;
         margin-top: 3.rem;
     }
+
+    .sidebar_close-btn {
+        display: inline-flex;
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+    }
 }
 
 /* ========================= LOGOUT BUTTON (sidebar) ========================= */
