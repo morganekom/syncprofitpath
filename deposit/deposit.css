@@ -515,6 +515,83 @@ body {
     box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
 }
 
+/* ── Paste at the bottom of deposit.css ── */
+
+/* Local currency selector row */
+.local-currency-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.4rem;
+}
+
+.local-currency-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.local-currency-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.local-currency-select {
+    flex: 1;
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    padding: 1rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: auto;
+}
+
+.local-currency-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-white);
+}
+
+.rate-status {
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* USD conversion preview */
+.usd-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--color-primary-light, rgba(0,226,123,0.1));
+    border-radius: var(--radius-1);
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    margin-top: 0.8rem;
+}
+
+.usd-preview i {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.usd-preview strong {
+    color: var(--color-dark);
+}
+
+
+
+
+
+
 
 /* ========================= MEDIA QUERIES (tablets) ========================= */
 @media screen and (max-width: 1024px) {
