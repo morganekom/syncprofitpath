@@ -219,3 +219,51 @@
     max-width: 30rem;
     line-height: 1.6;
 }
+
+
+
+
+
+
+
+
+
+
+
+/* ── Paste at the bottom of login.css ── */
+
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1.2rem;
+    border-radius: var(--radius-2, 1rem);
+    border: 2px solid var(--color-light, #f0eff5);
+    background: var(--color-white, #fff);
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark, #27282f);
+    cursor: pointer;
+    transition: all 280ms ease;
+}
+
+.google-btn:hover {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12);
+    background: var(--color-white, #fff);
+}
+
+.google-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.google-btn img {
+    width: 1.8rem;
+    height: 1.8rem;
+    object-fit: contain;
+    display: inline-block;
+}
