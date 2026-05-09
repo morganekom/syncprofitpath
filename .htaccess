@@ -1,0 +1,47 @@
+Options -Indexes
+RewriteEngine On
+
+# ── Remove .html extension ──
+# If the request is not a real file or directory,
+# try adding .html to find the file
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L,QSA]
+
+# ── Remove trailing slash ──
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# ── Clean URLs for subfolders ──
+# /deposit        → /deposit/deposit.html
+# /invest         → /invest/invest.html
+# /withdraw       → /withdraw/withdraw.html
+# /transactions   → /transactions/transactions.html
+# /refer          → /refer/refer.html
+# /settings       → /settings/settings.html
+# /auth/login     → /auth/login.html
+# /auth/signup    → /auth/signup.html
+# /auth/confirm   → /auth/confirm.html
+# /admin          → /admin/index.html
+
+RewriteRule ^deposit/?$           /deposit/deposit.html [L]
+RewriteRule ^invest/?$            /invest/invest.html [L]
+RewriteRule ^withdraw/?$          /withdraw/withdraw.html [L]
+RewriteRule ^transactions/?$      /transactions/transactions.html [L]
+RewriteRule ^refer/?$             /refer/refer.html [L]
+RewriteRule ^settings/?$          /settings/settings.html [L]
+RewriteRule ^auth/login/?$        /auth/login.html [L]
+RewriteRule ^auth/signup/?$       /auth/signup.html [L]
+RewriteRule ^auth/confirm/?$      /auth/confirm.html [L]
+RewriteRule ^admin/?$             /admin/index.html [L]
+RewriteRule ^admin/users/?$       /admin/user/users.html [L]
+RewriteRule ^admin/deposits/?$    /admin/deposit/deposit.html [L]
+RewriteRule ^admin/withdrawals/?$ /admin/withdrawals/withdrawals.html [L]
+RewriteRule ^admin/kyc/?$         /admin/kyc/kyc.html [L]
+RewriteRule ^admin/chat/?$        /admin/chat/chat.html [L]
+RewriteRule ^admin/plans/?$       /admin/plans/plans.html [L]
+
+# ── Force HTTPS ──
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
