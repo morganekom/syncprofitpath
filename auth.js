@@ -16,7 +16,7 @@
             const parts  = path.split('/').filter(Boolean);
             const depth  = parts.length - 1;
             const prefix = '../'.repeat(depth);
-            window.location.replace(prefix + 'auth/login.html');
+            window.location.replace(prefix + 'auth/login/');
         } else {
             document.documentElement.style.visibility = '';
         }
