@@ -26,7 +26,7 @@
     const role = currentUser.role || 'user';
 
     if (isAdminPage && role !== 'admin') {
-        window.location.replace('../dashboard.html');
+        window.location.replace('../dashboard/');
         return;
     }
 
