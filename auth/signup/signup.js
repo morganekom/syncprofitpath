@@ -277,7 +277,7 @@ function showVerifyEmailScreen(email) {
                 The link expires in 24 hours.
             </p>
             <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem;width:100%">
-                <a href="./login.html" class="auth-btn" style="text-align:center;text-decoration:none;">
+                <a href="./login/" class="auth-btn" style="text-align:center;text-decoration:none;">
                     Go to Sign In
                 </a>
                 <p style="text-align:center;font-size:1.1rem;color:var(--color-gray-light)">
