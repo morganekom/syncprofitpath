@@ -136,10 +136,10 @@ function showError(msg) {
         <h2>Verification Failed</h2>
         <p style="color:var(--color-gray-light);font-size:1.2rem;text-align:center;">${msg}</p>
         <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem;width:100%">
-            <a href="./signup.html" class="auth-btn" style="text-align:center;text-decoration:none;">
+            <a href="./signup/" class="auth-btn" style="text-align:center;text-decoration:none;">
                 Sign Up Again
             </a>
-            <a href="./login.html" class="auth-btn-outline" style="text-align:center;text-decoration:none;">
+            <a href="./login/" class="auth-btn-outline" style="text-align:center;text-decoration:none;">
                 Go to Sign In
             </a>
         </div>
