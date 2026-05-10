@@ -94,7 +94,7 @@ function redirectAfterLogin(role) {
     if (role === 'admin') {
         window.location.href = '../admin/index.html';
     } else {
-        window.location.href = '../dashboard.html';
+        window.location.href = '../dashboard/';
     }
 }
 
