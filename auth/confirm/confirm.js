@@ -78,7 +78,7 @@ async function handleConfirmation() {
 
         saveSession(newUser);
         showSuccess('Account verified! Welcome to SyncProfitPath. Redirecting…');
-        setTimeout(() => window.location.href = '../dashboard.html', 1800);
+        setTimeout(() => window.location.href = '../dashboard/', 1800);
 
     } catch (err) {
         console.error('Confirmation error:', err.message);
