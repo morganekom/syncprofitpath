@@ -108,5 +108,5 @@ document.addEventListener('DOMContentLoaded', loadLandingPlans);
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 if (currentUser) {
     const role = currentUser.role || 'user';
-    window.location.replace(role === 'admin' ? './admin/index.html' : './dashboard.html');
+    window.location.replace(role === 'admin' ? './admin/' : './dashboard/');
 }
