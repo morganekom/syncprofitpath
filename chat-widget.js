@@ -12,17 +12,17 @@
     let pollTimer    = null;
     let lastMsgCount = 0;
     let userId       = null;
-    let pendingFile  = null;   // { file, name, type, previewUrl }
+    let pendingFile  = null;   // { file, name, type } staged for next send
 
 
     // ================================================================
-    // INJECT HTML
+    // INJECT HTML — adds the widget button and panel to the page
     // ================================================================
 
     function injectWidget() {
         const html = `
-            <!-- Floating chat button — icon intentionally kept as comment-dots -->
-            <button class="chat-widget-btn" id="chatWidgetBtn" onclick="ChatWidget.toggle()" title="Chat with Sync">
+            <!-- Floating chat button — icon stays as comment-dots per spec -->
+            <button class="chat-widget-btn" id="chatWidgetBtn" onclick="ChatWidget.toggle()" title="Chat with Nova">
                 <i class="uil uil-comment-dots" id="chatWidgetIcon"></i>
                 <span class="chat-unread-badge" id="chatUnreadBadge"></span>
             </button>
@@ -37,8 +37,8 @@
                             <i class="uil uil-headphone"></i>
                         </div>
                         <div>
-                            <div class="chat-panel-title">Sync</div>
-                            <div class="chat-panel-subtitle">We usually reply within minutes</div>
+                            <div class="chat-panel-title">Nova</div>
+                            <div class="chat-panel-subtitle">I usually reply within minutes</div>
                         </div>
                     </div>
                     <button class="chat-panel-close" onclick="ChatWidget.toggle()">
@@ -53,33 +53,32 @@
                     </div>
                     <div class="chat-panel-welcome" id="chatPanelWelcome">
                         <i class="uil uil-headphone"></i>
-                        <h3>Hey there! I'm Sync 👋</h3>
-                        <p>How can I assist you today? Send a message and I'll get right on it.</p>
+                        <h3>Hey there! I'm Nova 👋</h3>
+                        <p>How can I assist you today? Send me a message and I'll get right on it.</p>
                     </div>
                 </div>
 
-                <!-- File preview bar — shown when a file is staged -->
+                <!-- File preview bar — visible only when a file is staged -->
                 <div class="chat-file-preview" id="chatFilePreview" style="display:none;">
                     <div class="chat-file-preview-inner">
                         <i class="uil uil-file-alt chat-file-icon" id="chatFileIcon"></i>
-                        <span class="chat-file-name" id="chatFileName">file.pdf</span>
+                        <span class="chat-file-name" id="chatFileName"></span>
                     </div>
                     <button class="chat-file-remove" onclick="ChatWidget.removeFile()" title="Remove file">
-                        <i class="uil uil-multiply"></i>
+                        <i class="uil uil-times"></i>
                     </button>
                 </div>
 
                 <!-- Input row -->
                 <div class="chat-panel-input-row">
-                    <!-- Hidden file input — accepts images and PDFs only -->
+                    <!-- Hidden file input — images and PDF only -->
                     <input
                         type="file"
                         id="chatFileInput"
                         accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
                         style="display:none;"
-                        onchange="ChatWidget.handleFileSelect(this)">
+                        onchange="ChatWidget.stageFile(this)">
 
-                    <!-- Attach button -->
                     <button class="chat-attach-btn" onclick="document.getElementById('chatFileInput').click()" title="Attach image or PDF">
                         <i class="uil uil-paperclip"></i>
                     </button>
@@ -112,13 +111,14 @@
     // ================================================================
 
     function init() {
+        // Only run if user is logged in
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         if (!currentUser || !currentUser.id) return;
 
         userId = currentUser.id;
 
         injectWidget();
-        loadMessages(false);
+        loadMessages(false); // initial load without loading spinner
         startPolling();
     }
 
@@ -146,78 +146,77 @@
 
 
     // ================================================================
-    // FILE HANDLING
+    // FILE STAGING
     // ================================================================
 
-    function handleFileSelect(input) {
+    function stageFile(input) {
         const file = input.files[0];
         if (!file) return;
 
-        // Guard: images and PDF only, max 10 MB
         const allowed = ['image/jpeg','image/png','image/gif','image/webp','application/pdf'];
         if (!allowed.includes(file.type)) {
-            alert('Only images (JPG, PNG, GIF, WEBP) and PDF files are supported.');
+            alert('Only images (JPG, PNG, GIF, WEBP) and PDF files can be attached.');
             input.value = '';
             return;
         }
         if (file.size > 10 * 1024 * 1024) {
-            alert('File is too large. Maximum size is 10 MB.');
+            alert('File too large. Maximum size is 10 MB.');
             input.value = '';
             return;
         }
 
         pendingFile = { file, name: file.name, type: file.type };
 
-        // Show preview bar
-        const preview  = document.getElementById('chatFilePreview');
-        const nameEl   = document.getElementById('chatFileName');
-        const iconEl   = document.getElementById('chatFileIcon');
+        const iconEl  = document.getElementById('chatFileIcon');
+        const nameEl  = document.getElementById('chatFileName');
+        const preview = document.getElementById('chatFilePreview');
 
-        nameEl.textContent = file.name;
-        iconEl.className   = file.type === 'application/pdf'
+        iconEl.className = file.type === 'application/pdf'
             ? 'uil uil-file-alt chat-file-icon chat-file-icon--pdf'
             : 'uil uil-image chat-file-icon chat-file-icon--img';
+
+        nameEl.textContent    = file.name;
         preview.style.display = 'flex';
 
-        // Reset input so the same file can be re-selected if removed
+        // Reset so the same file can be re-selected after removal
         input.value = '';
     }
 
     function removeFile() {
         pendingFile = null;
         document.getElementById('chatFilePreview').style.display = 'none';
-        document.getElementById('chatFileIcon').className = 'uil uil-file-alt chat-file-icon';
+        document.getElementById('chatFileName').textContent       = '';
+        document.getElementById('chatFileIcon').className         = 'uil uil-file-alt chat-file-icon';
     }
 
 
     // ================================================================
     // UPLOAD FILE TO SUPABASE STORAGE
-    // Returns the public URL string, or null on failure.
+    // Returns public URL on success, throws on failure.
     // ================================================================
 
     async function uploadFile(file) {
-        const ext      = file.name.split('.').pop();
-        const path     = `chat/${userId}/${Date.now()}.${ext}`;
+        const ext  = file.name.split('.').pop().toLowerCase();
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-        const { data, error } = await db.storage
+        const { error: uploadError } = await db.storage
             .from('chat-attachments')
             .upload(path, file, { cacheControl: '3600', upsert: false });
 
-        if (error) {
-            console.error('File upload error:', error.message);
-            return null;
-        }
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
-        const { data: urlData } = db.storage
+        const { data } = db.storage
             .from('chat-attachments')
             .getPublicUrl(path);
 
-        return urlData?.publicUrl || null;
+        if (!data?.publicUrl) throw new Error('Could not get public URL for uploaded file');
+
+        return { publicUrl: data.publicUrl, fileName: file.name, fileType: file.type };
     }
 
 
     // ================================================================
-    // LOAD MESSAGES
+    // LOAD MESSAGES FROM SUPABASE
     // ================================================================
 
     async function loadMessages(showLoading = false) {
@@ -252,6 +251,7 @@
 
             welcomeEl.style.display = 'none';
 
+            // Only re-render if message count changed (avoids flicker)
             if (data.length !== lastMsgCount) {
                 lastMsgCount = data.length;
                 renderMessages(data);
@@ -269,7 +269,7 @@
     function renderMessages(messages) {
         const container = document.getElementById('chatPanelMessages');
 
-        // Remove existing message bubbles (keep loading + welcome els)
+        // Remove existing bubbles — keep the loading and welcome elements
         Array.from(container.children).forEach(child => {
             if (child.id !== 'chatPanelLoading' && child.id !== 'chatPanelWelcome') {
                 child.remove();
@@ -288,18 +288,36 @@
             const el = document.createElement('div');
             el.className = `widget-msg ${isUser ? 'from-user' : 'from-admin'}`;
 
-            // Build bubble content — text and/or attachment
-            let bubbleContent = '';
+            // Build bubble — text and/or attachment
+            let bubbleHtml = '';
+
             if (msg.message) {
-                bubbleContent += `<div class="widget-bubble">${escapeHtml(msg.message)}</div>`;
+                bubbleHtml += `<div class="widget-bubble">${escapeHtml(msg.message)}</div>`;
             }
+
             if (msg.file_url) {
-                bubbleContent += buildAttachmentBubble(msg.file_url, msg.file_name, msg.file_type);
+                const isImage = msg.file_type && msg.file_type.startsWith('image/');
+                if (isImage) {
+                    bubbleHtml += `
+                        <div class="widget-bubble widget-bubble--file">
+                            <a href="${msg.file_url}" target="_blank" rel="noopener noreferrer">
+                                <img src="${msg.file_url}" alt="${escapeHtml(msg.file_name || 'image')}" class="widget-attachment-img">
+                            </a>
+                        </div>`;
+                } else {
+                    bubbleHtml += `
+                        <div class="widget-bubble widget-bubble--file">
+                            <a href="${msg.file_url}" target="_blank" rel="noopener noreferrer" class="widget-file-link">
+                                <i class="uil uil-file-alt"></i>
+                                <span>${escapeHtml(msg.file_name || 'attachment')}</span>
+                            </a>
+                        </div>`;
+                }
             }
 
             el.innerHTML = `
-                ${bubbleContent}
-                <div class="widget-meta">${isUser ? 'You' : 'Sync'} · ${time}</div>
+                ${bubbleHtml}
+                <div class="widget-meta">${isUser ? 'You' : 'Nova'} · ${time}</div>
             `;
             container.appendChild(el);
         });
@@ -307,29 +325,9 @@
         scrollToBottom();
     }
 
-    function buildAttachmentBubble(url, name, type) {
-        const isImage = type && type.startsWith('image/');
-        if (isImage) {
-            return `
-                <div class="widget-bubble widget-bubble--attachment">
-                    <a href="${url}" target="_blank" rel="noopener">
-                        <img src="${url}" alt="${escapeHtml(name || 'image')}" class="widget-attachment-img">
-                    </a>
-                </div>`;
-        }
-        // PDF or other file
-        return `
-            <div class="widget-bubble widget-bubble--attachment">
-                <a href="${url}" target="_blank" rel="noopener" class="widget-file-link">
-                    <i class="uil uil-file-alt"></i>
-                    <span>${escapeHtml(name || 'attachment')}</span>
-                </a>
-            </div>`;
-    }
-
 
     // ================================================================
-    // SEND MESSAGE (text + optional file)
+    // SEND MESSAGE
     // ================================================================
 
     async function send() {
@@ -339,7 +337,7 @@
         const sendBtn = document.getElementById('chatPanelSend');
         const message = input.value.trim();
 
-        // Must have text or a file
+        // Need at least text or a file
         if (!message && !pendingFile) return;
 
         input.disabled   = true;
@@ -350,12 +348,11 @@
             let fileName = null;
             let fileType = null;
 
-            // Upload file first if one is staged
             if (pendingFile) {
-                fileUrl  = await uploadFile(pendingFile.file);
-                fileName = pendingFile.name;
-                fileType = pendingFile.type;
-                if (!fileUrl) throw new Error('File upload failed');
+                const result = await uploadFile(pendingFile.file);
+                fileUrl  = result.publicUrl;
+                fileName = result.fileName;
+                fileType = result.fileType;
             }
 
             const { error } = await db
@@ -378,7 +375,6 @@
             sendBtn.disabled   = false;
             input.focus();
 
-            // Clear file preview
             if (pendingFile) removeFile();
 
             await loadMessages(false);
@@ -387,13 +383,14 @@
             console.error('Chat send error:', err.message);
             input.disabled   = false;
             sendBtn.disabled = false;
-            alert('Failed to send message. Please try again.');
+            alert('Failed to send. Please try again.');
         }
     }
 
 
     // ================================================================
     // MARK ADMIN MESSAGES AS READ
+    // Called when user opens the chat panel
     // ================================================================
 
     async function markAdminMessagesRead() {
@@ -413,7 +410,7 @@
 
 
     // ================================================================
-    // UNREAD BADGE
+    // UNREAD BADGE ON FLOATING BUTTON
     // ================================================================
 
     function updateUnreadBadge(count) {
@@ -429,7 +426,7 @@
 
 
     // ================================================================
-    // POLLING
+    // POLLING — checks for new messages every 8 seconds
     // ================================================================
 
     function startPolling() {
@@ -446,6 +443,7 @@
         if (container) setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
     }
 
+    // Ctrl/Cmd+Enter sends
     function handleKey(event) {
         if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
             event.preventDefault();
@@ -468,10 +466,10 @@
 
 
     // ================================================================
-    // PUBLIC API
+    // EXPOSE PUBLIC API
     // ================================================================
 
-    window.ChatWidget = { toggle, send, handleKey, autoResize, handleFileSelect, removeFile };
+    window.ChatWidget = { toggle, send, handleKey, autoResize, stageFile, removeFile };
 
 
     // ================================================================
