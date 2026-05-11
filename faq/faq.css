@@ -17,7 +17,7 @@ body {
 /* ========================= HERO ========================= */
 .faq-hero {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1.4rem;
     margin-bottom: 2.4rem;
     flex-wrap: wrap;
@@ -26,13 +26,15 @@ body {
 .faq-hero-icon {
     width: 4.8rem;
     height: 4.8rem;
+    min-width: 4.8rem;
+    min-height: 4.8rem;
     border-radius: 50%;
     background: rgba(0, 226, 123, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self: center;
 }
 
 .faq-hero-icon i {
@@ -231,7 +233,7 @@ body {
 
 .faq-still-help-inner {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1.4rem;
     flex-wrap: wrap;
 }
@@ -239,13 +241,15 @@ body {
 .faq-still-icon {
     width: 4.4rem;
     height: 4.4rem;
+    min-width: 4.4rem;
+    min-height: 4.4rem;
     border-radius: 50%;
     background: rgba(0, 226, 123, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self: center;
 }
 
 .faq-still-icon i {
