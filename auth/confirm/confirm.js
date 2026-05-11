@@ -32,7 +32,7 @@ async function handleConfirmation() {
             // Already confirmed — just log them in
             saveSession(existingUser);
             showSuccess('Account already verified. Redirecting to your dashboard…');
-            setTimeout(() => window.location.href = '../dashboard/', 1500);
+            setTimeout(() => window.location.href = '../../dashboard/', 1500);
             return;
         }
 
@@ -78,7 +78,7 @@ async function handleConfirmation() {
 
         saveSession(newUser);
         showSuccess('Account verified! Welcome to SyncProfitPath. Redirecting…');
-        setTimeout(() => window.location.href = '../dashboard/', 1800);
+        setTimeout(() => window.location.href = '../../dashboard/', 1800);
 
     } catch (err) {
         console.error('Confirmation error:', err.message);
