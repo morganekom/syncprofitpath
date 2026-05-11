@@ -21,17 +21,22 @@ body {
     gap: 1.4rem;
     margin-bottom: 2.4rem;
     flex-wrap: wrap;
+    /* Prevent flex children from stretching when wrapping */
+    align-items: flex-start;
 }
 
 .faq-hero-icon {
     width: 4.8rem;
     height: 4.8rem;
+    min-width: 4.8rem;
+    min-height: 4.8rem;
     border-radius: 50%;
     background: rgba(0, 226, 123, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .faq-hero-icon i {
@@ -233,17 +238,21 @@ body {
     align-items: center;
     gap: 1.4rem;
     flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .faq-still-icon {
     width: 4.4rem;
     height: 4.4rem;
+    min-width: 4.4rem;
+    min-height: 4.4rem;
     border-radius: 50%;
     background: rgba(0, 226, 123, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .faq-still-icon i {
