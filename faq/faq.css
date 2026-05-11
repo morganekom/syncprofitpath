@@ -42,7 +42,7 @@ body {
     color: var(--color-primary);
 }
 
-.faq-hero > div {
+.faq-hero > div:not(.faq-hero-icon) {
     flex: 1;
     min-width: 0;
 }
@@ -257,7 +257,7 @@ body {
     color: var(--color-primary);
 }
 
-.faq-still-help-inner > div {
+.faq-still-help-inner > div:not(.faq-still-icon) {
     flex: 1;
     min-width: 0;
 }
