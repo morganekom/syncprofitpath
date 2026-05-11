@@ -394,8 +394,34 @@ nav {
 
 
 
+/* ========================= LOGOUT BUTTON (sidebar) ========================= */
+.sidebar_logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2vw;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-family: "Poppins", sans-serif;
+    transition: var(--transition);
+    margin-top: auto;
+}
 
+.sidebar_logout-btn i {
+    font-size: 2rem;
+    color: var(--color-danger);
+}
 
+.sidebar_logout-btn h5 {
+    font-weight: 500;
+    color: var(--color-danger);
+}
+
+.sidebar_logout-btn:hover {
+    background: var(--color-danger-light);
+}
 
 
 
@@ -787,34 +813,7 @@ canvas {
     }
 }
 
-/* ========================= LOGOUT BUTTON (sidebar) ========================= */
-.sidebar_logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem 4vw 1.5rem 2vw;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-    border-radius: 0 0.5rem 0.5rem 0;
-    width: 100%;
-    font-family: "Poppins", sans-serif;
-}
 
-.sidebar_logout-btn i {
-    font-size: 2rem;
-    color: var(--color-danger);
-}
-
-.sidebar_logout-btn h5 {
-    font-weight: 500;
-    color: var(--color-danger);
-}
-
-.sidebar_logout-btn:hover {
-    background: var(--color-danger-light);
-}
 
 
 
