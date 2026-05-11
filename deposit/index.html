@@ -353,15 +353,19 @@
 
             <!-- ── CONTAINER 3: Upload Proof ── -->
             <div class="form-card">
-                <h3>Upload Proof of Deposit</h3>
-                <label class="file-upload-label" for="proofFile">
-                    <div class="upload-text">
-                        <strong>Choose file</strong>
-                        <div>No file chosen</div>
-                    </div>
-                </label>
-                <input type="file" id="proofFile" accept="image/*,.pdf" onchange="showFileName(this)" />
-                <div class="file-name-display" id="fileNameDisplay"></div>
+                <div class="form-group">
+                    <label>Upload Proof of Deposit <span class="required">*</span></label>
+                    <label class="file-upload-label" for="proofFile">
+                        <i class="uil uil-image-upload" style="font-size:2.4rem; color:var(--color-primary);"></i>
+                        <div class="upload-text">
+                            <strong>Click to upload proof</strong>
+                            <small>Screenshot or photo of your transaction — max 5MB</small>
+                        </div>
+                    </label>
+                    <input type="file" id="proofFile" accept="image/*,.pdf" style="display:none"
+                        onchange="showFileName(this)">
+                    <p class="file-chosen" id="fileNameDisplay"></p>
+                </div>
             </div>
 
 
@@ -378,7 +382,12 @@
                 <i class="uil uil-check-circle"></i>
             </div>
             <h2>Deposit Submitted!</h2>
-            <p>Your deposit is being reviewed. We'll confirm it within 24 hours and credit your account.</p>
+            <p class="form-success" style="text-align:center; font-size:1.3rem; margin-bottom:1rem;">
+                ✓ Your proof of deposit has been submitted successfully.
+            </p>
+            <p style="text-align:center; font-size:1.2rem; color:var(--color-gray-light); line-height:1.7;">
+                Our team will review and confirm your deposit within <strong>24 hours</strong>. You'll receive a notification once your balance has been updated.
+            </p>
             <button class="deposit-success-btn" onclick="resetDeposit()">Make Another Deposit</button>
         </div>
 

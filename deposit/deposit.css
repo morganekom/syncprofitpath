@@ -244,21 +244,38 @@ body {
 }
 
 /* ── FILE UPLOAD ── */
+/* ── REQUIRED STAR ── */
+.required {
+    color: var(--color-danger);
+    font-weight: 700;
+    margin-left: 0.3rem;
+}
+
+/* ── FORM GROUP (matches KYC section) ── */
+.form-group label {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin-bottom: 0.8rem;
+}
+
+/* ── FILE UPLOAD LABEL (matches KYC dashed style) ── */
 .file-upload-label {
     display: flex;
-    flex-direction: row;
-    background: var(--color-white);
-    border-radius: var(--radius-3);
-    padding: 2rem 1.7rem;
+    align-items: center;
+    gap: 1.2rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.4rem 1.6rem;
     cursor: pointer;
+    border: 2px dashed var(--color-gray-light);
     transition: var(--transition);
-    text-align: center;
-    border: 2px solid transparent;
 }
 
 .file-upload-label:hover {
-    background: var(--color-light);
-    border-color: var(--color-gray-light);
+    border-color: var(--color-primary);
+    background: rgba(0, 226, 123, 0.04);
 }
 
 /* Error state on file upload */
@@ -266,33 +283,38 @@ body {
     border-color: var(--color-danger);
 }
 
+/* Chosen state */
+.file-upload-label.file-chosen {
+    border-color: var(--color-primary);
+    background: rgba(0, 226, 123, 0.04);
+}
+
 .upload-text {
     display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    font-size: 1.3rem;
-    color: var(--color-gray-dark);
-    align-items: center;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
-.file-upload-label strong {
-    color: var(--color-dark);
+.upload-text strong {
+    font-size: 1.2rem;
     font-weight: 600;
-    background: var(--color-light);
-    align-items: center;
-    border-radius: var(--radius-2);
-    padding: 0.7rem;
+    color: var(--color-dark);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
 }
 
-#proofFile {
-    display: none;
+.upload-text small {
+    color: var(--color-gray-light);
+    font-size: 1rem;
 }
 
-.file-name-display {
-    font-size: 1.3rem;
+/* File chosen confirmation message (matches .file-chosen in settings) */
+.file-chosen {
+    font-size: 1.1rem;
     color: var(--color-success);
-    margin-top: 0.8rem;
     min-height: 1.4rem;
+    margin-top: 0.4rem;
 }
 
 /* ── SUBMIT BUTTON ── */
@@ -618,4 +640,11 @@ body {
     .modal-footer {
         flex-direction: column;
     }
+}
+
+/* ── ADDRESS COPIED HIGHLIGHT (Fix 4) ── */
+/* When user copies a wallet address, the currency card gets a primary border */
+.currency-option.address-copied {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(0, 226, 123, 0.2);
 }

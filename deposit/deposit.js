@@ -138,11 +138,17 @@ function toggleCurrency(headerEl) {
 // ================================================================
 
 function copyAddress(btn) {
-    const address = btn.closest('.wallet-row').querySelector('.wallet-address').textContent;
+    const address        = btn.closest('.wallet-row').querySelector('.wallet-address').textContent;
+    const currencyOption = btn.closest('.currency-option');
+
     navigator.clipboard.writeText(address).then(() => {
         btn.classList.add('copied');
         setTimeout(() => btn.classList.remove('copied'), 2000);
     });
+
+    // Highlight copied currency with primary border so user knows which address they copied
+    document.querySelectorAll('.currency-option').forEach(el => el.classList.remove('address-copied'));
+    if (currencyOption) currencyOption.classList.add('address-copied');
 }
 
 
@@ -193,22 +199,19 @@ amountInput.addEventListener('input', () => {
 
 function showFileName(input) {
     const uploadLabel     = document.querySelector('.file-upload-label');
-    const labelStrong     = uploadLabel.querySelector('strong');
-    const labelSub        = uploadLabel.querySelector('div');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
 
     if (input.files[0]) {
         const name = input.files[0].name;
-        labelStrong.textContent     = name.length > 32 ? name.slice(0, 29) + '…' : name;
-        labelSub.textContent        = 'File selected — click to change';
-        fileNameDisplay.textContent = '✓ Ready to upload';
+
+        // Show uploaded file name below the label, like KYC section
+        fileNameDisplay.textContent = '✓ ' + (name.length > 40 ? name.slice(0, 37) + '…' : name);
         fileNameDisplay.style.color = 'var(--color-success)';
+
         uploadLabel.classList.remove('upload-error');
         uploadLabel.classList.add('file-chosen');
         fileUploaded = true;
     } else {
-        labelStrong.textContent     = 'Choose file';
-        labelSub.textContent        = 'No file chosen';
         fileNameDisplay.textContent = '';
         fileNameDisplay.style.color = '';
         uploadLabel.classList.remove('file-chosen');
@@ -401,16 +404,15 @@ function resetDeposit() {
     document.getElementById('usdPreview').style.display = 'none';
 
     const uploadLabel     = document.querySelector('.file-upload-label');
-    const labelStrong     = uploadLabel.querySelector('strong');
-    const labelSub        = uploadLabel.querySelector('div');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
 
     document.getElementById('proofFile').value = '';
-    labelStrong.textContent     = 'Choose file';
-    labelSub.textContent        = 'No file chosen';
     fileNameDisplay.textContent = '';
     fileNameDisplay.style.color = '';
-    uploadLabel.classList.remove('upload-error', 'file-chosen');
+    uploadLabel.classList.remove('upload-error', 'file-chosen', 'address-copied');
+
+    // Clear copied currency highlight too
+    document.querySelectorAll('.currency-option').forEach(el => el.classList.remove('address-copied'));
 
     document.querySelectorAll('.currency-option.active').forEach(el => {
         el.classList.remove('active');
