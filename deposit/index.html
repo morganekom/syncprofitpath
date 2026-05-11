@@ -2,16 +2,15 @@
 <html lang="en">
 
 <head>
-    <!-- THIS GOES FIRST -->
     <script>
         (function () {
             const theme = localStorage.getItem('currrentTheme');
             if (theme) document.documentElement.classList.add(theme);
         })();
     </script>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit</title>
+    <title>Deposit — SyncProfitPath</title>
     <link rel="icon" type="image/png" href="../assets/favicon.png">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
     <link rel="stylesheet" href="../style.css">
@@ -28,414 +27,285 @@
             </a>
             <div class="nav_search">
                 <i class="uil uil-search"></i>
-                <input type="search" placeholder="search">
+                <input type="search" placeholder="Search">
             </div>
             <div class="nav_profile-wrapper">
-                <button class="nav_theme-btn">
-                    <i class="uil uil-moon"></i>
-                </button>
+                <button class="nav_theme-btn"><i class="uil uil-moon"></i></button>
                 <div class="nav_profile">
                     <div class="nav_profile-photo">
                         <img src="../assets/profile-1.jpg" alt="Profile Photo">
                     </div>
-                    <h5 id="navName">Divine Godwin</h5>
+                    <h5 id="navName">User</h5>
                     <i class="uil uil-angle-down"></i>
                 </div>
-                <button class="nav_menu-btn">
-                    <i class="uil uil-bars"></i>
-                </button>
+                <button class="nav_menu-btn"><i class="uil uil-bars"></i></button>
             </div>
         </div>
     </nav>
 
-
     <!--==================== SIDEBAR ====================-->
     <menu class="sidebar">
-        <a href="../dashboard/">
-            <i class="uil uil-create-dashboard"></i>
-            <h5>Dashboard</h5>
-        </a>
-        <a href="./" class="active">
-            <i class="uil uil-arrow-circle-down"></i>
-            <h5>Deposit</h5>
-        </a>
-        <a href="../invest/">
-            <i class="uil uil-diamond"></i>
-            <h5>Invest</h5>
-        </a>
-        <a href="../withdraw/">
-            <i class="uil uil-arrow-circle-up"></i>
-            <h5>Withdraw</h5>
-        </a>
-        <a href="../transactions/">
-            <i class="uil uil-history"></i>
-            <h5>Transactions</h5>
-        </a>
-        <a href="../refer/">
-            <i class="uil uil-user-plus"></i>
-            <h5>Refer & Earn</h5>
-        </a>
-        <a href="../settings/">
-            <i class="uil uil-setting"></i>
-            <h5>Settings</h5>
-        </a>
-        <button class="sidebar_close-btn">
-            <i class="uil uil-multiply"></i>
-        </button>
+        <a href="../dashboard/"><i class="uil uil-create-dashboard"></i><h5>Dashboard</h5></a>
+        <a href="./" class="active"><i class="uil uil-arrow-circle-down"></i><h5>Deposit</h5></a>
+        <a href="../invest/"><i class="uil uil-diamond"></i><h5>Invest</h5></a>
+        <a href="../withdraw/"><i class="uil uil-arrow-circle-up"></i><h5>Withdraw</h5></a>
+        <a href="../transactions/"><i class="uil uil-history"></i><h5>Transactions</h5></a>
+        <a href="../refer/"><i class="uil uil-user-plus"></i><h5>Refer & Earn</h5></a>
+        <a href="../settings/"><i class="uil uil-setting"></i><h5>Settings</h5></a>
+        <button class="sidebar_close-btn"><i class="uil uil-multiply"></i></button>
         <button class="sidebar_logout-btn" onclick="logout()">
-            <i class="uil uil-sign-out-alt"></i>
-            <h5>Logout</h5>
+            <i class="uil uil-sign-out-alt"></i><h5>Logout</h5>
         </button>
     </menu>
 
-
-    <!--==================== DEPOSIT ====================-->
+    <!--==================== MAIN CONTENT ====================-->
     <section class="deposit-section">
-        <h1>Deposit</h1>
 
-        <!-- depositForm wraps everything so we can hide it on success -->
+        <!-- Page header -->
+        <div class="deposit-page-header">
+            <h1>Deposit Funds</h1>
+            <p>Choose your preferred cryptocurrency, copy the wallet address, then upload your proof of payment.</p>
+        </div>
+
+        <!-- Form (hidden on success) -->
         <div id="depositForm">
 
-            <!-- ── CONTAINER 1: Payment Method ── -->
-            <div class="form-card">
-                <h3>Choose Payment Method</h3>
-                <div class="currency-list">
-
-                    <!-- BITCOIN -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="btc">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#f7931a22; color:#f7931a;">₿</div>
-                                    <div>
-                                        <div class="currency-name"><h4>Bitcoin</h4></div>
-                                        <div class="currency-ticker"><p>BTC</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-btc" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ETHEREUM -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="eth">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#627eea22; color:#627eea;">Ξ</div>
-                                    <div>
-                                        <div class="currency-name"><h4>Ethereum</h4></div>
-                                        <div class="currency-ticker"><p>ETH</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-eth" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">0x45F0530a1C4e449dF5669AdCe86424b290a37BCe</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- USDT -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="usdt">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#26a17b22; color:#26a17b;">₮</div>
-                                    <div>
-                                        <div class="currency-name"><h4>Tether</h4></div>
-                                        <div class="currency-ticker"><p>USDT</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-usdt" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">0x45F0530a1C4e449dF5669AdCe86424b290a37BCe</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- USDC -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="usdc">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#2775ca22; color:#2775ca;">Ⓤ</div>
-                                    <div>
-                                        <div class="currency-name"><h4>USDC</h4></div>
-                                        <div class="currency-ticker"><p>USDC</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-usdc" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">0x45F0530a1C4e449dF5669AdCe86424b290a37BCe</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SOLANA -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="sol">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#9945ff22; color:#9945ff;">◎</div>
-                                    <div>
-                                        <div class="currency-name"><h4>Solana</h4></div>
-                                        <div class="currency-ticker"><p>SOL</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-sol" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">F6iruMuC6YejoZshgJH8×1XPEXN3bgzE9KgB8H5LwBU</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- LITECOIN -->
-                    <div class="currency-cell">
-                        <div class="currency-option" data-currency="ltc">
-                            <div class="currency-header" onclick="toggleCurrency(this)">
-                                <div class="currency-left">
-                                    <div class="currency-icon" style="background:#bfbbbb22; color:#bfbbbb;">Ł</div>
-                                    <div>
-                                        <div class="currency-name"><h4>Litecoin</h4></div>
-                                        <div class="currency-ticker"><p>LTC</p></div>
-                                    </div>
-                                </div>
-                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                            <div class="currency-details">
-                                <div class="detail-label">QR Code</div>
-                                <div class="qr-box">
-                                    <div id="qr-ltc" class="qr-canvas-wrap"></div>
-                                </div>
-                                <div class="detail-label">Wallet Address</div>
-                                <div class="wallet-row">
-                                    <span class="wallet-address">ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j</span>
-                                    <button class="copy-btn" onclick="copyAddress(this)" title="Copy address">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div><!-- end .currency-list -->
-            </div><!-- end form-card 1 -->
-
-
-            <!-- ── CONTAINER 2: Local Currency + Amount ── -->
-            <div class="form-card">
-                <h3>Enter Deposit Amount</h3>
-
-                <!-- Step 1: pick local currency -->
-                <div class="local-currency-row">
-                    <label class="local-currency-label" for="localCurrencySelect">
-                        Your currency
-                    </label>
-                    <div class="local-currency-wrap">
-                        <select id="localCurrencySelect" class="local-currency-select" onchange="onCurrencyChange()">
-                            <option value="USD" data-symbol="$">🇺🇸 USD — US Dollar</option>
-                            <option value="EUR" data-symbol="€">🇪🇺 EUR — Euro</option>
-                            <option value="GBP" data-symbol="£">🇬🇧 GBP — British Pound</option>
-                            <option value="NGN" data-symbol="₦">🇳🇬 NGN — Nigerian Naira</option>
-                            <option value="GHS" data-symbol="₵">🇬🇭 GHS — Ghanaian Cedi</option>
-                            <option value="KES" data-symbol="KSh">🇰🇪 KES — Kenyan Shilling</option>
-                            <option value="ZAR" data-symbol="R">🇿🇦 ZAR — South African Rand</option>
-                            <option value="CAD" data-symbol="C$">🇨🇦 CAD — Canadian Dollar</option>
-                            <option value="AUD" data-symbol="A$">🇦🇺 AUD — Australian Dollar</option>
-                            <option value="INR" data-symbol="₹">🇮🇳 INR — Indian Rupee</option>
-                            <option value="AED" data-symbol="د.إ">🇦🇪 AED — UAE Dirham</option>
-                            <option value="EGP" data-symbol="E£">🇪🇬 EGP — Egyptian Pound</option>
-                            <option value="TZS" data-symbol="TSh">🇹🇿 TZS — Tanzanian Shilling</option>
-                            <option value="UGX" data-symbol="USh">🇺🇬 UGX — Ugandan Shilling</option>
-                            <option value="XOF" data-symbol="CFA">🌍 XOF — West African CFA</option>
-                        </select>
-                        <!-- Rate fetch status -->
-                        <span class="rate-status" id="rateStatus"></span>
-                    </div>
+            <!-- Step indicator -->
+            <div class="deposit-steps">
+                <div class="deposit-step active" id="step1">
+                    <div class="step-num">1</div>
+                    <span class="step-label">Choose Crypto</span>
                 </div>
-
-                <!-- Step 2: enter amount in local currency -->
-                <div class="amount-wrapper">
-                    <span id="currencySymbol">$</span>
-                    <input class="amount-input" id="amountInput" type="number" min="0" placeholder="0.00" />
+                <div class="deposit-step" id="step2">
+                    <div class="step-num">2</div>
+                    <span class="step-label">Enter Amount</span>
                 </div>
-
-                <!-- Live USD conversion preview -->
-                <div class="usd-preview" id="usdPreview" style="display:none;">
-                    <i class="uil uil-exchange"></i>
-                    <span>≈ <strong id="usdEquivalent">$0.00</strong> USD will be credited to your account</span>
-                </div>
-
-                <p class="field-error" id="amountError"></p>
-            </div>
-
-
-            <!-- ── CONTAINER 3: Upload Proof ── -->
-            <div class="form-card">
-                <div class="form-group">
-                    <label>Upload Proof of Deposit <span class="required">*</span></label>
-                    <label class="file-upload-label" for="proofFile">
-                        <i class="uil uil-image-upload" style="font-size:2.4rem; color:var(--color-primary);"></i>
-                        <div class="upload-text">
-                            <strong>Click to upload proof</strong>
-                            <small>Screenshot or photo of your transaction — max 5MB</small>
-                        </div>
-                    </label>
-                    <input type="file" id="proofFile" accept="image/*,.pdf" style="display:none"
-                        onchange="showFileName(this)">
-                    <p class="file-chosen" id="fileNameDisplay"></p>
+                <div class="deposit-step" id="step3">
+                    <div class="step-num">3</div>
+                    <span class="step-label">Upload Proof</span>
                 </div>
             </div>
 
+            <!-- Two-column layout -->
+            <div class="deposit-layout">
 
-            <!-- ── SUBMIT — disabled until all 3 conditions met ── -->
-            <!-- id="submitBtn" connects to deposit.js checkFormReady() -->
-            <button class="submit-btn" id="submitBtn" disabled>Submit Deposit</button>
+                <!-- LEFT: form steps -->
+                <div class="deposit-left">
 
+                    <!-- Step 1: Choose crypto -->
+                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                        <div class="deposit-card-title">
+                            <i class="uil uil-bitcoin-circle"></i> Choose Payment Method
+                        </div>
+                        <div class="crypto-grid" id="cryptoGrid">
+
+                            <button class="crypto-btn" data-currency="btc" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#f7931a18; color:#f7931a;">₿</div>
+                                <span class="crypto-name">Bitcoin</span>
+                                <span class="crypto-ticker">BTC</span>
+                            </button>
+
+                            <button class="crypto-btn" data-currency="eth" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#627eea18; color:#627eea;">Ξ</div>
+                                <span class="crypto-name">Ethereum</span>
+                                <span class="crypto-ticker">ETH</span>
+                            </button>
+
+                            <button class="crypto-btn" data-currency="usdt" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#26a17b18; color:#26a17b;">₮</div>
+                                <span class="crypto-name">Tether</span>
+                                <span class="crypto-ticker">USDT</span>
+                            </button>
+
+                            <button class="crypto-btn" data-currency="usdc" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#2775ca18; color:#2775ca;">Ⓤ</div>
+                                <span class="crypto-name">USDC</span>
+                                <span class="crypto-ticker">USDC</span>
+                            </button>
+
+                            <button class="crypto-btn" data-currency="sol" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#9945ff18; color:#9945ff;">◎</div>
+                                <span class="crypto-name">Solana</span>
+                                <span class="crypto-ticker">SOL</span>
+                            </button>
+
+                            <button class="crypto-btn" data-currency="ltc" onclick="selectCrypto(this)">
+                                <div class="crypto-icon" style="background:#bfbbbb18; color:#888;">Ł</div>
+                                <span class="crypto-name">Litecoin</span>
+                                <span class="crypto-ticker">LTC</span>
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Amount -->
+                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                        <div class="deposit-card-title">
+                            <i class="uil uil-dollar-sign"></i> Enter Deposit Amount
+                        </div>
+                        <div class="amount-card">
+                            <div class="currency-select-row">
+                                <span class="currency-select-label">Your currency</span>
+                                <div class="currency-select-wrap">
+                                    <select id="localCurrencySelect" class="local-currency-select" onchange="onCurrencyChange()">
+                                        <option value="USD" data-symbol="$">🇺🇸 USD — US Dollar</option>
+                                        <option value="EUR" data-symbol="€">🇪🇺 EUR — Euro</option>
+                                        <option value="GBP" data-symbol="£">🇬🇧 GBP — British Pound</option>
+                                        <option value="NGN" data-symbol="₦">🇳🇬 NGN — Nigerian Naira</option>
+                                        <option value="GHS" data-symbol="₵">🇬🇭 GHS — Ghanaian Cedi</option>
+                                        <option value="KES" data-symbol="KSh">🇰🇪 KES — Kenyan Shilling</option>
+                                        <option value="ZAR" data-symbol="R">🇿🇦 ZAR — South African Rand</option>
+                                        <option value="CAD" data-symbol="C$">🇨🇦 CAD — Canadian Dollar</option>
+                                        <option value="AUD" data-symbol="A$">🇦🇺 AUD — Australian Dollar</option>
+                                        <option value="INR" data-symbol="₹">🇮🇳 INR — Indian Rupee</option>
+                                        <option value="AED" data-symbol="د.إ">🇦🇪 AED — UAE Dirham</option>
+                                        <option value="EGP" data-symbol="E£">🇪🇬 EGP — Egyptian Pound</option>
+                                        <option value="TZS" data-symbol="TSh">🇹🇿 TZS — Tanzanian Shilling</option>
+                                        <option value="UGX" data-symbol="USh">🇺🇬 UGX — Ugandan Shilling</option>
+                                        <option value="XOF" data-symbol="CFA">🌍 XOF — West African CFA</option>
+                                    </select>
+                                    <span class="rate-status" id="rateStatus"></span>
+                                </div>
+                            </div>
+                            <div class="amount-wrapper">
+                                <span class="amount-symbol" id="currencySymbol">$</span>
+                                <input class="amount-input" id="amountInput" type="number" min="0" placeholder="0.00">
+                            </div>
+                            <div class="usd-preview" id="usdPreview">
+                                <i class="uil uil-exchange"></i>
+                                <span>≈ <strong id="usdEquivalent">$0.00</strong> USD will be credited to your account</span>
+                            </div>
+                            <p class="field-error" id="amountError"></p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Upload proof -->
+                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                        <div class="deposit-card-title">
+                            <i class="uil uil-image-upload"></i> Upload Proof of Payment
+                        </div>
+                        <div class="upload-card">
+                            <div class="upload-label-text">
+                                Payment screenshot or receipt <span class="required">*</span>
+                            </div>
+                            <label class="file-upload-label" for="proofFile">
+                                <i class="uil uil-cloud-upload upload-icon"></i>
+                                <div class="upload-text">
+                                    <strong>Click to upload proof</strong>
+                                    <small>Screenshot or photo of your transaction — max 5MB</small>
+                                </div>
+                            </label>
+                            <input type="file" id="proofFile" accept="image/*,.pdf" style="display:none"
+                                onchange="showFileName(this)">
+                            <p class="file-chosen-name" id="fileNameDisplay"></p>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button class="submit-btn" id="submitBtn" disabled>
+                        <i class="uil uil-check-circle"></i> Submit Deposit
+                    </button>
+
+                </div><!-- end .deposit-left -->
+
+                <!-- RIGHT: wallet details panel -->
+                <div class="wallet-panel">
+                    <div class="deposit-card">
+                        <div class="deposit-card-title">
+                            <i class="uil uil-wallet"></i> Wallet Details
+                        </div>
+
+                        <!-- Placeholder before selection -->
+                        <div class="wallet-placeholder" id="walletPlaceholder">
+                            <i class="uil uil-arrow-left"></i>
+                            <p>Select a cryptocurrency to see the wallet address and QR code</p>
+                        </div>
+
+                        <!-- Actual wallet details (shown after selection) -->
+                        <div class="wallet-details" id="walletDetails">
+
+                            <!-- Coin header -->
+                            <div class="wallet-coin-header">
+                                <div class="wallet-coin-icon" id="walletCoinIcon"></div>
+                                <div>
+                                    <div class="wallet-coin-name" id="walletCoinName">—</div>
+                                    <div class="wallet-coin-ticker" id="walletCoinTicker">—</div>
+                                </div>
+                            </div>
+
+                            <!-- QR Code -->
+                            <div>
+                                <div class="wallet-detail-label">QR Code</div>
+                                <div class="qr-wrap">
+                                    <div id="qrContainer" class="qr-canvas-wrap"></div>
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div>
+                                <div class="wallet-detail-label">Wallet Address</div>
+                                <div class="wallet-address-row">
+                                    <span class="wallet-address-text" id="walletAddressText">—</span>
+                                    <button class="copy-btn" id="copyBtn" onclick="copyWalletAddress()" title="Copy address">
+                                        <i class="uil uil-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Network warning -->
+                            <div class="network-badge" id="networkBadge" style="display:none;">
+                                <i class="uil uil-exclamation-triangle"></i>
+                                <span id="networkBadgeText">Send only on the correct network</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div><!-- end .wallet-panel -->
+
+            </div><!-- end .deposit-layout -->
         </div><!-- end #depositForm -->
 
 
-        <!-- ── SUCCESS STATE — shown after confirmed submission ── -->
+        <!-- Success state -->
         <div class="deposit-success" id="depositSuccess">
-            <div class="success-icon">
-                <i class="uil uil-check-circle"></i>
-            </div>
+            <div class="success-icon"><i class="uil uil-check-circle"></i></div>
             <h2>Deposit Submitted!</h2>
-            <p class="form-success" style="text-align:center; font-size:1.3rem; margin-bottom:1rem;">
-                ✓ Your proof of deposit has been submitted successfully.
-            </p>
-            <p style="text-align:center; font-size:1.2rem; color:var(--color-gray-light); line-height:1.7;">
-                Our team will review and confirm your deposit within <strong>24 hours</strong>. You'll receive a notification once your balance has been updated.
-            </p>
+            <p>Your proof has been received. Our team will review and confirm your deposit within <strong>24 hours</strong>. Your balance will be updated once approved.</p>
             <button class="deposit-success-btn" onclick="resetDeposit()">Make Another Deposit</button>
         </div>
 
-    </section><!-- end .deposit-section -->
+    </section>
 
-
-    <!-- ==================== CONFIRMATION MODAL ==================== -->
-    <!-- Pops up when user clicks Submit — shows a summary before final confirm -->
+    <!-- Confirmation modal -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal">
-
             <div class="modal-header">
                 <h3>Confirm Deposit</h3>
                 <button class="modal-close-btn" onclick="closeDepositModal()">
                     <i class="uil uil-multiply"></i>
                 </button>
             </div>
-
-            <!-- Summary of what the user is about to submit -->
             <div class="modal-summary">
                 <div class="modal-summary-row">
-                    <span>Currency</span>
-                    <span id="confirmCoin">—</span>
+                    <span>Cryptocurrency</span><span id="confirmCoin">—</span>
                 </div>
                 <div class="modal-summary-row">
-                    <span>Amount</span>
-                    <span id="confirmAmount">—</span>
+                    <span>Amount</span><span id="confirmAmount">—</span>
                 </div>
                 <div class="modal-summary-row">
-                    <span>Proof file</span>
-                    <span id="confirmFile">—</span>
+                    <span>Proof file</span><span id="confirmFile">—</span>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button class="modal-cancel-btn" onclick="closeDepositModal()">Cancel</button>
                 <button class="modal-confirm-btn" id="modalConfirmBtn" onclick="confirmDeposit()">
-                    Confirm Deposit
+                    Confirm &amp; Submit
                 </button>
             </div>
-
         </div>
     </div>
 
-
-    
     <script src="../auth.js"></script>
-    <!-- Supabase CDN — must load before supabase.js and deposit.js -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../supabase.js"></script>
     <script src="../main.js"></script>

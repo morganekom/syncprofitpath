@@ -1,26 +1,45 @@
 // ================================================================
-// DEPOSIT.JS — All form states and interactions
+// DEPOSIT.JS — Redesigned for new two-column layout
 // ================================================================
 
+// ── STATE ──
+let selectedCurrency = null;
+let amountEntered    = false;
+let fileUploaded     = false;
+let localCurrency    = 'USD';
+let localSymbol      = '$';
+let exchangeRates    = null;
+let usdAmount        = 0;
+let currentQRCode    = null;
 
-// ── TRACK FORM COMPLETION ──
-let selectedCurrency = null;   // crypto selected (btc, eth, etc)
-let amountEntered    = false;  // local currency amount is valid
-let fileUploaded     = false;  // proof file picked
+// ── WALLET ADDRESSES ──
+const WALLETS = {
+    btc:  { address: 'bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c',     name: 'Bitcoin',  ticker: 'BTC',  icon: '₿', color: '#f7931a', bg: '#f7931a18', network: null },
+    eth:  { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Ethereum', ticker: 'ETH',  icon: 'Ξ', color: '#627eea', bg: '#627eea18', network: 'ERC-20 network only' },
+    usdt: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'ERC-20 network only' },
+    usdc: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'ERC-20 network only' },
+    sol:  { address: 'F6irucMuC6YejoZshgJH8x1XPEXN3bgzE9KgB8H5LwBU',   name: 'Solana',   ticker: 'SOL',  icon: '◎', color: '#9945ff', bg: '#9945ff18', network: 'Solana network only' },
+    ltc:  { address: 'ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j',    name: 'Litecoin', ticker: 'LTC',  icon: 'Ł', color: '#888888', bg: '#bfbbbb18', network: null },
+};
 
-// ── CURRENCY STATE ──
-let localCurrency    = 'USD';  // user's chosen local currency
-let localSymbol      = '$';    // display symbol
-let exchangeRates    = null;   // rates relative to USD (fetched once)
-let usdAmount        = 0;      // converted USD amount to store in DB
+// ── DOM REFS (after DOMContentLoaded) ──
+let submitBtn, amountInput, fieldError;
 
-const submitBtn   = document.getElementById('submitBtn');
-const amountInput = document.getElementById('amountInput');
-const fieldError  = document.getElementById('amountError');
+document.addEventListener('DOMContentLoaded', () => {
+    submitBtn   = document.getElementById('submitBtn');
+    amountInput = document.getElementById('amountInput');
+    fieldError  = document.getElementById('amountError');
+
+    amountInput.addEventListener('input', onAmountInput);
+    submitBtn.addEventListener('click', onSubmitClick);
+
+    fetchRates();
+    updateSteps();
+});
 
 
 // ================================================================
-// FETCH EXCHANGE RATES ON PAGE LOAD
+// EXCHANGE RATES
 // ================================================================
 
 async function fetchRates() {
@@ -29,61 +48,34 @@ async function fetchRates() {
     statusEl.style.color = 'var(--color-gray-light)';
 
     try {
-        // Free API — no key needed, updates daily
         const res  = await fetch('https://open.er-api.com/v6/latest/USD');
         const data = await res.json();
-
         if (data.result !== 'success') throw new Error('Bad response');
-
         exchangeRates = data.rates;
         statusEl.textContent = '✓ Live rate';
         statusEl.style.color = 'var(--color-success)';
-
-        // Auto-select USD as default
         onCurrencyChange();
-
-    } catch (err) {
-        console.warn('Rate fetch failed:', err.message);
-        // Fallback — treat everything as USD
+    } catch {
         exchangeRates = { USD: 1 };
-        statusEl.textContent = 'Rate unavailable — using USD';
+        statusEl.textContent = 'Rate unavailable';
         statusEl.style.color = 'var(--color-warning)';
         onCurrencyChange();
     }
 }
 
-document.addEventListener('DOMContentLoaded', fetchRates);
-
-
-// ================================================================
-// CURRENCY SELECTOR CHANGE
-// ================================================================
-
 function onCurrencyChange() {
     const select    = document.getElementById('localCurrencySelect');
-    const selected  = select.options[select.selectedIndex];
-
-    localCurrency   = selected.value;
-    localSymbol     = selected.dataset.symbol || selected.value;
-
-    // Update the $ symbol next to the input
-    const symbolEl  = document.getElementById('currencySymbol');
-    if (symbolEl) symbolEl.textContent = localSymbol;
-
-    // Re-validate amount with new currency
-    if (amountInput.value) updateUsdPreview();
+    const option    = select.options[select.selectedIndex];
+    localCurrency   = option.value;
+    localSymbol     = option.dataset.symbol || option.value;
+    document.getElementById('currencySymbol').textContent = localSymbol;
+    if (amountInput && amountInput.value) updateUsdPreview();
 }
-
-
-// ================================================================
-// CONVERT LOCAL → USD
-// ================================================================
 
 function toUSD(localAmount) {
     if (!exchangeRates || localCurrency === 'USD') return localAmount;
     const rate = exchangeRates[localCurrency];
-    if (!rate || rate === 0) return localAmount; // fallback
-    return localAmount / rate;
+    return (!rate || rate === 0) ? localAmount : localAmount / rate;
 }
 
 function updateUsdPreview() {
@@ -111,62 +103,121 @@ function updateUsdPreview() {
 
 
 // ================================================================
-// CURRENCY TOGGLE (crypto payment method)
+// CRYPTO SELECTION
 // ================================================================
 
-function toggleCurrency(headerEl) {
-    const option    = headerEl.closest('.currency-option');
-    const wasActive = option.classList.contains('active');
+function selectCrypto(btn) {
+    // Deselect all
+    document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('selected'));
 
-    document.querySelectorAll('.currency-option.active').forEach(el => {
-        el.classList.remove('active');
-    });
+    const coin = btn.dataset.currency;
 
-    if (!wasActive) {
-        option.classList.add('active');
-        selectedCurrency = option.dataset.currency;
-    } else {
+    // Toggle off if clicking same one
+    if (selectedCurrency === coin) {
         selectedCurrency = null;
+        hideWalletDetails();
+        checkFormReady();
+        updateSteps();
+        return;
     }
 
+    btn.classList.add('selected');
+    selectedCurrency = coin;
+    showWalletDetails(coin);
     checkFormReady();
+    updateSteps();
+}
+
+function showWalletDetails(coin) {
+    const w = WALLETS[coin];
+    if (!w) return;
+
+    document.getElementById('walletPlaceholder').style.display = 'none';
+    document.getElementById('walletDetails').classList.add('visible');
+
+    // Coin header
+    const iconEl = document.getElementById('walletCoinIcon');
+    iconEl.textContent       = w.icon;
+    iconEl.style.background  = w.bg;
+    iconEl.style.color       = w.color;
+    document.getElementById('walletCoinName').textContent   = w.name;
+    document.getElementById('walletCoinTicker').textContent = w.ticker;
+
+    // Address
+    document.getElementById('walletAddressText').textContent = w.address;
+
+    // Network badge
+    const badge     = document.getElementById('networkBadge');
+    const badgeText = document.getElementById('networkBadgeText');
+    if (w.network) {
+        badge.style.display  = 'flex';
+        badgeText.textContent = '⚠ ' + w.network;
+    } else {
+        badge.style.display  = 'none';
+    }
+
+    // QR Code
+    const container = document.getElementById('qrContainer');
+    container.innerHTML = '';
+    if (typeof QRCode !== 'undefined') {
+        currentQRCode = new QRCode(container, {
+            text:         w.address,
+            width:        160,
+            height:       160,
+            colorDark:    '#000000',
+            colorLight:   '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M,
+        });
+    }
+
+    // Reset copy button
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.innerHTML = '<i class="uil uil-copy"></i>';
+    copyBtn.classList.remove('copied');
+}
+
+function hideWalletDetails() {
+    document.getElementById('walletPlaceholder').style.display = 'flex';
+    document.getElementById('walletDetails').classList.remove('visible');
+    document.getElementById('qrContainer').innerHTML = '';
 }
 
 
 // ================================================================
-// COPY WALLET ADDRESS
+// COPY ADDRESS
 // ================================================================
 
-function copyAddress(btn) {
-    const address        = btn.closest('.wallet-row').querySelector('.wallet-address').textContent;
-    const currencyOption = btn.closest('.currency-option');
+function copyWalletAddress() {
+    if (!selectedCurrency) return;
+    const address = WALLETS[selectedCurrency].address;
+    const copyBtn = document.getElementById('copyBtn');
 
     navigator.clipboard.writeText(address).then(() => {
-        btn.classList.add('copied');
-        setTimeout(() => btn.classList.remove('copied'), 2000);
+        copyBtn.innerHTML = '<i class="uil uil-check"></i>';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+            copyBtn.innerHTML = '<i class="uil uil-copy"></i>';
+            copyBtn.classList.remove('copied');
+        }, 2500);
     });
-
-    // Highlight copied currency with primary border so user knows which address they copied
-    document.querySelectorAll('.currency-option').forEach(el => el.classList.remove('address-copied'));
-    if (currencyOption) currencyOption.classList.add('address-copied');
 }
 
 
 // ================================================================
-// AMOUNT INPUT — live validation
+// AMOUNT INPUT
 // ================================================================
 
-amountInput.addEventListener('input', () => {
+function onAmountInput() {
     const val = parseFloat(amountInput.value);
-
     amountInput.classList.remove('input-error');
     fieldError.textContent = '';
     amountEntered = false;
 
-    if (amountInput.value === '') {
+    if (!amountInput.value) {
         document.getElementById('usdPreview').style.display = 'none';
         usdAmount = 0;
         checkFormReady();
+        updateSteps();
         return;
     }
 
@@ -174,23 +225,24 @@ amountInput.addEventListener('input', () => {
         amountInput.classList.add('input-error');
         fieldError.textContent = 'Please enter a valid amount greater than 0.';
         checkFormReady();
+        updateSteps();
         return;
     }
 
-    // Convert to USD for minimum check
     const usdVal = toUSD(val);
-
     if (usdVal < 10) {
         amountInput.classList.add('input-error');
-        fieldError.textContent = `Minimum deposit is $10 USD. Please enter a higher amount.`;
+        fieldError.textContent = 'Minimum deposit is $10 USD.';
         checkFormReady();
+        updateSteps();
         return;
     }
 
     updateUsdPreview();
     amountEntered = true;
     checkFormReady();
-});
+    updateSteps();
+}
 
 
 // ================================================================
@@ -198,113 +250,128 @@ amountInput.addEventListener('input', () => {
 // ================================================================
 
 function showFileName(input) {
-    const uploadLabel     = document.querySelector('.file-upload-label');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const label   = document.querySelector('.file-upload-label');
+    const display = document.getElementById('fileNameDisplay');
 
     if (input.files[0]) {
         const name = input.files[0].name;
-
-        // Show uploaded file name below the label, like KYC section
-        fileNameDisplay.textContent = '✓ ' + (name.length > 40 ? name.slice(0, 37) + '…' : name);
-        fileNameDisplay.style.color = 'var(--color-success)';
-
-        uploadLabel.classList.remove('upload-error');
-        uploadLabel.classList.add('file-chosen');
+        display.textContent = '✓ ' + (name.length > 45 ? name.slice(0, 42) + '…' : name);
+        display.style.color = 'var(--color-success)';
+        label.classList.remove('upload-error');
+        label.classList.add('file-chosen');
         fileUploaded = true;
     } else {
-        fileNameDisplay.textContent = '';
-        fileNameDisplay.style.color = '';
-        uploadLabel.classList.remove('file-chosen');
+        display.textContent = '';
+        label.classList.remove('file-chosen');
         fileUploaded = false;
     }
 
     checkFormReady();
+    updateSteps();
 }
 
 
 // ================================================================
-// CHECK FORM READY
+// STEP INDICATOR
+// ================================================================
+
+function updateSteps() {
+    const s1 = document.getElementById('step1');
+    const s2 = document.getElementById('step2');
+    const s3 = document.getElementById('step3');
+
+    // Step 1
+    s1.className = 'deposit-step ' + (selectedCurrency ? 'done' : 'active');
+    s1.querySelector('.step-num').textContent = selectedCurrency ? '✓' : '1';
+
+    // Step 2
+    if (!selectedCurrency) {
+        s2.className = 'deposit-step';
+    } else if (amountEntered) {
+        s2.className = 'deposit-step done';
+        s2.querySelector('.step-num').textContent = '✓';
+    } else {
+        s2.className = 'deposit-step active';
+        s2.querySelector('.step-num').textContent = '2';
+    }
+
+    // Step 3
+    if (!amountEntered) {
+        s3.className = 'deposit-step';
+        s3.querySelector('.step-num').textContent = '3';
+    } else if (fileUploaded) {
+        s3.className = 'deposit-step done';
+        s3.querySelector('.step-num').textContent = '✓';
+    } else {
+        s3.className = 'deposit-step active';
+        s3.querySelector('.step-num').textContent = '3';
+    }
+}
+
+
+// ================================================================
+// FORM READY CHECK
 // ================================================================
 
 function checkFormReady() {
-    submitBtn.disabled = !(selectedCurrency && amountEntered && fileUploaded);
+    if (submitBtn) {
+        submitBtn.disabled = !(selectedCurrency && amountEntered && fileUploaded);
+    }
 }
 
 
 // ================================================================
-// SUBMIT — shows confirmation modal
+// SUBMIT — opens confirmation modal
 // ================================================================
 
-submitBtn.addEventListener('click', () => {
-    let hasError = false;
-
-    if (!selectedCurrency) hasError = true;
-
-    if (!amountEntered) {
-        amountInput.classList.add('input-error');
-        fieldError.textContent = 'Please enter a deposit amount.';
-        hasError = true;
-    }
-
-    if (!fileUploaded) {
-        document.querySelector('.file-upload-label').classList.add('upload-error');
-        hasError = true;
-    }
-
-    if (hasError) return;
+function onSubmitClick() {
+    if (!selectedCurrency || !amountEntered || !fileUploaded) return;
 
     const localVal  = parseFloat(amountInput.value);
     const usdVal    = toUSD(localVal);
     const fileName  = document.getElementById('proofFile').files[0]?.name || '';
+    const coin      = WALLETS[selectedCurrency];
 
-    // Show local amount + USD equivalent in modal
-    const localFormatted = localSymbol + localVal.toLocaleString('en-US', {
-        minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
-    const usdFormatted = '$' + usdVal.toLocaleString('en-US', {
-        minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
+    const localFormatted = localSymbol + localVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const usdFormatted   = '$' + usdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    document.getElementById('confirmCoin').textContent   = selectedCurrency.toUpperCase();
+    document.getElementById('confirmCoin').textContent   = `${coin.name} (${coin.ticker})`;
     document.getElementById('confirmAmount').textContent =
-        localCurrency === 'USD'
-            ? usdFormatted
-            : `${localFormatted} (${usdFormatted} USD)`;
-    document.getElementById('confirmFile').textContent   = fileName;
+        localCurrency === 'USD' ? usdFormatted : `${localFormatted} ≈ ${usdFormatted}`;
+    document.getElementById('confirmFile').textContent   = fileName.length > 30 ? fileName.slice(0,27)+'…' : fileName;
 
     document.getElementById('modalOverlay').classList.add('open');
-});
+    document.body.style.overflow = 'hidden';
+}
 
 
 // ================================================================
-// CONFIRMATION MODAL
+// MODAL
 // ================================================================
 
 function closeModal(event) {
-    if (event.target === document.getElementById('modalOverlay')) {
-        closeDepositModal();
-    }
+    if (event.target === document.getElementById('modalOverlay')) closeDepositModal();
 }
 
 function closeDepositModal() {
     document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
 }
 
 async function confirmDeposit() {
     const confirmBtn       = document.getElementById('modalConfirmBtn');
-    confirmBtn.textContent = 'Submitting...';
+    confirmBtn.textContent = 'Submitting…';
     confirmBtn.disabled    = true;
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const localVal    = parseFloat(amountInput.value);
-    const usdVal      = parseFloat(toUSD(localVal).toFixed(2)); // stored in DB as USD
+    const usdVal      = parseFloat(toUSD(localVal).toFixed(2));
     const reference   = 'DEP-' + Date.now().toString(36).toUpperCase();
     const proofFile   = document.getElementById('proofFile').files[0];
+    const coin        = WALLETS[selectedCurrency];
 
-
-    // ── STEP 1: Upload proof of payment ──
+    // ── Upload proof ──
     let proofUrl = null;
-
     if (proofFile) {
         const ext      = proofFile.name.split('.').pop();
         const filePath = `${currentUser.id}/${reference}.${ext}`;
@@ -316,30 +383,24 @@ async function confirmDeposit() {
 
         if (uploadError) {
             console.error('Upload error:', uploadError.message);
-            confirmBtn.textContent = 'Confirm Deposit';
+            fieldError.textContent = 'Failed to upload proof. Please try again.';
+            confirmBtn.textContent = 'Confirm & Submit';
             confirmBtn.disabled    = false;
-            document.getElementById('amountError').textContent =
-                'Failed to upload proof. Please try again.';
             closeDepositModal();
             return;
         }
 
-        const { data: urlData } = db
-            .storage
-            .from('deposit-proofs')
-            .getPublicUrl(filePath);
-
+        const { data: urlData } = db.storage.from('deposit-proofs').getPublicUrl(filePath);
         proofUrl = urlData?.publicUrl || null;
     }
 
-
-    // ── STEP 2: Insert transaction — amount stored as USD ──
+    // ── Insert transaction ──
     const { error: txError } = await db
         .from('transactions')
         .insert([{
             user_id:   currentUser.id,
             type:      'deposit',
-            amount:    usdVal,                       // always USD in DB
+            amount:    usdVal,
             coin:      selectedCurrency,
             status:    'pending',
             note:      localCurrency !== 'USD'
@@ -351,17 +412,15 @@ async function confirmDeposit() {
         }]);
 
     if (txError) {
-        console.error('Transaction insert error:', txError.message);
-        confirmBtn.textContent = 'Confirm Deposit';
+        console.error('TX error:', txError.message);
+        fieldError.textContent = 'Something went wrong. Please try again.';
+        confirmBtn.textContent = 'Confirm & Submit';
         confirmBtn.disabled    = false;
-        document.getElementById('amountError').textContent =
-            'Something went wrong saving your deposit. Please try again.';
         closeDepositModal();
         return;
     }
 
-
-    // ── STEP 3: Increment user's pending balance (in USD) ──
+    // ── Update pending balance ──
     const currentPending = parseFloat(localStorage.getItem('userPending')) || 0;
     const newPending     = currentPending + usdVal;
 
@@ -370,26 +429,17 @@ async function confirmDeposit() {
         .update({ pending: newPending })
         .eq('id', currentUser.id);
 
-    if (userError) {
-        console.warn('Pending balance update failed:', userError.message);
-    } else {
-        localStorage.setItem('userPending', String(newPending));
-    }
-
+    if (!userError) localStorage.setItem('userPending', String(newPending));
 
     closeDepositModal();
-    showSuccessState();
-}
-
-
-// ================================================================
-// SUCCESS STATE
-// ================================================================
-
-function showSuccessState() {
-    document.getElementById('depositForm').style.display = 'none';
+    document.getElementById('depositForm').style.display  = 'none';
     document.getElementById('depositSuccess').classList.add('show');
 }
+
+
+// ================================================================
+// RESET
+// ================================================================
 
 function resetDeposit() {
     selectedCurrency = null;
@@ -397,81 +447,28 @@ function resetDeposit() {
     fileUploaded     = false;
     usdAmount        = 0;
 
+    document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('selected'));
+    hideWalletDetails();
+
     amountInput.value = '';
     amountInput.classList.remove('input-error');
     fieldError.textContent = '';
-
     document.getElementById('usdPreview').style.display = 'none';
 
-    const uploadLabel     = document.querySelector('.file-upload-label');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    document.getElementById('proofFile').value      = '';
+    document.getElementById('fileNameDisplay').textContent = '';
+    document.querySelector('.file-upload-label').classList.remove('upload-error', 'file-chosen');
 
-    document.getElementById('proofFile').value = '';
-    fileNameDisplay.textContent = '';
-    fileNameDisplay.style.color = '';
-    uploadLabel.classList.remove('upload-error', 'file-chosen', 'address-copied');
+    document.getElementById('localCurrencySelect').value = 'USD';
+    onCurrencyChange();
 
-    // Clear copied currency highlight too
-    document.querySelectorAll('.currency-option').forEach(el => el.classList.remove('address-copied'));
-
-    document.querySelectorAll('.currency-option.active').forEach(el => {
-        el.classList.remove('active');
-    });
-
-    // Reset local currency selector to USD
-    const select = document.getElementById('localCurrencySelect');
-    if (select) {
-        select.value = 'USD';
-        onCurrencyChange();
-    }
-
-    document.getElementById('modalConfirmBtn').textContent = 'Confirm Deposit';
+    document.getElementById('modalConfirmBtn').textContent = 'Confirm & Submit';
     document.getElementById('modalConfirmBtn').disabled    = false;
 
     submitBtn.disabled = true;
 
     document.getElementById('depositSuccess').classList.remove('show');
-    document.getElementById('depositForm').style.display = 'block';
+    document.getElementById('depositForm').style.display = '';
+
+    updateSteps();
 }
-
-
-// ================================================================
-// QR CODE GENERATION
-// Runs after page load. Maps each crypto ID to its wallet address
-// and generates a QR code into the matching div.
-// ================================================================
-
-const WALLET_ADDRESSES = {
-    btc:  'bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c',
-    eth:  '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',
-    usdt: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',
-    usdc: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',
-    sol:  'F6irucMuC6YejoZshgJH8x1XPEXN3bgzE9KgB8H5LwBU',
-    ltc:  'ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j',
-};
-
-function generateQRCodes() {
-    if (typeof QRCode === 'undefined') {
-        console.warn('QRCode library not loaded');
-        return;
-    }
-
-    Object.entries(WALLET_ADDRESSES).forEach(([coin, address]) => {
-        const container = document.getElementById(`qr-${coin}`);
-        if (!container) return;
-
-        // Clear any previous render
-        container.innerHTML = '';
-
-        new QRCode(container, {
-            text:         address,
-            width:        160,
-            height:       160,
-            colorDark:    '#000000',
-            colorLight:   '#ffffff',
-            correctLevel: QRCode.CorrectLevel.M,
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', generateQRCodes);

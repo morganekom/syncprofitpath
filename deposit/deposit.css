@@ -1,206 +1,402 @@
+/* deposit.css — Redesigned to match app design language */
+
 body {
     grid-template-columns: 17rem auto;
 }
 
-
-/* ── FORM WRAPPER ── */
+/* ========================= PAGE LAYOUT ========================= */
 .deposit-section {
-    margin-top: 7rem;
-    margin-right: 2vw;
+    margin-top: 5rem;
+    padding: 2.4rem 2.4rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
-.deposit-section h1 {
+.deposit-page-header {
+    margin-bottom: 2.4rem;
+}
+
+.deposit-page-header h1 {
+    font-size: 2.4rem;
     color: var(--color-dark);
-    margin-bottom: 1.7rem;
+    font-weight: 800;
 }
 
-/* ── SHARED CONTAINER CARD ── */
-.form-card {
-    margin-bottom: 1.5rem;
+.deposit-page-header p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+    margin-top: 0.4rem;
 }
 
-.form-card h3 {
-    color: var(--color-dark);
-    margin-bottom: 1rem;
-}
-
-/* ── CURRENCY OPTIONS ── */
-.currency-list {
+/* ========================= TWO-COLUMN LAYOUT ========================= */
+.deposit-layout {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
     align-items: start;
 }
 
-.currency-cell {
-    min-width: 0;
-}
-
-.currency-cell .currency-option {
-    height: auto;
-    width: 100%;
-}
-
-.currency-option {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+/* ========================= SECTION CARDS ========================= */
+.deposit-card {
     background: var(--color-white);
+    border-radius: var(--radius-3);
     padding: var(--card-padding);
-    border-radius: var(--radius-3);
-    overflow: visible;
-    border: 2px solid transparent;
-    transition: var(--transition);
 }
 
-/* Selected state — green border when a currency is active */
-.currency-option.active {
-    border-color: var(--color-primary);
-}
-
-/* The clickable header row */
-.currency-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 0.3rem;
-    user-select: none;
-    cursor: pointer;
-}
-
-.currency-option:hover {
-    background: var(--color-white);
-    border-color: var(--color-gray-light);
-}
-
-.currency-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-/* Coloured circle icon per currency */
-.currency-icon {
-    width: 3.4rem;
-    height: 3.4rem;
-    border-radius: var(--radius-3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.7rem;
+.deposit-card-title {
+    font-size: 1.3rem;
     font-weight: 700;
-    flex-shrink: 0;
+    color: var(--color-dark);
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
 }
 
-.currency-name {
-    color: var(--color-gray-dark);
-}
-
-.currency-ticker {
-    color: var(--color-gray-dark);
-}
-
-/* Chevron arrow that rotates on open */
-.chevron {
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--color-gray-dark);
-    transition: var(--transition);
-    flex-shrink: 0;
-}
-
-.currency-option.active .chevron {
-    transform: rotate(180deg);
+.deposit-card-title i {
+    font-size: 1.6rem;
     color: var(--color-primary);
 }
 
-/* ── DROPDOWN DETAILS ── */
-.currency-details {
-    display: none;
-    padding: 0 1rem 1.2rem;
-    border-top: 1px solid var(--color-light);
+/* ========================= STEP INDICATOR ========================= */
+.deposit-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 2.4rem;
 }
 
-.currency-option.active .currency-details {
-    display: block;
+.deposit-step {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 1;
+    position: relative;
 }
 
-.detail-label {
-    font-size: 1rem;
-    color: var(--color-gray-dark);
-    margin-bottom: 0.3rem;
-    margin-top: 1rem;
+.deposit-step:not(:last-child)::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--color-light);
+    margin: 0 0.8rem;
+    border-radius: 1px;
 }
 
-/* QR code placeholder */
-.qr-box {
-    width: 15rem;
-    height: 15rem;
+.deposit-step.active:not(:last-child)::after,
+.deposit-step.done:not(:last-child)::after {
+    background: var(--color-primary);
+}
+
+.step-num {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.deposit-step.active .step-num {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.deposit-step.done .step-num {
+    background: var(--color-success);
+    color: #fff;
+}
+
+.step-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.deposit-step.active .step-label {
+    color: var(--color-dark);
+}
+
+/* ========================= CRYPTO SELECTOR ========================= */
+.crypto-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+}
+
+.crypto-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.2rem 0.8rem;
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+
+.crypto-btn:hover {
+    border-color: var(--color-gray-light);
     background: var(--color-white);
+}
+
+.crypto-btn.selected {
+    border-color: var(--color-primary);
+    background: var(--color-white);
+    box-shadow: 0 0 0 3px rgba(0, 226, 123, 0.15);
+}
+
+.crypto-icon {
+    width: 3.6rem;
+    height: 3.6rem;
     border-radius: var(--radius-2);
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    font-size: 1.8rem;
+    font-weight: 700;
 }
 
-.qr-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+.crypto-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-dark);
 }
 
-/* Wallet address row */
-.wallet-row {
+.crypto-ticker {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+/* ========================= WALLET DETAILS (right panel) ========================= */
+.wallet-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    position: sticky;
+    top: 8rem;
+}
+
+.wallet-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 4rem 2rem;
+    color: var(--color-gray-light);
+    text-align: center;
+}
+
+.wallet-placeholder i {
+    font-size: 3.6rem;
+    opacity: 0.4;
+}
+
+.wallet-placeholder p {
+    font-size: 1.2rem;
+}
+
+.wallet-details {
+    display: none;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.wallet-details.visible {
+    display: flex;
+}
+
+/* Selected crypto header in right panel */
+.wallet-coin-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--color-light);
+}
+
+.wallet-coin-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.wallet-coin-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.wallet-coin-ticker {
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+}
+
+/* QR code */
+.qr-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 1.4rem;
     background: var(--color-light);
-    border-radius: var(--radius-3);
-    padding: 10px 14px;
+    border-radius: var(--radius-2);
 }
 
-.wallet-address {
-    font-size: 12px;
-    color: var(--color-gray-dark);
-    word-break: break-all;
-    flex: 1;
-    font-family: 'Courier New', monospace;
+.qr-canvas-wrap {
+    border-radius: var(--radius-1);
+    overflow: hidden;
+    line-height: 0;
 }
 
-/* Copy icon button */
-.copy-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-gray-dark);
-    padding: 4px;
-    border-radius: 6px;
-    transition: color 0.2s, background 0.2s;
-    flex-shrink: 0;
+/* Wallet address */
+.wallet-detail-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+}
+
+.wallet-address-row {
     display: flex;
     align-items: center;
+    gap: 0.8rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1rem 1.2rem;
+}
+
+.wallet-address-text {
+    flex: 1;
+    font-size: 1.1rem;
+    font-family: 'Courier New', monospace;
+    color: var(--color-dark);
+    word-break: break-all;
+    line-height: 1.5;
+}
+
+.copy-btn {
+    background: var(--color-white);
+    border: none;
+    border-radius: var(--radius-1);
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--color-gray-dark);
+    flex-shrink: 0;
 }
 
 .copy-btn:hover {
     color: var(--color-primary);
-    background: var(--color-white);
 }
 
 .copy-btn.copied {
-    color: var(--color-primary);
+    color: var(--color-success);
 }
 
-/* ── AMOUNT INPUT ── */
+.copy-btn i {
+    font-size: 1.4rem;
+}
+
+/* Network warning badge */
+.network-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(234, 181, 7, 0.12);
+    border-radius: var(--radius-1);
+    font-size: 1rem;
+    color: var(--color-warning);
+    font-weight: 600;
+}
+
+.network-badge i { font-size: 1.3rem; }
+
+/* ========================= AMOUNT + CURRENCY ========================= */
+.amount-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.currency-select-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.currency-select-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    white-space: nowrap;
+}
+
+.currency-select-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.local-currency-select {
+    flex: 1;
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: auto;
+}
+
+.local-currency-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.rate-status {
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 .amount-wrapper {
     position: relative;
 }
 
-.amount-wrapper span {
+.amount-symbol {
     position: absolute;
     left: 1.6rem;
     top: 50%;
-    transform: translateY(-51%);
+    transform: translateY(-50%);
     color: var(--color-gray-dark);
     font-size: 2rem;
     font-weight: 600;
@@ -209,11 +405,11 @@ body {
 
 .amount-input {
     width: 100%;
-    background: var(--color-white);
-    border-radius: var(--radius-3);
-    padding: 1.6rem 1.8rem 1.6rem 3rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.6rem 1.8rem 1.6rem 3.4rem;
     font-size: 2rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-dark);
     outline: none;
     border: 2px solid transparent;
@@ -221,53 +417,64 @@ body {
     font-family: "Poppins", sans-serif;
 }
 
-.amount-input::placeholder {
-    color: var(--color-gray-dark);
-}
-
 .amount-input:focus {
     border-color: var(--color-primary);
+    background: var(--color-white);
 }
 
-/* ── ERROR STATE — red border on amount input ── */
 .amount-input.input-error {
     border-color: var(--color-danger);
 }
 
-/* Inline error message under amount */
+.amount-input::placeholder { color: var(--color-gray-light); }
+
+.usd-preview {
+    display: none;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(0, 226, 123, 0.08);
+    border-radius: var(--radius-1);
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    border: 1px solid rgba(0, 226, 123, 0.2);
+}
+
+.usd-preview i { font-size: 1.4rem; color: var(--color-primary); flex-shrink: 0; }
+.usd-preview strong { color: var(--color-dark); }
+
 .field-error {
     font-size: 1.1rem;
     color: var(--color-danger);
-    margin-top: 0.6rem;
     min-height: 1.4rem;
-    padding-left: 0.4rem;
+    padding-left: 0.2rem;
 }
 
-/* ── FILE UPLOAD ── */
-/* ── REQUIRED STAR ── */
-.required {
-    color: var(--color-danger);
-    font-weight: 700;
-    margin-left: 0.3rem;
+/* ========================= FILE UPLOAD ========================= */
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
 }
 
-/* ── FORM GROUP (matches KYC section) ── */
-.form-group label {
-    display: block;
+.upload-label-text {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-dark);
-    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-/* ── FILE UPLOAD LABEL (matches KYC dashed style) ── */
+.required { color: var(--color-danger); }
+
 .file-upload-label {
     display: flex;
     align-items: center;
     gap: 1.2rem;
     background: var(--color-light);
     border-radius: var(--radius-2);
-    padding: 1.4rem 1.6rem;
+    padding: 1.6rem;
     cursor: pointer;
     border: 2px dashed var(--color-gray-light);
     transition: var(--transition);
@@ -278,30 +485,26 @@ body {
     background: rgba(0, 226, 123, 0.04);
 }
 
-/* Error state on file upload */
-.file-upload-label.upload-error {
-    border-color: var(--color-danger);
-}
+.file-upload-label.upload-error { border-color: var(--color-danger); }
 
-/* Chosen state */
 .file-upload-label.file-chosen {
     border-color: var(--color-primary);
+    border-style: solid;
     background: rgba(0, 226, 123, 0.04);
 }
 
-.upload-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+.upload-icon {
+    font-size: 2.4rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
 }
 
 .upload-text strong {
+    display: block;
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-dark);
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
+    margin-bottom: 0.2rem;
 }
 
 .upload-text small {
@@ -309,49 +512,43 @@ body {
     font-size: 1rem;
 }
 
-/* File chosen confirmation message (matches .file-chosen in settings) */
-.file-chosen {
+.file-chosen-name {
     font-size: 1.1rem;
     color: var(--color-success);
     min-height: 1.4rem;
-    margin-top: 0.4rem;
+    font-weight: 500;
 }
 
-/* ── SUBMIT BUTTON ── */
+/* ========================= SUBMIT BUTTON ========================= */
 .submit-btn {
+    width: 100%;
+    padding: 1.5rem;
     background: var(--color-primary);
     color: var(--color-dark);
-    padding: 1.5rem;
     font-size: 1.3rem;
     font-weight: 700;
     border: none;
     border-radius: var(--radius-2);
     cursor: pointer;
     transition: var(--transition);
-    margin-top: 0.5rem;
-    /* close to upload proof */
-    margin-bottom: 5rem;
-    width: 100%;
     font-family: "Poppins", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
 }
 
 .submit-btn:hover:not(:disabled) {
-    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+    box-shadow: 0 0.8rem 2rem rgba(0, 226, 123, 0.4);
+    transform: translateY(-1px);
 }
 
-/* ── DISABLED STATE — button greyed out until form is complete ── */
 .submit-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
-
-/* ── LOADING STATE — spinner text while submitting ── */
-.submit-btn.loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
 
 /* ========================= CONFIRMATION MODAL ========================= */
 .modal-overlay {
@@ -359,37 +556,29 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 1000;
     place-items: center;
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(4px);
 }
 
-.modal-overlay.open {
-    display: grid;
-}
+.modal-overlay.open { display: grid; }
 
 .modal {
     background: var(--color-white);
     border-radius: var(--radius-3);
     width: 100%;
     max-width: 42rem;
-    padding: var(--card-padding);
+    padding: 2.4rem;
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 1.6rem;
     animation: slideUp 250ms ease;
+    margin: 1rem;
 }
 
 @keyframes slideUp {
-    from {
-        transform: translateY(2rem);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(2rem); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
 }
 
 .modal-header {
@@ -398,12 +587,17 @@ body {
     align-items: center;
 }
 
+.modal-header h3 {
+    font-size: 1.6rem;
+    color: var(--color-dark);
+}
+
 .modal-close-btn {
     background: var(--color-light);
     border: none;
     border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
+    width: 3.2rem;
+    height: 3.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -424,7 +618,7 @@ body {
     padding: var(--card-padding);
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 1rem;
 }
 
 .modal-summary-row {
@@ -432,16 +626,17 @@ body {
     justify-content: space-between;
     align-items: center;
     font-size: 1.2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.modal-summary-row span:first-child {
-    color: var(--color-gray-light);
+.modal-summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
-.modal-summary-row span:last-child {
-    color: var(--color-dark);
-    font-weight: 600;
-}
+.modal-summary-row span:first-child { color: var(--color-gray-light); }
+.modal-summary-row span:last-child  { color: var(--color-dark); font-weight: 600; }
 
 .modal-footer {
     display: flex;
@@ -462,10 +657,7 @@ body {
     font-family: "Poppins", sans-serif;
 }
 
-.modal-cancel-btn:hover {
-    background: var(--color-danger-light);
-    color: var(--color-danger);
-}
+.modal-cancel-btn:hover { background: var(--color-danger-light); color: var(--color-danger); }
 
 .modal-confirm-btn {
     flex: 2;
@@ -481,10 +673,8 @@ body {
     font-family: "Poppins", sans-serif;
 }
 
-.modal-confirm-btn:hover {
-    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
-}
-
+.modal-confirm-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal-confirm-btn:not(:disabled):hover { box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35); }
 
 /* ========================= SUCCESS STATE ========================= */
 .deposit-success {
@@ -492,35 +682,27 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 1.2rem;
+    gap: 1.4rem;
     background: var(--color-white);
     border-radius: var(--radius-3);
-    padding: 4rem var(--card-padding);
-    margin-bottom: 5rem;
+    padding: 5rem var(--card-padding);
 }
 
-.deposit-success.show {
-    display: flex;
-}
+.deposit-success.show { display: flex; }
 
-.success-icon {
-    font-size: 5rem;
-    color: var(--color-success);
-    line-height: 1;
-}
+.success-icon { font-size: 6rem; color: var(--color-success); line-height: 1; }
 
-.deposit-success h2 {
-    color: var(--color-dark);
-}
+.deposit-success h2 { font-size: 2.2rem; color: var(--color-dark); }
 
 .deposit-success p {
     color: var(--color-gray-light);
     font-size: 1.2rem;
-    max-width: 32rem;
+    max-width: 36rem;
+    line-height: 1.7;
 }
 
 .deposit-success-btn {
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     padding: 1.2rem 3rem;
     background: var(--color-primary);
     color: var(--color-dark);
@@ -533,118 +715,19 @@ body {
     font-family: "Poppins", sans-serif;
 }
 
-.deposit-success-btn:hover {
-    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
-}
+.deposit-success-btn:hover { box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35); }
 
-/* ── Paste at the bottom of deposit.css ── */
-
-/* Local currency selector row */
-.local-currency-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 1.4rem;
-}
-
-.local-currency-label {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-}
-
-.local-currency-wrap {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.local-currency-select {
-    flex: 1;
-    background: var(--color-white);
-    border: 2px solid transparent;
-    border-radius: var(--radius-2);
-    padding: 1rem 1.2rem;
-    font-size: 1.1rem;
-    font-family: "Poppins", sans-serif;
-    color: var(--color-dark);
-    cursor: pointer;
-    transition: var(--transition);
-    appearance: auto;
-}
-
-.local-currency-select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    background: var(--color-white);
-}
-
-.rate-status {
-    font-size: 1rem;
-    font-weight: 600;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-/* USD conversion preview */
-.usd-preview {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    background: var(--color-primary-light, rgba(0,226,123,0.1));
-    border-radius: var(--radius-1);
-    padding: 0.9rem 1.2rem;
-    font-size: 1.1rem;
-    color: var(--color-gray-dark);
-    margin-top: 0.8rem;
-}
-
-.usd-preview i {
-    font-size: 1.4rem;
-    color: var(--color-primary);
-    flex-shrink: 0;
-}
-
-.usd-preview strong {
-    color: var(--color-dark);
-}
-
-
-
-
-
-
-
-/* ========================= MEDIA QUERIES (tablets) ========================= */
+/* ========================= MEDIA QUERIES ========================= */
 @media screen and (max-width: 1024px) {
-    body {
-        grid-template-columns: 1fr;
-    }
+    body { grid-template-columns: 1fr; }
+    .deposit-layout { grid-template-columns: 1fr; }
+    .wallet-panel { position: static; }
 }
 
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
 @media screen and (max-width: 600px) {
-    .deposit-section {
-        margin-left: 2vw;
-    }
-
-    .currency-list {
-        grid-template-columns: 1fr;
-    }
-
-    .modal {
-        margin: 0 1rem;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-    }
-}
-
-/* ── ADDRESS COPIED HIGHLIGHT (Fix 4) ── */
-/* When user copies a wallet address, the currency card gets a primary border */
-.currency-option.address-copied {
-    border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 2px rgba(0, 226, 123, 0.2);
+    .deposit-section { padding: 1.6rem 1rem 6rem; }
+    .crypto-grid { grid-template-columns: repeat(3, 1fr); }
+    .modal { margin: 0 1rem; }
+    .modal-footer { flex-direction: column; }
+    .deposit-steps .step-label { display: none; }
 }
