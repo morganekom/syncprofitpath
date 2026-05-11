@@ -251,11 +251,32 @@ function validateModalAmount() {
 
 async function confirmInvestment() {
     const confirmBtn = document.getElementById('modalConfirmBtn');
-    confirmBtn.textContent = 'Submitting...';
-    confirmBtn.disabled    = true;
+    const errorEl    = document.getElementById('modalError');
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const amount      = parseFloat(document.getElementById('modalAmount').value);
+
+    // ── BALANCE CHECK — fetch live balance from Supabase ──
+    const { data: userData, error: balanceError } = await db
+        .from('users')
+        .select('balance')
+        .eq('id', currentUser.id)
+        .single();
+
+    if (balanceError || !userData) {
+        errorEl.textContent = 'Could not verify your balance. Please try again.';
+        return;
+    }
+
+    const availableBalance = parseFloat(userData.balance || 0);
+
+    if (amount > availableBalance) {
+        errorEl.textContent = `Insufficient balance. Your available balance is $${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`;
+        return;
+    }
+
+    confirmBtn.textContent = 'Submitting...';
+    confirmBtn.disabled    = true;
     const reference   = 'INV-' + Date.now().toString(36).toUpperCase();
 
     const { error } = await db
