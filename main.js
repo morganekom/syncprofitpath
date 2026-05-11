@@ -105,8 +105,8 @@ if (navProfile) {
         const parts  = window.location.pathname.split('/').filter(Boolean);
         // parts = segments of the path excluding empty strings
         // last part is the filename, everything before it is directories
-        const depth  = parts.length - 1;   // number of folder levels below root
-        const prefix = '../'.repeat(depth); // go up one level per folder
+        const depth  = parts.length;
+        const prefix = '../'.repeat(depth);
         window.location.href = prefix + 'settings/';
     });
 }
