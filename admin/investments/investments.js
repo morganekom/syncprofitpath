@@ -3,9 +3,10 @@
 // Lists all investment transactions. Admin can approve or reject.
 //
 // Approve: status → 'completed', user balance DECREASES by amount
-//          (the funds are moved from available balance into the plan).
-// Reject:  status → 'failed', balance stays the same
-//          (user never had balance deducted on submission).
+//          (the funds move from available balance into the plan).
+//          Sets daily_rate, start_date, end_date, inv_active = true
+//          so the daily cron can calculate profits automatically.
+// Reject:  status → 'failed', balance stays the same.
 // ================================================================
 
 
@@ -103,10 +104,10 @@ function applyFilter() {
         if (!matchStatus) return false;
         if (!query) return true;
 
-        const name   = (inv.users?.full_name || inv.users?.first_name || '').toLowerCase();
-        const ref    = (inv.reference || '').toLowerCase();
-        const plan   = (inv.method   || '').toLowerCase(); // plan stored in method field
-        const coin   = (inv.coin     || '').toLowerCase();
+        const name = (inv.users?.full_name || inv.users?.first_name || '').toLowerCase();
+        const ref  = (inv.reference || '').toLowerCase();
+        const plan = (inv.method   || '').toLowerCase();
+        const coin = (inv.coin     || '').toLowerCase();
         return name.includes(query) || ref.includes(query) || plan.includes(query) || coin.includes(query);
     });
 
@@ -141,8 +142,13 @@ function renderTable() {
         const name   = escapeHtml(inv.users?.full_name || inv.users?.first_name || 'Unknown');
         const amount = '$' + parseFloat(inv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
         const date   = formatDate(inv.created_at);
-        const plan   = escapeHtml(inv.method || '—');  // plan name stored in method
+        const plan   = escapeHtml(inv.method || '—');
         const coin   = escapeHtml((inv.coin || '—').toUpperCase());
+
+        // Show daily rate if already set
+        const rateLabel = inv.daily_rate != null
+            ? `<small class="text-muted">${inv.daily_rate}%/day</small>`
+            : '';
 
         const actions = inv.status === 'pending'
             ? `<div class="row-actions">
@@ -163,7 +169,7 @@ function renderTable() {
                     <small class="text-muted">${escapeHtml(inv.users?.email || '')}</small>
                 </td>
                 <td class="tx-reference">${escapeHtml(inv.reference || '—')}</td>
-                <td>${plan}</td>
+                <td>${plan}<br>${rateLabel}</td>
                 <td>${coin}</td>
                 <td class="tx-amount-label investment">${amount}</td>
                 <td class="tx-date">${date}</td>
@@ -189,27 +195,34 @@ function openInvModal(id) {
     const amount    = '$' + parseFloat(inv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
     const balance   = '$' + parseFloat(inv.users?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
+    // Parse daily rate from note field: "Standard plan — 3% daily"
+    const noteMatch = (inv.note || '').match(/([\d.]+)%\s*daily/i);
+    const parsedRate = noteMatch ? parseFloat(noteMatch[1]) : null;
+
     setText('miUser',      name);
     setText('miEmail',     inv.users?.email || '—');
     setText('miReference', inv.reference    || '—');
-    setText('miPlan',      inv.method       || '—');   // plan stored in method
+    setText('miPlan',      inv.method       || '—');
     setText('miCoin',      (inv.coin || '—').toUpperCase());
     setText('miAmount',    amount);
     setText('miBalance',   balance);
     setText('miDate',      formatDateTime(inv.created_at));
+    setText('miRate',      parsedRate != null ? parsedRate + '% daily' : '—');
     document.getElementById('miStatus').innerHTML =
         `<span class="badge ${inv.status}">${capitalise(inv.status)}</span>`;
 
-    // Show note + actions only for pending
-    document.getElementById('miNoteWrap').style.display = isPending ? 'flex'  : 'none';
-    document.getElementById('miActions').style.display  = isPending ? 'flex'  : 'none';
+    // Store parsed rate on the modal for use in handleInvAction
+    document.getElementById('invModal').dataset.parsedRate = parsedRate != null ? parsedRate : '';
+
+    document.getElementById('miNoteWrap').style.display = isPending ? 'flex' : 'none';
+    document.getElementById('miActions').style.display  = isPending ? 'flex' : 'none';
     document.getElementById('miResolved').style.display = 'none';
     document.getElementById('miNote').value             = '';
 
     const approveBtn = document.getElementById('miApproveBtn');
     const rejectBtn  = document.getElementById('miRejectBtn');
     approveBtn.disabled = false;
-    approveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Approve & Deduct';
+    approveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Approve & Activate';
     rejectBtn.disabled   = false;
     rejectBtn.innerHTML  = '<i class="uil uil-times-circle"></i> Reject';
 
@@ -250,10 +263,30 @@ async function handleInvAction(newStatus) {
         const amount = parseFloat(inv.amount);
         const userId = inv.users?.id || inv.user_id;
 
-        // 1. Update transaction status
+        // ── BUILD TRANSACTION UPDATE ──
         const txUpdate = { status: newStatus };
         if (note) txUpdate.note = note;
 
+        if (newStatus === 'completed') {
+            // Parse daily rate from the note field e.g. "Standard plan — 3% daily"
+            const parsedRate = parseFloat(
+                document.getElementById('invModal').dataset.parsedRate || '0'
+            );
+
+            const today    = new Date();
+            const endDate  = new Date(today);
+            endDate.setDate(endDate.getDate() + 30);
+
+            const toDateStr = d => d.toISOString().split('T')[0];
+
+            txUpdate.daily_rate    = parsedRate || null;
+            txUpdate.start_date    = toDateStr(today);
+            txUpdate.end_date      = toDateStr(endDate);
+            txUpdate.duration_days = 30;
+            txUpdate.inv_active    = true;
+        }
+
+        // 1. Update transaction
         const { error: txError } = await db
             .from('transactions')
             .update(txUpdate)
@@ -261,7 +294,7 @@ async function handleInvAction(newStatus) {
 
         if (txError) throw txError;
 
-        // 2. Fetch fresh user balance to avoid stale data
+        // 2. Update user balance
         const { data: userData, error: fetchError } = await db
             .from('users')
             .select('balance')
@@ -271,15 +304,9 @@ async function handleInvAction(newStatus) {
         if (fetchError) throw fetchError;
 
         const currentBalance = parseFloat(userData.balance || 0);
-        let   newBalance;
-
-        if (newStatus === 'completed') {
-            // Approved — deduct the investment amount from the user's available balance
-            newBalance = Math.max(0, currentBalance - amount);
-        } else {
-            // Rejected — no balance change (user never had it deducted on submission)
-            newBalance = currentBalance;
-        }
+        const newBalance = newStatus === 'completed'
+            ? Math.max(0, currentBalance - amount)  // deduct invested amount
+            : currentBalance;                         // reject — no change
 
         const { error: userError } = await db
             .from('users')
@@ -288,14 +315,14 @@ async function handleInvAction(newStatus) {
 
         if (userError) throw userError;
 
-        // 3. Update local state so table reflects change without full reload
+        // 3. Update local state
         activeInvestment.status = newStatus;
         allInvestments = allInvestments.map(i =>
             i.id === inv.id ? { ...i, status: newStatus } : i
         );
         applyFilter();
 
-        // 4. Show resolved state inside modal
+        // 4. Show resolved state in modal
         document.getElementById('miActions').style.display  = 'none';
         document.getElementById('miNoteWrap').style.display = 'none';
         const resolvedEl  = document.getElementById('miResolved');
@@ -304,7 +331,7 @@ async function handleInvAction(newStatus) {
 
         if (newStatus === 'completed') {
             resolvedMsg.textContent =
-                `✓ Investment approved. $${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} deducted from user balance.`;
+                `✓ Investment activated. $${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} deducted from balance. Daily profits will be credited automatically.`;
         } else {
             resolvedMsg.textContent = '✕ Investment rejected. No balance change.';
         }
@@ -316,7 +343,7 @@ async function handleInvAction(newStatus) {
         console.error('Investment action error:', err.message);
         approveBtn.disabled = false;
         rejectBtn.disabled  = false;
-        approveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Approve & Deduct';
+        approveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Approve & Activate';
         rejectBtn.innerHTML  = '<i class="uil uil-times-circle"></i> Reject';
         alert('Something went wrong: ' + err.message);
     }
