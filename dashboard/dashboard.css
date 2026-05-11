@@ -464,34 +464,118 @@ body {
 .plan-premium-row  .plan-rate { color: var(--color-purple); }
 
 
-/* ========================= SUPPORT LINKS ========================= */
+/* ========================= SUPPORT ========================= */
+.support-chat-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.support-chat-row:hover {
+    background: rgba(0, 226, 123, 0.12);
+}
+
+.support-chat-avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: rgba(0, 226, 123, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.support-chat-avatar i {
+    font-size: 1.7rem;
+    color: var(--color-primary);
+}
+
+.support-chat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.support-chat-info h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin-bottom: 0.1rem;
+}
+
+.support-chat-info small {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+.support-online-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--color-success);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+}
+
 .support-links {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.2rem;
 }
 
 .support-links a {
-    color: var(--color-dark);
-    font-size: 1.2rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid var(--color-light);
-    transition: var(--transition);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.8rem;
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-1);
+    transition: var(--transition);
+    background: transparent;
 }
 
-.support-links a:last-child { border-bottom: none; }
-
-.support-links a::after {
-    content: '›';
+.support-links a i {
+    font-size: 1.4rem;
     color: var(--color-gray-light);
-    font-size: 1.6rem;
+    flex-shrink: 0;
+    transition: var(--transition);
 }
 
-.support-links a:hover { color: var(--color-primary); }
-.support-links a:hover::after { color: var(--color-primary); }
+.support-links a:hover {
+    background: var(--color-light);
+    color: var(--color-primary);
+}
+
+.support-links a:hover i {
+    color: var(--color-primary);
+}
+
+.support-faq-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--color-light);
+    transition: var(--transition);
+}
+
+.support-faq-link i {
+    font-size: 1.3rem;
+    transition: var(--transition);
+}
+
+.support-faq-link:hover i {
+    transform: translateX(3px);
+}
 
 
 /* ========================= MEDIA QUERIES (tablet) ========================= */

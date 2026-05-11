@@ -288,12 +288,39 @@
             <div class="dash-panel-header">
                 <h2>Support</h2>
             </div>
-            <div class="support-links">
-                <a href="#">How your funds are stored</a>
-                <a href="#">How to fund your account</a>
-                <a href="#">How to invest</a>
-                <a href="#">View FAQ</a>
+
+            <!-- Live chat entry -->
+            <div class="support-chat-row" onclick="ChatWidget && ChatWidget.toggle()">
+                <div class="support-chat-avatar">
+                    <i class="uil uil-headphone-alt"></i>
+                </div>
+                <div class="support-chat-info">
+                    <h5>Live chat</h5>
+                    <small>Usually replies in minutes</small>
+                </div>
+                <span class="support-online-dot"></span>
             </div>
+
+            <!-- Quick help links -->
+            <div class="support-links">
+                <a href="../faq/#deposits">
+                    <i class="uil uil-arrow-circle-down"></i>
+                    How to fund your account
+                </a>
+                <a href="../faq/#investing">
+                    <i class="uil uil-diamond"></i>
+                    How investing works
+                </a>
+                <a href="../faq/#withdrawals">
+                    <i class="uil uil-arrow-circle-up"></i>
+                    How to withdraw
+                </a>
+            </div>
+
+            <!-- View all -->
+            <a href="../faq/" class="support-faq-link">
+                View all FAQs <i class="uil uil-arrow-right"></i>
+            </a>
         </div>
 
     </aside>
