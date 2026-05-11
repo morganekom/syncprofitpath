@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- THIS GOES FIRST -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('currrentTheme');
+            if (theme) document.documentElement.classList.add(theme);
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & FAQ — SyncProfitPath</title>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./faq.css">
+</head>
+
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <a href="../dashboard/" class="nav_logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="Search...">
+            </div>
+            <div class="nav_profile-wrapper">
+                <button class="nav_theme-btn"><i class="uil uil-moon"></i></button>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../assets/profile-1.jpg" alt="Profile">
+                    </div>
+                    <h5 id="navName">User Name</h5>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <button class="nav_menu-btn"><i class="uil uil-bars"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../dashboard/">
+            <i class="uil uil-create-dashboard"></i><h5>Dashboard</h5>
+        </a>
+        <a href="../deposit/">
+            <i class="uil uil-arrow-circle-down"></i><h5>Deposit</h5>
+        </a>
+        <a href="../invest/">
+            <i class="uil uil-diamond"></i><h5>Invest</h5>
+        </a>
+        <a href="../withdraw/">
+            <i class="uil uil-arrow-circle-up"></i><h5>Withdraw</h5>
+        </a>
+        <a href="../transactions/">
+            <i class="uil uil-history"></i><h5>Transactions</h5>
+        </a>
+        <a href="../refer/">
+            <i class="uil uil-user-plus"></i><h5>Refer & Earn</h5>
+        </a>
+        <a href="../settings/">
+            <i class="uil uil-setting"></i><h5>Settings</h5>
+        </a>
+        <button class="sidebar_close-btn">
+            <i class="uil uil-multiply"></i>
+        </button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i>
+            <h5>Logout</h5>
+        </button>
+    </menu>
+
+    <!--==================== MAIN ====================-->
+    <main class="faq-main">
+
+        <!-- Header -->
+        <div class="faq-hero">
+            <div class="faq-hero-icon">
+                <i class="uil uil-headphone-alt"></i>
+            </div>
+            <div>
+                <h1>Help & FAQ</h1>
+                <p>Everything you need to know about using SyncProfitPath.</p>
+            </div>
+            <button class="faq-chat-btn" onclick="ChatWidget && ChatWidget.toggle()">
+                <i class="uil uil-comment-dots"></i>
+                Chat with support
+            </button>
+        </div>
+
+        <!-- Tab nav -->
+        <div class="faq-tabs">
+            <button class="faq-tab active" onclick="switchTab('deposits')">
+                <i class="uil uil-arrow-circle-down"></i> Deposits
+            </button>
+            <button class="faq-tab" onclick="switchTab('investing')">
+                <i class="uil uil-diamond"></i> Investing
+            </button>
+            <button class="faq-tab" onclick="switchTab('withdrawals')">
+                <i class="uil uil-arrow-circle-up"></i> Withdrawals
+            </button>
+            <button class="faq-tab" onclick="switchTab('account')">
+                <i class="uil uil-shield-check"></i> Account & KYC
+            </button>
+        </div>
+
+        <!-- ── DEPOSITS ── -->
+        <div class="faq-section active" id="tab-deposits">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How do I fund my account?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Go to <strong>Deposit</strong> from the sidebar or dashboard. Choose your preferred cryptocurrency — Bitcoin, Ethereum, USDT, USDC, Solana, or Litecoin — then copy the wallet address shown and send your funds from your external wallet or exchange. Once sent, paste your transaction hash and submit. Our team will confirm the deposit, usually within 30 minutes.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>What is the minimum deposit?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">The minimum deposit is <strong>$100</strong>, which qualifies you for the Basic Plan. Higher deposits unlock the Standard ($500+) and Premium ($2,000+) plans with better daily rates.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>Which cryptocurrencies can I use?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">We currently accept Bitcoin (BTC), Ethereum (ETH), USDT (TRC20 & ERC20), USDC, Solana (SOL), and Litecoin (LTC). Make sure you're sending on the correct network — sending on the wrong network will result in lost funds that cannot be recovered.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How long does a deposit take to confirm?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Most deposits are confirmed within <strong>30 minutes</strong> to 2 hours depending on network congestion. Once confirmed, the amount is added to your available balance and you can begin investing immediately.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>My deposit is still pending after several hours. What should I do?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">First, check that your transaction hash is visible on a blockchain explorer (e.g. blockchair.com or etherscan.io) and has at least 1 confirmation. If it does and your balance still hasn't updated, open a chat with our support team and share your transaction hash — we'll look into it right away.</div>
+            </div>
+        </div>
+
+        <!-- ── INVESTING ── -->
+        <div class="faq-section" id="tab-investing">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How does investing work?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Once your account is funded, go to the <strong>Invest</strong> page and choose a plan that matches your balance. Enter the amount you want to invest and confirm. Your investment starts earning the plan's daily rate immediately, and profits are credited to your account every 24 hours.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>What are the available plans and their rates?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">
+                    There are three plans:
+                    <ul>
+                        <li><strong>Basic</strong> — $100 to $500, earning 1.5% daily (10× ROI)</li>
+                        <li><strong>Standard</strong> — $500 to $2,000, earning 3% daily (20× ROI)</li>
+                        <li><strong>Premium</strong> — $2,000 to $10,000, earning 5% daily (50× ROI)</li>
+                    </ul>
+                    The plan applied to your investment is determined by the amount you invest, not your total balance.
+                </div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>When are profits credited to my account?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Profits are calculated and credited to your account balance every <strong>24 hours</strong>. You can track your cumulative earnings in the Investment Profit card on your dashboard.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>Can I invest more than once?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Yes. You can make multiple investments. Each investment is tracked independently and earns at the rate of the plan it qualified for at the time of investment.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How do I upgrade to a higher plan?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Simply make a new deposit and invest an amount that falls within a higher plan's range. There is no manual upgrade process — the plan rate is automatically applied based on the investment amount you choose.</div>
+            </div>
+        </div>
+
+        <!-- ── WITHDRAWALS ── -->
+        <div class="faq-section" id="tab-withdrawals">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How do I withdraw my funds?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Go to <strong>Withdraw</strong> from the sidebar. Enter the amount you want to withdraw, select the cryptocurrency, and provide your wallet address. Submit the request and our team will process it — you'll receive a confirmation once the transfer is complete.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>What is the minimum withdrawal amount?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">The minimum withdrawal is <strong>$10</strong>. There is no maximum — you can withdraw your full available balance at any time.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How long does a withdrawal take?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Withdrawal requests are typically processed within <strong>24 hours</strong>, often much sooner. Once processed, the transfer time depends on network conditions — most arrive within minutes to a few hours.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>Are there any withdrawal fees?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">SyncProfitPath does not charge withdrawal fees. However, standard blockchain network (gas) fees may apply depending on the cryptocurrency and network used. These are deducted from the amount sent.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>Do I need to complete KYC before I can withdraw?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Yes. KYC verification is required before your first withdrawal. This is a one-time process. Go to <strong>Settings → KYC Verification</strong> and submit a government-issued ID and proof of address. Verification typically takes 24–48 hours.</div>
+            </div>
+        </div>
+
+        <!-- ── ACCOUNT & KYC ── -->
+        <div class="faq-section" id="tab-account">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How do I complete KYC verification?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Go to <strong>Settings</strong> from the sidebar and open the <strong>KYC Verification</strong> tab. Upload a clear photo of a government-issued ID (passport, national ID, or driver's licence) and a proof of address document dated within the last 3 months. Submit and our team will review your documents within 24–48 hours.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>Why was my KYC rejected?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Common reasons include blurry or cropped images, expired documents, or mismatched information. If your KYC was rejected, you'll receive a reason in your account. Fix the issue and resubmit. If you need help, chat with our support team.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How are my funds kept safe?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">All user data and communications are protected with 256-bit SSL encryption. The majority of user assets are held in cold wallet storage — offline and inaccessible to external threats. We enforce strict internal security protocols and regular audits to protect your investments at all times.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How does the referral program work?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Every user gets a unique referral code found in the <strong>Refer & Earn</strong> section. When someone signs up using your code and makes a deposit, you earn a referral bonus automatically. You can track all your referrals and total earnings in that section.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>How do I change my password or profile details?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Go to <strong>Settings</strong> from the sidebar. From there you can update your profile photo, display name, email address, and password. Changes are saved to your account immediately.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">
+                    <span>I can't log in to my account. What should I do?</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="faq-a">Double-check that you're using the email address you signed up with and that your password is correct. If you've forgotten your password, use the <strong>Forgot password</strong> link on the login page. If you're still locked out, chat with support and we'll help you recover access.</div>
+            </div>
+        </div>
+
+        <!-- Still need help -->
+        <div class="faq-still-help">
+            <div class="faq-still-help-inner">
+                <div class="faq-still-icon">
+                    <i class="uil uil-comment-heart"></i>
+                </div>
+                <div>
+                    <h3>Still need help?</h3>
+                    <p>Our support team is online and usually responds within minutes.</p>
+                </div>
+                <button class="faq-chat-btn" onclick="ChatWidget && ChatWidget.toggle()">
+                    <i class="uil uil-comment-dots"></i>
+                    Open live chat
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase.js"></script>
+    <script src="../main.js"></script>
+    <script src="../chat-widget.js"></script>
+    <script src="./faq.js"></script>
+</body>
+</html>

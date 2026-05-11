@@ -1,0 +1,284 @@
+/* faq.css */
+
+body {
+    grid-template-columns: 17rem auto;
+}
+
+
+/* ========================= MAIN ========================= */
+.faq-main {
+    margin-top: 7rem;
+    margin-right: 2.9vw;
+    padding-bottom: 6rem;
+    max-width: 780px;
+}
+
+
+/* ========================= HERO ========================= */
+.faq-hero {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    margin-bottom: 2.4rem;
+    flex-wrap: wrap;
+}
+
+.faq-hero-icon {
+    width: 4.8rem;
+    height: 4.8rem;
+    border-radius: 50%;
+    background: rgba(0, 226, 123, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.faq-hero-icon i {
+    font-size: 2.2rem;
+    color: var(--color-primary);
+}
+
+.faq-hero > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.faq-hero h1 {
+    color: var(--color-dark);
+    margin-bottom: 0.2rem;
+}
+
+.faq-hero p {
+    color: var(--color-gray-light);
+    font-size: 1.2rem;
+}
+
+
+/* ========================= CHAT BUTTON ========================= */
+.faq-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.8rem;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    border: none;
+    border-radius: var(--radius-2);
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.faq-chat-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.faq-chat-btn i {
+    font-size: 1.5rem;
+}
+
+
+/* ========================= TAB NAV ========================= */
+.faq-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 0.6rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.faq-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: var(--radius-2);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    white-space: nowrap;
+}
+
+.faq-tab i {
+    font-size: 1.4rem;
+}
+
+.faq-tab:hover {
+    background: var(--color-light);
+    color: var(--color-dark);
+}
+
+.faq-tab.active {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.faq-tab.active i {
+    color: var(--color-dark);
+}
+
+
+/* ========================= FAQ SECTIONS ========================= */
+.faq-section {
+    display: none;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.faq-section.active {
+    display: flex;
+}
+
+
+/* ========================= FAQ ITEMS ========================= */
+.faq-item {
+    background: var(--color-white);
+    border-radius: var(--radius-2);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.faq-item:hover {
+    transform: translateY(-1px);
+}
+
+.faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 1.6rem;
+}
+
+.faq-q span {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    line-height: 1.4;
+}
+
+.faq-q i {
+    font-size: 1.8rem;
+    color: var(--color-gray-light);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.faq-item.open .faq-q i {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.faq-a {
+    font-size: 1.2rem;
+    color: var(--color-gray-light);
+    line-height: 1.7;
+    padding: 0 1.6rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-item.open .faq-a {
+    max-height: 400px;
+    padding: 0 1.6rem 1.4rem;
+}
+
+.faq-a strong {
+    color: var(--color-dark);
+    font-weight: 600;
+}
+
+.faq-a ul {
+    margin: 0.8rem 0 0 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.faq-a ul li {
+    font-size: 1.2rem;
+    color: var(--color-gray-light);
+}
+
+.faq-a ul li strong {
+    color: var(--color-dark);
+}
+
+
+/* ========================= STILL NEED HELP ========================= */
+.faq-still-help {
+    margin-top: 3rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+}
+
+.faq-still-help-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+}
+
+.faq-still-icon {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    background: rgba(0, 226, 123, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.faq-still-icon i {
+    font-size: 2rem;
+    color: var(--color-primary);
+}
+
+.faq-still-help-inner > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.faq-still-help h3 {
+    color: var(--color-dark);
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.faq-still-help p {
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+}
+
+
+/* ========================= RESPONSIVE ========================= */
+@media screen and (max-width: 1024px) {
+    body { grid-template-columns: 1fr; }
+    .faq-main { margin-right: 1.5rem; margin-left: 1.5rem; }
+}
+
+@media screen and (max-width: 600px) {
+    .faq-tabs { gap: 0.4rem; }
+    .faq-tab { padding: 0.8rem 1rem; font-size: 1.1rem; }
+    .faq-tab span { display: none; }
+    .faq-hero { gap: 1rem; }
+    .faq-chat-btn { width: 100%; justify-content: center; }
+    .faq-still-help-inner .faq-chat-btn { width: 100%; justify-content: center; }
+}
