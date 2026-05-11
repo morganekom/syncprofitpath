@@ -14,7 +14,7 @@
     if (!currentUser) {
         if (!isAuthPage) {
             const parts  = path.split('/').filter(Boolean);
-            const depth  = parts.length - 1;
+            const depth  = parts.length;
             const prefix = '../'.repeat(depth);
             window.location.replace(prefix + 'auth/login/');
         } else {

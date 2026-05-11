@@ -143,7 +143,7 @@ function logout() {
     if (remEmail)   localStorage.setItem('rememberedEmail', remEmail);
 
     const parts  = window.location.pathname.split('/').filter(Boolean);
-    const depth  = parts.length - 1;
+    const depth  = parts.length;
     const prefix = '../'.repeat(depth);
     window.location.href = prefix + 'auth/login/';
 }
