@@ -171,6 +171,12 @@ function openEditModal(id) {
     document.getElementById('pmSlug').value        = p.slug        || '';
     document.getElementById('pmTier').value        = p.tier_class  || '';
     document.getElementById('pmBadge').value       = p.badge_label || '';
+
+    // Read-only fields — admin cannot change these directly
+    document.getElementById('pmSlug').readOnly  = true;
+    document.getElementById('pmTier').readOnly  = true;
+    document.getElementById('pmBadge').readOnly = true;
+    document.getElementById('pmRoi').readOnly   = true;
     document.getElementById('pmDailyRate').value   = p.daily_rate     != null ? p.daily_rate     : '';
     document.getElementById('pmRoi').value         = p.roi_multiplier != null ? p.roi_multiplier : '';
     document.getElementById('pmMin').value         = p.min_amount     != null ? p.min_amount     : '';
@@ -206,7 +212,11 @@ function openAddModal() {
     ['pmId', 'pmName', 'pmSlug', 'pmTier', 'pmBadge',
      'pmDailyRate', 'pmRoi', 'pmMin', 'pmMax',
      'pmReturnType', 'pmWithdraw', 'pmCancelTime', 'pmSortOrder']
-        .forEach(id => { document.getElementById(id).value = ''; });
+        .forEach(id => {
+            const el       = document.getElementById(id);
+            el.value       = '';
+            el.readOnly    = false;
+        });
 
     document.getElementById('pmIsActive').checked = true;
     setText('pmActiveLabel', 'Active');
@@ -223,6 +233,19 @@ function openAddModal() {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pmIsActive').addEventListener('change', function () {
         setText('pmActiveLabel', this.checked ? 'Active' : 'Inactive');
+    });
+
+    // Auto-calculate ROI and Badge when daily rate changes
+    document.getElementById('pmDailyRate').addEventListener('input', function () {
+        const rate = parseFloat(this.value);
+        if (isNaN(rate) || rate <= 0) return;
+
+        // ROI = 1 + (daily_rate / 100 * 30 days)
+        const roi = parseFloat((1 + (rate / 100) * 30).toFixed(2));
+        document.getElementById('pmRoi').value   = roi;
+
+        // Badge Label = "Daily X%"
+        document.getElementById('pmBadge').value = 'Daily ' + rate + '%';
     });
 });
 
