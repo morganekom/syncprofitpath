@@ -349,10 +349,16 @@
             let fileType = null;
 
             if (pendingFile) {
-                const result = await uploadFile(pendingFile.file);
-                fileUrl  = result.publicUrl;
-                fileName = result.fileName;
-                fileType = result.fileType;
+                try {
+                    const result = await uploadFile(pendingFile.file);
+                    fileUrl  = result.publicUrl;
+                    fileName = result.fileName;
+                    fileType = result.fileType;
+                } catch (uploadErr) {
+                    // If storage bucket isn't set up yet, still send the text message
+                    console.warn('File upload failed (has the SQL migration been run?):', uploadErr.message);
+                    fileUrl = null;
+                }
             }
 
             const { error } = await db
