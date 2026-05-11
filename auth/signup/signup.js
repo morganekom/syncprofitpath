@@ -327,7 +327,7 @@ async function signUpWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: 'https://syncprofitpath.com/auth/callback.html',
+            redirectTo: 'https://syncprofitpath.com/auth/callback/',
         }
     });
 
