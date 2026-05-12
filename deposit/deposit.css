@@ -399,6 +399,7 @@ body {
 
 .local-currency-select {
     flex: 1;
+    box-sizing: border-box;
     background: var(--color-light);
     border: 2px solid transparent;
     border-radius: var(--radius-2);
@@ -413,7 +414,7 @@ body {
 
 .local-currency-select:focus {
     outline: none;
-    border-color: var(--color-primary);
+    /* No border change on focus — native select handles its own focus state */
 }
 
 .rate-status {
@@ -440,6 +441,7 @@ body {
 
 .amount-input {
     width: 100%;
+    box-sizing: border-box;
     background: var(--color-light);
     border-radius: var(--radius-2);
     padding: 1.6rem 1.8rem 1.6rem 3.4rem;
@@ -760,7 +762,7 @@ body {
     .deposit-layout {
         display: flex;
         flex-direction: column;
-        gap: 1.6rem;  /* THIS is what adds space between cards */
+        gap: 1.6rem;
     }
 
     /* Unstick wallet card */
