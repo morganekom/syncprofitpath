@@ -126,6 +126,13 @@ function selectCrypto(btn) {
     showWalletDetails(coin);
     checkFormReady();
     updateSteps();
+
+    // On mobile the wallet panel is below — scroll it into view so user sees it
+    if (window.innerWidth <= 1024) {
+        setTimeout(() => {
+            document.querySelector('.wallet-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+    }
 }
 
 function showWalletDetails(coin) {

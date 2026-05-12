@@ -720,38 +720,18 @@ body {
 /* ========================= MEDIA QUERIES ========================= */
 @media screen and (max-width: 1024px) {
     body { grid-template-columns: 1fr; }
-
-    /* Stack into a single column */
-    .deposit-layout {
-        grid-template-columns: 1fr;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .wallet-panel {
-        position: static;
-        /* Slot the wallet panel after the first card (Choose Payment Method)
-           so users see the wallet address immediately after selecting a coin */
-        order: -1;
-    }
-
-    /* Hide the placeholder prompt on tablet/mobile — saves space */
-    .wallet-placeholder {
-        padding: 2rem;
-    }
-
-    /* Once a coin is selected the wallet panel is already visible inline */
+    .deposit-layout { grid-template-columns: 1fr; }
+    .wallet-panel { position: static; }
 }
 
 @media screen and (max-width: 600px) {
     .deposit-section { padding: 1.6rem 1rem 6rem; }
-    .crypto-grid { grid-template-columns: repeat(3, 1fr); }
+    /* 2 columns — fits mobile without overflowing */
+    .crypto-grid { grid-template-columns: repeat(2, 1fr); }
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
     .deposit-steps .step-label { display: none; }
-
-    /* QR code: fill available width on small screens */
-    .qr-wrap { padding: 1rem; }
+    /* QR code fits narrow screens */
     .qr-canvas-wrap canvas,
-    .qr-canvas-wrap img { width: 100% !important; height: auto !important; max-width: 180px; }
+    .qr-canvas-wrap img { width: 140px !important; height: 140px !important; }
 }
