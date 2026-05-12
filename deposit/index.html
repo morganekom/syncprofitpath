@@ -86,14 +86,14 @@
                 </div>
             </div>
 
-            <!-- Two-column layout -->
+            <!-- Layout: single column on mobile, two-column on desktop -->
             <div class="deposit-layout">
 
-                <!-- LEFT: form steps -->
+                <!-- COLUMN 1: all form cards stacked -->
                 <div class="deposit-left">
 
                     <!-- Step 1: Choose crypto -->
-                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                    <div class="deposit-card crypto-card">
                         <div class="deposit-card-title">
                             <i class="uil uil-bitcoin-circle"></i> Choose Payment Method
                         </div>
@@ -138,8 +138,48 @@
                         </div>
                     </div>
 
+                    <!-- WALLET CARD — lives here in the DOM (natural mobile position)
+                         On desktop CSS moves it to right column via grid-area -->
+                    <div class="deposit-card wallet-card" id="walletCard">
+                        <div class="deposit-card-title">
+                            <i class="uil uil-wallet"></i> Wallet Details
+                        </div>
+                        <div class="wallet-placeholder" id="walletPlaceholder">
+                            <i class="uil uil-arrow-up"></i>
+                            <p>Select a cryptocurrency above to see the wallet address and QR code</p>
+                        </div>
+                        <div class="wallet-details" id="walletDetails">
+                            <div class="wallet-coin-header">
+                                <div class="wallet-coin-icon" id="walletCoinIcon"></div>
+                                <div>
+                                    <div class="wallet-coin-name" id="walletCoinName">—</div>
+                                    <div class="wallet-coin-ticker" id="walletCoinTicker">—</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="wallet-detail-label">QR Code</div>
+                                <div class="qr-wrap">
+                                    <div id="qrContainer" class="qr-canvas-wrap"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="wallet-detail-label">Wallet Address</div>
+                                <div class="wallet-address-row">
+                                    <span class="wallet-address-text" id="walletAddressText">—</span>
+                                    <button class="copy-btn" id="copyBtn" onclick="copyWalletAddress()" title="Copy address">
+                                        <i class="uil uil-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="network-badge" id="networkBadge" style="display:none;">
+                                <i class="uil uil-exclamation-triangle"></i>
+                                <span id="networkBadgeText"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Step 2: Amount -->
-                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                    <div class="deposit-card amount-card">
                         <div class="deposit-card-title">
                             <i class="uil uil-dollar-sign"></i> Enter Deposit Amount
                         </div>
@@ -180,7 +220,7 @@
                     </div>
 
                     <!-- Step 3: Upload proof -->
-                    <div class="deposit-card" style="margin-bottom: 1.6rem;">
+                    <div class="deposit-card upload-card">
                         <div class="deposit-card-title">
                             <i class="uil uil-image-upload"></i> Upload Proof of Payment
                         </div>
@@ -207,60 +247,6 @@
                     </button>
 
                 </div><!-- end .deposit-left -->
-
-                <!-- RIGHT: wallet details panel -->
-                <div class="wallet-panel">
-                    <div class="deposit-card">
-                        <div class="deposit-card-title">
-                            <i class="uil uil-wallet"></i> Wallet Details
-                        </div>
-
-                        <!-- Placeholder before selection -->
-                        <div class="wallet-placeholder" id="walletPlaceholder">
-                            <i class="uil uil-arrow-left"></i>
-                            <p>Select a cryptocurrency to see the wallet address and QR code</p>
-                        </div>
-
-                        <!-- Actual wallet details (shown after selection) -->
-                        <div class="wallet-details" id="walletDetails">
-
-                            <!-- Coin header -->
-                            <div class="wallet-coin-header">
-                                <div class="wallet-coin-icon" id="walletCoinIcon"></div>
-                                <div>
-                                    <div class="wallet-coin-name" id="walletCoinName">—</div>
-                                    <div class="wallet-coin-ticker" id="walletCoinTicker">—</div>
-                                </div>
-                            </div>
-
-                            <!-- QR Code -->
-                            <div>
-                                <div class="wallet-detail-label">QR Code</div>
-                                <div class="qr-wrap">
-                                    <div id="qrContainer" class="qr-canvas-wrap"></div>
-                                </div>
-                            </div>
-
-                            <!-- Address -->
-                            <div>
-                                <div class="wallet-detail-label">Wallet Address</div>
-                                <div class="wallet-address-row">
-                                    <span class="wallet-address-text" id="walletAddressText">—</span>
-                                    <button class="copy-btn" id="copyBtn" onclick="copyWalletAddress()" title="Copy address">
-                                        <i class="uil uil-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Network warning -->
-                            <div class="network-badge" id="networkBadge" style="display:none;">
-                                <i class="uil uil-exclamation-triangle"></i>
-                                <span id="networkBadgeText">Send only on the correct network</span>
-                            </div>
-
-                        </div>
-                    </div>
-                </div><!-- end .wallet-panel -->
 
             </div><!-- end .deposit-layout -->
         </div><!-- end #depositForm -->

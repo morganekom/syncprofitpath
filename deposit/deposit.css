@@ -32,6 +32,33 @@ body {
 /* ========================= TWO-COLUMN LAYOUT ========================= */
 .deposit-layout {
     display: grid;
+    /* Desktop: two columns */
+    grid-template-columns: 1.1fr 0.9fr;
+    /* Named areas: crypto + wallet-card on left/right,
+       then amount, upload, submit full-width left column */
+    grid-template-areas:
+        "crypto   wallet"
+        "amount   wallet"
+        "upload   wallet"
+        "submit   wallet";
+    gap: 1.6rem;
+    align-items: start;
+}
+
+.deposit-left {
+    /* Use subgrid rows to slot cards into named areas */
+    display: contents; /* let children participate in parent grid directly */
+}
+
+/* Assign each card to its grid area on desktop */
+.deposit-card.crypto-card  { grid-area: crypto; }
+.deposit-card.wallet-card  { grid-area: wallet; position: sticky; top: 8rem; }
+.deposit-card.amount-card  { grid-area: amount; }
+.deposit-card.upload-card  { grid-area: upload; }
+.submit-btn                { grid-area: submit; }
+
+.deposit-layout {
+    display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 2rem;
     align-items: start;
@@ -720,13 +747,31 @@ body {
 /* ========================= MEDIA QUERIES ========================= */
 @media screen and (max-width: 1024px) {
     body { grid-template-columns: 1fr; }
-    .deposit-layout { grid-template-columns: 1fr; }
-    .wallet-panel { position: static; }
+
+    /* Mobile: single column, wallet card sits naturally between crypto + amount */
+    .deposit-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+    }
+
+    .deposit-card.wallet-card { position: static; }
+
+    /* Reorder: crypto(1) → wallet(2) → amount(3) → upload(4) → submit(5) */
+    .deposit-card.crypto-card { order: 1; }
+    .deposit-card.wallet-card { order: 2; }
+    .deposit-card.amount-card { order: 3; }
+    .deposit-card.upload-card { order: 4; }
+    .submit-btn               { order: 5; }
+
+    /* Wallet placeholder arrow points up on mobile */
+    .wallet-placeholder i.uil-arrow-left::before { content: "\ea4c"; } /* arrow-up */
 }
 
 @media screen and (max-width: 600px) {
     .deposit-section { padding: 1.6rem 1rem 6rem; }
-    .crypto-grid { grid-template-columns: repeat(3, 1fr); }
+    /* 2 columns for crypto grid — fits without overflow */
+    .crypto-grid { grid-template-columns: repeat(2, 1fr); }
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
     .deposit-steps .step-label { display: none; }
