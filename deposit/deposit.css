@@ -8,11 +8,14 @@ body {
 /* ========================= PAGE LAYOUT ========================= */
 .deposit-section {
     margin-top: 5rem;
-    padding: 2.4rem 2vw 6rem 2.4rem;
+    padding: 2.4rem 1.6rem 6rem;
     display: flex;
     flex-direction: column;
     gap: 0;
     overflow-x: hidden;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
 }
 
 .deposit-page-header {
@@ -773,11 +776,15 @@ body {
 
 @media screen and (max-width: 600px) {
     .deposit-section { padding: 1.6rem 1rem 6rem; }
-
-    /* crypto grid stays 3 columns on all screens */
-
+    .deposit-steps .step-label { display: none; }
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
-    .deposit-steps .step-label { display: none; }
 
+    /* Stack currency row vertically so select doesn't overflow */
+    .currency-select-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+    .currency-select-wrap { width: 100%; }
+    .local-currency-select { width: 100%; }
+
+    /* Wallet address text smaller on mobile */
+    .wallet-address-text { font-size: 1rem; }
 }
