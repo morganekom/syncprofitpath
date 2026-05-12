@@ -13,14 +13,20 @@ let usdAmount        = 0;
 let currentQRCode    = null;
 
 // ── WALLET ADDRESSES ──
+// ================================================================
+// ▼▼▼  WALLET ADDRESSES — EDIT HERE  ▼▼▼
+// Change any address below to update what users see on the deposit page.
+// USDT and USDC use TRC-20 (Tron) — use your Tron wallet address for both.
+// ================================================================
 const WALLETS = {
     btc:  { address: 'bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c',     name: 'Bitcoin',  ticker: 'BTC',  icon: '₿', color: '#f7931a', bg: '#f7931a18', network: null },
     eth:  { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Ethereum', ticker: 'ETH',  icon: 'Ξ', color: '#627eea', bg: '#627eea18', network: 'ERC-20 network only' },
-    usdt: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'ERC-20 network only' },
-    usdc: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'ERC-20 network only' },
+    usdt: { address: 'YOUR_TRON_WALLET_ADDRESS_HERE',                    name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'TRC-20 (Tron) network only' },
+    usdc: { address: 'YOUR_TRON_WALLET_ADDRESS_HERE',                    name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'TRC-20 (Tron) network only' },
     sol:  { address: 'F6irucMuC6YejoZshgJH8x1XPEXN3bgzE9KgB8H5LwBU',   name: 'Solana',   ticker: 'SOL',  icon: '◎', color: '#9945ff', bg: '#9945ff18', network: 'Solana network only' },
     ltc:  { address: 'ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j',    name: 'Litecoin', ticker: 'LTC',  icon: 'Ł', color: '#888888', bg: '#bfbbbb18', network: null },
 };
+// ================================================================
 
 // ── DOM REFS (after DOMContentLoaded) ──
 let submitBtn, amountInput, fieldError;
