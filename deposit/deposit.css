@@ -1,16 +1,18 @@
 /* deposit.css — Redesigned to match app design language */
+/* NOTE: body grid-template-columns is handled by style.css — do not override here */
 
 body {
-    grid-template-columns: 17rem auto;
+    overflow-x: hidden;
 }
 
 /* ========================= PAGE LAYOUT ========================= */
 .deposit-section {
     margin-top: 5rem;
-    padding: 2.4rem 2.4rem 6rem;
+    padding: 2.4rem 2vw 6rem 2.4rem;
     display: flex;
     flex-direction: column;
-    gap: 0; /* layout gap handled per section */
+    gap: 0;
+    overflow-x: hidden;
 }
 
 .deposit-page-header {
@@ -772,15 +774,10 @@ body {
 @media screen and (max-width: 600px) {
     .deposit-section { padding: 1.6rem 1rem 6rem; }
 
-    /* 2-column crypto grid — prevents right-side overflow */
-    .crypto-grid { grid-template-columns: repeat(2, 1fr); }
+    /* crypto grid stays 3 columns on all screens */
 
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
     .deposit-steps .step-label { display: none; }
 
-    /* Smaller crypto buttons on small screens */
-    .crypto-btn { padding: 1rem 0.5rem; }
-    .crypto-icon { width: 3rem; height: 3rem; font-size: 1.5rem; }
-    .crypto-name { font-size: 1rem; }
 }
