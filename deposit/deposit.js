@@ -16,8 +16,8 @@ let currentQRCode    = null;
 const WALLETS = {
     btc:  { address: 'bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c',     name: 'Bitcoin',  ticker: 'BTC',  icon: '₿', color: '#f7931a', bg: '#f7931a18', network: null },
     eth:  { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Ethereum', ticker: 'ETH',  icon: 'Ξ', color: '#627eea', bg: '#627eea18', network: 'ERC-20 network only' },
-    usdt: { address: 'TUsdt_address_trc20_here',                         name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'TRC-20 (Tron) network only' },
-    usdc: { address: 'TUsdc_address_trc20_here',                         name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'TRC-20 (Tron) network only' },
+    usdt: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'ERC-20 network only' },
+    usdc: { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'ERC-20 network only' },
     sol:  { address: 'F6irucMuC6YejoZshgJH8x1XPEXN3bgzE9KgB8H5LwBU',   name: 'Solana',   ticker: 'SOL',  icon: '◎', color: '#9945ff', bg: '#9945ff18', network: 'Solana network only' },
     ltc:  { address: 'ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j',    name: 'Litecoin', ticker: 'LTC',  icon: 'Ł', color: '#888888', bg: '#bfbbbb18', network: null },
 };
@@ -116,7 +116,6 @@ function selectCrypto(btn) {
     if (selectedCurrency === coin) {
         selectedCurrency = null;
         hideWalletDetails();
-        hideWalletDetailsInline();
         checkFormReady();
         updateSteps();
         return;
@@ -125,7 +124,6 @@ function selectCrypto(btn) {
     btn.classList.add('selected');
     selectedCurrency = coin;
     showWalletDetails(coin);
-    showWalletDetailsInline(coin);
     checkFormReady();
     updateSteps();
 }
@@ -184,73 +182,6 @@ function hideWalletDetails() {
     document.getElementById('qrContainer').innerHTML = '';
 }
 
-
-
-// ================================================================
-// INLINE WALLET PANEL (mobile — shown between crypto + amount)
-// ================================================================
-
-function showWalletDetailsInline(coin) {
-    const w = WALLETS[coin];
-    if (!w) return;
-
-    document.getElementById('walletPlaceholderInline').style.display = 'none';
-    document.getElementById('walletDetailsInline').classList.add('visible');
-
-    const iconEl = document.getElementById('walletCoinIconInline');
-    iconEl.textContent      = w.icon;
-    iconEl.style.background = w.bg;
-    iconEl.style.color      = w.color;
-    document.getElementById('walletCoinNameInline').textContent   = w.name;
-    document.getElementById('walletCoinTickerInline').textContent = w.ticker;
-    document.getElementById('walletAddressTextInline').textContent = w.address;
-
-    const badge = document.getElementById('networkBadgeInline');
-    const badgeTxt = document.getElementById('networkBadgeTextInline');
-    if (w.network) {
-        badge.style.display = 'flex';
-        badgeTxt.textContent = '⚠ ' + w.network;
-    } else {
-        badge.style.display = 'none';
-    }
-
-    const container = document.getElementById('qrContainerInline');
-    container.innerHTML = '';
-    if (typeof QRCode !== 'undefined') {
-        new QRCode(container, {
-            text:         w.address,
-            width:        160,
-            height:       160,
-            colorDark:    '#000000',
-            colorLight:   '#ffffff',
-            correctLevel: QRCode.CorrectLevel.M,
-        });
-    }
-
-    const copyBtn = document.getElementById('copyBtnInline');
-    copyBtn.innerHTML = '<i class="uil uil-copy"></i>';
-    copyBtn.classList.remove('copied');
-}
-
-function hideWalletDetailsInline() {
-    document.getElementById('walletPlaceholderInline').style.display = 'flex';
-    document.getElementById('walletDetailsInline').classList.remove('visible');
-    document.getElementById('qrContainerInline').innerHTML = '';
-}
-
-function copyWalletAddressInline() {
-    if (!selectedCurrency) return;
-    const address = WALLETS[selectedCurrency].address;
-    const copyBtn = document.getElementById('copyBtnInline');
-    navigator.clipboard.writeText(address).then(() => {
-        copyBtn.innerHTML = '<i class="uil uil-check"></i>';
-        copyBtn.classList.add('copied');
-        setTimeout(() => {
-            copyBtn.innerHTML = '<i class="uil uil-copy"></i>';
-            copyBtn.classList.remove('copied');
-        }, 2500);
-    });
-}
 
 // ================================================================
 // COPY ADDRESS
@@ -518,7 +449,6 @@ function resetDeposit() {
 
     document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('selected'));
     hideWalletDetails();
-    hideWalletDetailsInline();
 
     amountInput.value = '';
     amountInput.classList.remove('input-error');
