@@ -761,8 +761,8 @@
         gap: 1.6rem;
     }
 
-    /* Unstick wallet card */
-    .deposit-card.wallet-card { position: static; }
+    /* Unstick wallet card and remove any desktop top offset */
+    .deposit-card.wallet-card { position: static; margin-top: 0; }
 
     /* Order: crypto → wallet → amount → upload → submit */
     .deposit-card.crypto-card { order: 1; }
@@ -773,7 +773,7 @@
 }
 
 @media screen and (max-width: 600px) {
-    .deposit-section { padding: 1.6rem 1rem 6rem; }
+    .deposit-section { margin-top: 0; padding: 1.6rem 1rem 6rem; }
     .deposit-steps .step-label { display: none; }
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
