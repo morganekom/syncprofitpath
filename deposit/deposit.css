@@ -286,6 +286,7 @@ body {
 .qr-wrap {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 1.4rem;
     background: var(--color-light);
     border-radius: var(--radius-2);
