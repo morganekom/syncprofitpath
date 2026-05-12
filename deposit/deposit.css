@@ -37,11 +37,24 @@ body {
     align-items: start;
 }
 
+/* On desktop: left column is a flex column so we can control order */
+.deposit-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+/* Wallet panel inline card — only visible on mobile, hidden on desktop */
+.wallet-panel-inline {
+    display: none;
+}
+
 /* ========================= SECTION CARDS ========================= */
 .deposit-card {
     background: var(--color-white);
     border-radius: var(--radius-3);
     padding: var(--card-padding);
+    /* gap handled by .deposit-left flex gap */
 }
 
 .deposit-card-title {
@@ -720,18 +733,25 @@ body {
 /* ========================= MEDIA QUERIES ========================= */
 @media screen and (max-width: 1024px) {
     body { grid-template-columns: 1fr; }
-    .deposit-layout { grid-template-columns: 1fr; }
-    .wallet-panel { position: static; }
+
+    .deposit-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* On tablet/mobile: hide the right-column wallet panel,
+       show the inline wallet panel (between crypto + amount) */
+    .wallet-panel        { display: none; }
+    .wallet-panel-inline { display: block; }
+
+    .wallet-panel-inline .deposit-card {
+        margin-bottom: 0;
+    }
 }
 
 @media screen and (max-width: 600px) {
     .deposit-section { padding: 1.6rem 1rem 6rem; }
-    /* 2 columns — fits mobile without overflowing */
-    .crypto-grid { grid-template-columns: repeat(2, 1fr); }
+    .crypto-grid { grid-template-columns: repeat(3, 1fr); }
     .modal { margin: 0 1rem; }
     .modal-footer { flex-direction: column; }
     .deposit-steps .step-label { display: none; }
-    /* QR code fits narrow screens */
-    .qr-canvas-wrap canvas,
-    .qr-canvas-wrap img { width: 140px !important; height: 140px !important; }
 }
