@@ -279,6 +279,13 @@ async function handleKycAction(newStatus) {
         if (error) throw error;
 
         // Update local state
+        // Send email notification
+        sendEmail(newStatus === 'verified' ? 'kyc_approved' : 'kyc_rejected', {
+            email: activeUser.email || '',
+            name:  activeUser.full_name || activeUser.first_name || 'there',
+            note:  document.getElementById('mkNote')?.value?.trim() || '',
+        });
+
         activeUser.kyc_status = newStatus;
         allUsers = allUsers.map(u =>
             u.id === activeUser.id ? { ...u, kyc_status: newStatus } : u
