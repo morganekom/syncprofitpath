@@ -273,11 +273,11 @@ const TEMPLATES = {
 
 };
 
-// ── Main sendEmail function ───────────────────────────────────────
-async function sendEmail(type, data) {
+// ── Main sendNotification function ───────────────────────────────────────
+async function sendNotification(type, data) {
     const template = TEMPLATES[type];
     if (!template) {
-        console.warn(`sendEmail: unknown type "${type}"`);
+        console.warn(`sendNotification: unknown type "${type}"`);
         return;
     }
 
@@ -301,12 +301,12 @@ async function sendEmail(type, data) {
         const result = await res.json();
 
         if (!res.ok) {
-            console.error(`sendEmail "${type}" failed:`, result);
+            console.error(`sendNotification "${type}" failed:`, result);
         } else {
-            console.log(`sendEmail "${type}" sent to ${data.email}`);
+            console.log(`sendNotification "${type}" sent to ${data.email}`);
         }
     } catch (err) {
         // Never block the main action — email is non-critical
-        console.warn(`sendEmail "${type}" error:`, err.message);
+        console.warn(`sendNotification "${type}" error:`, err.message);
     }
 }
