@@ -17,7 +17,7 @@
 //   await sendEmail('kyc_rejected',      { name, email, note })
 // ================================================================
 
-const RESEND_API_KEY = 'YOUR_RESEND_API_KEY_HERE'; // ← paste your Resend API key
+const RESEND_API_KEY = 're_CKjw3kk4_CGyvZCH9Z2oCnxVoX1DV4FEF'; // ← paste your Resend API key
 const FROM_EMAIL     = 'SyncProfitPath <noreply@verify.syncprofitpath.com>';
 const BRAND_COLOR    = '#00e27b';
 const LOGO_URL       = 'https://syncprofitpath.com/assets/logo.png';
