@@ -310,7 +310,19 @@ async function handleAction(newStatus) {
         );
         applyFilter();
 
-        // 4. Show resolved state in modal
+        // 4. Send email notification
+        const emailData = {
+            email:  d.users?.email || '',
+            name:   d.users?.full_name || d.users?.first_name || 'there',
+            amount: amount,
+            coin:   d.coin || d.method || '',
+            ref:    d.reference || d.id,
+            note:   note || '',
+        };
+        if (newStatus === 'completed') sendEmail('deposit_approved', emailData);
+        else                           sendEmail('deposit_rejected', emailData);
+
+        // 5. Show resolved state in modal
         document.getElementById('mdActions').style.display  = 'none';
         document.getElementById('mdNoteWrap').style.display = 'none';
         const resolvedEl = document.getElementById('mdResolved');
