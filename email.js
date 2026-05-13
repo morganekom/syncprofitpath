@@ -1,5 +1,5 @@
 // ================================================================
-// EMAIL.JS — Direct Resend API calls for transactional emails
+// NOTIFICATIONS.JS — Direct Resend API calls for transactional emails
 // Load this on any page that sends emails (after supabase.js).
 //
 // Usage:
