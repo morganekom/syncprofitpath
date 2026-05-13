@@ -304,7 +304,18 @@ async function handleWdrAction(newStatus) {
 
         if (userError) throw userError;
 
-        // 3. Update local state
+        // 3. Send email notification
+        const w = activeWithdrawal;
+        sendEmail(newStatus === 'completed' ? 'withdraw_approved' : 'withdraw_rejected', {
+            email:  w.users?.email || '',
+            name:   w.users?.full_name || w.users?.first_name || 'there',
+            amount: amount,
+            coin:   w.coin || w.method || '',
+            ref:    w.reference || w.id,
+            note:   note || '',
+        });
+
+        // 4. Update local state
         activeWithdrawal.status = newStatus;
         allWithdrawals = allWithdrawals.map(wdr =>
             wdr.id === w.id ? { ...wdr, status: newStatus } : wdr
