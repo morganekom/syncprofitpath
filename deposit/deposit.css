@@ -1,5 +1,8 @@
 /* deposit.css — Redesigned to match app design language */
 /* NOTE: body grid-template-columns is handled by style.css — do not override here */
+body {
+    grid-template-columns: 17rem auto;
+}
 
 /* ========================= PAGE LAYOUT ========================= */
 .deposit-section {
