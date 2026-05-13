@@ -2,7 +2,7 @@
 /* NOTE: body grid-template-columns is handled by style.css — do not override here */
 
 body {
-    overflow-x: hidden;
+    grid-template-columns: 17rem auto;
 }
 
 /* ========================= PAGE LAYOUT ========================= */
