@@ -303,6 +303,16 @@ async function confirmInvestment() {
     // Show the modal's built-in success state
     document.querySelector('.modal-field').style.display   = 'none';
     document.getElementById('modalFooter').style.display  = 'none';
+    // Send pending notification
+    const invUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    sendEmail('invest_pending', {
+        email:  invUser.email || '',
+        name:   invUser.full_name || invUser.first_name || 'there',
+        amount: investAmount,
+        plan:   activePlan?.name || '',
+        ref:    investRef || '',
+    });
+
     document.getElementById('modalSuccess').classList.add('show');
 }
 
