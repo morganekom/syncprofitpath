@@ -3,18 +3,18 @@
 // Load this on any page that sends emails (after supabase.js).
 //
 // Usage:
-//   await sendEmail('deposit_pending',  { name, email, amount, coin, ref })
-//   await sendEmail('deposit_approved', { name, email, amount, coin, ref })
-//   await sendEmail('deposit_rejected', { name, email, amount, coin, ref, note })
-//   await sendEmail('withdraw_pending',  { name, email, amount, coin, ref })
-//   await sendEmail('withdraw_approved', { name, email, amount, coin, ref })
-//   await sendEmail('withdraw_rejected', { name, email, amount, coin, ref, note })
-//   await sendEmail('invest_pending',    { name, email, amount, plan, ref })
-//   await sendEmail('invest_approved',   { name, email, amount, plan, ref })
-//   await sendEmail('invest_rejected',   { name, email, amount, plan, ref, note })
-//   await sendEmail('kyc_pending',       { name, email })
-//   await sendEmail('kyc_approved',      { name, email })
-//   await sendEmail('kyc_rejected',      { name, email, note })
+//   await sendNotification('deposit_pending',  { name, email, amount, coin, ref })
+//   await sendNotification('deposit_approved', { name, email, amount, coin, ref })
+//   await sendNotification('deposit_rejected', { name, email, amount, coin, ref, note })
+//   await sendNotification('withdraw_pending',  { name, email, amount, coin, ref })
+//   await sendNotification('withdraw_approved', { name, email, amount, coin, ref })
+//   await sendNotification('withdraw_rejected', { name, email, amount, coin, ref, note })
+//   await sendNotification('invest_pending',    { name, email, amount, plan, ref })
+//   await sendNotification('invest_approved',   { name, email, amount, plan, ref })
+//   await sendNotification('invest_rejected',   { name, email, amount, plan, ref, note })
+//   await sendNotification('kyc_pending',       { name, email })
+//   await sendNotification('kyc_approved',      { name, email })
+//   await sendNotification('kyc_rejected',      { name, email, note })
 // ================================================================
 
 const RESEND_API_KEY = 'YOUR_RESEND_API_KEY_HERE'; // ← paste your Resend API key
