@@ -473,6 +473,12 @@ async function submitKyc() {
 
     // Sync localStorage
     localStorage.setItem('kycStatus', 'pending');
+        // Send KYC pending notification
+        const kycUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        sendEmail('kyc_pending', {
+            email: kycUser.email || '',
+            name:  kycUser.full_name || kycUser.first_name || 'there',
+        });
     const updatedUser = { ...currentUser, kyc_status: 'pending' };
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
