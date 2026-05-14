@@ -319,8 +319,8 @@ async function handleAction(newStatus) {
             ref:    d.reference || d.id,
             note:   note || '',
         };
-        if (newStatus === 'completed') sendEmail('deposit_approved', emailData);
-        else                           sendEmail('deposit_rejected', emailData);
+        if (newStatus === 'completed') sendNotification({ type: 'deposit_approved', ...emailData });
+        else                           sendNotification({ type: 'deposit_rejected', ...emailData });
 
         // 5. Show resolved state in modal
         document.getElementById('mdActions').style.display  = 'none';
