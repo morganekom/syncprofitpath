@@ -280,10 +280,10 @@ async function handleKycAction(newStatus) {
 
         // Update local state
         // Send email notification
-        sendEmail(newStatus === 'verified' ? 'kyc_approved' : 'kyc_rejected', {
+        sendNotification({
+            type:  newStatus === 'verified' ? 'kyc_approved' : 'kyc_rejected',
             email: activeUser.email || '',
             name:  activeUser.full_name || activeUser.first_name || 'there',
-            note:  document.getElementById('mkNote')?.value?.trim() || '',
         });
 
         activeUser.kyc_status = newStatus;
