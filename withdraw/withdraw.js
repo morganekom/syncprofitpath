@@ -234,12 +234,13 @@ async function confirmWithdrawal() {
     closeWithdrawModal();
     // Send pending notification
     const wUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    sendEmail('withdraw_pending', {
-        email:  wUser.email || '',
-        name:   wUser.full_name || wUser.first_name || 'there',
-        amount: withdrawAmount,
-        coin:   selectedCoin || '',
-        ref:    withdrawRef || '',
+    sendNotification({
+        type:   'withdrawal_pending',
+        email:  currentUser.email || '',
+        name:   currentUser.full_name || currentUser.first_name || 'there',
+        amount: amount,
+        method: methodLabel,
+        ref:    reference,
     });
 
     showSuccessState();
