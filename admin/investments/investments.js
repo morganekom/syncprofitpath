@@ -316,13 +316,14 @@ async function handleInvAction(newStatus) {
         if (userError) throw userError;
 
         // 3. Send email notification
-        sendEmail(newStatus === 'completed' ? 'invest_approved' : 'invest_rejected', {
+        sendNotification({
+            type:   newStatus === 'completed' ? 'investment_approved' : 'investment_rejected',
             email:  inv.users?.email || '',
             name:   inv.users?.full_name || inv.users?.first_name || 'there',
             amount: amount,
             plan:   inv.method || '',
+            coin:   inv.coin || '',
             ref:    inv.reference || inv.id,
-            note:   note || '',
         });
 
         // 4. Update local state
