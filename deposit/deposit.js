@@ -439,7 +439,8 @@ async function confirmDeposit() {
 
     // Send pending notification to user
     const currentUserData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    sendEmail('deposit_pending', {
+    sendNotification({
+        type:   'deposit_pending',
         email:  currentUserData.email || '',
         name:   currentUserData.full_name || currentUserData.first_name || 'there',
         amount: usdVal,
