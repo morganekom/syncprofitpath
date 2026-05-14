@@ -305,12 +305,14 @@ async function confirmInvestment() {
     document.getElementById('modalFooter').style.display  = 'none';
     // Send pending notification
     const invUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    sendEmail('invest_pending', {
-        email:  invUser.email || '',
-        name:   invUser.full_name || invUser.first_name || 'there',
-        amount: investAmount,
+    sendNotification({
+        type:   'investment_pending',
+        email:  currentUser.email || '',
+        name:   currentUser.full_name || currentUser.first_name || 'there',
+        amount: amount,
         plan:   activePlan?.name || '',
-        ref:    investRef || '',
+        coin:   selectedModalCoin || '',
+        ref:    reference,
     });
 
     document.getElementById('modalSuccess').classList.add('show');
