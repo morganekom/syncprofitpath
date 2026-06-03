@@ -49,8 +49,8 @@ async function loadPlans() {
             const minAmt     = p.min_amount  != null ? p.min_amount  : 0;
             const maxAmt     = p.max_amount  != null ? p.max_amount  : 0;
             const returnType = p.return_type || '—';
-            const withdraw   = p.withdraw    || '—';
             const cancelTime = p.cancel_time || '—';
+            const withdraw   = p.withdraw    || '—';
             const badge      = p.badge_label || `Daily ${dailyRate}%`;
 
             return `
@@ -74,7 +74,7 @@ async function loadPlans() {
                         <p>${roi}×</p>
                     </div>
                     <div class="plan-row">
-                        <h3>Withdraw</h3>
+                        <h3>Maturity Period</h3>
                         <p>${escapeHtml(withdraw)}</p>
                     </div>
                     <div class="plan-row">
