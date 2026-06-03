@@ -365,7 +365,7 @@ function calculateProfit() {
         return;
     }
 
-    const profit          = amount * (calcPlan.rate / 100) * calcPlan.roi;
+    const profit          = amount * (calcPlan.rate / 100) * 30;  // daily_rate × 30 days
     profitDisplay.textContent = `$${formatNum(profit)}`;
 
     checkCalculatorReady();
