@@ -24,6 +24,7 @@ if (dateEl) {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadUserBalances();
     await loadRecentTransactions();
+    loadActiveInvestments();
     checkKycAlert();
     loadCryptoPrices();
 });
@@ -354,6 +355,14 @@ const COIN_ICONS = {
     doge: { symbol: 'Ð',  bg: '#c2a63322', color: '#c2a633', label: 'Dogecoin'  },
     xrp:  { symbol: '✕',  bg: '#00aae422', color: '#00aae4', label: 'XRP'       },
 };
+
+function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
 
 function buildActiveInvCard(inv) {
     const today     = new Date();
