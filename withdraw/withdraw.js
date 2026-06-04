@@ -50,6 +50,26 @@ const amountInput = document.getElementById('withdrawAmount');
 document.addEventListener('DOMContentLoaded', async () => {
     await loadWithdrawalLimits();
 
+    // KYC check — if kyc_required is on and user isn't verified, block withdrawal
+    try {
+        const { data: settings } = await db.from('site_settings').select('kyc_required').eq('id', 1).single();
+        if (settings && settings.kyc_required) {
+            const kycStatus = localStorage.getItem('userKycStatus') || 'pending';
+            if (kycStatus !== 'verified') {
+                document.getElementById('withdrawEmpty').style.display  = 'flex';
+                document.getElementById('withdrawForm').style.display   = 'none';
+                const emptyEl = document.getElementById('withdrawEmpty');
+                if (emptyEl) emptyEl.innerHTML = `
+                    <i class="uil uil-shield-exclamation" style="font-size:3rem;color:var(--color-warning);margin-bottom:1rem;"></i>
+                    <h4>Identity Verification Required</h4>
+                    <p>You need to complete KYC verification before you can withdraw funds.</p>
+                    <a href="../settings/" class="btn btn-primary" style="margin-top:1rem;">Verify Identity →</a>
+                `;
+                return;
+            }
+        }
+    } catch (e) {}
+
     // Update balance display
     document.getElementById('availableBalance').textContent = '$' + formatNum(AVAILABLE_BALANCE);
     document.getElementById('amountMax').textContent        = 'Max: $' + formatNum(AVAILABLE_BALANCE);
