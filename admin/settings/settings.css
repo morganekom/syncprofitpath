@@ -1,0 +1,588 @@
+/* settings.css
+   Admin — Settings page
+   Loaded after style.css + admin.css
+   Covers: settings sections, form fields, toggles, save rows,
+   and carries over all plans-modal styles from plans.css
+*/
+
+
+/* ========================= HEADER ACTIONS ========================= */
+.settings-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+/* ========================= SETTINGS SECTION CARD ========================= */
+.settings-section {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 2rem var(--card-padding);
+    margin-bottom: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+
+/* ── SECTION HEADER ── */
+.settings-section-header {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+}
+
+.settings-section-icon {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: var(--radius-2);
+    background: rgba(0, 226, 123, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.settings-section-icon i {
+    font-size: 2rem;
+    color: var(--color-primary);
+}
+
+.settings-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0 0 0.3rem;
+}
+
+.settings-section-desc {
+    font-size: 1.05rem;
+    color: var(--color-gray-light);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Push action button (e.g. Add Plan) to the right */
+.settings-section-header .settings-action-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-2);
+    padding: 0.9rem 1.6rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.settings-section-header .settings-action-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+.settings-section-header .settings-action-btn i {
+    font-size: 1.4rem;
+    color: inherit;
+}
+
+
+/* ========================= FORM GRID ========================= */
+.settings-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+/* Full-width grid for wallet addresses (one per row on mobile anyway) */
+.settings-form-grid--full {
+    grid-template-columns: 1fr 1fr;
+}
+
+
+/* ── FIELD ── */
+.settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.settings-input {
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    padding: 0.95rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark);
+    transition: var(--transition);
+    width: 100%;
+}
+
+.settings-input::placeholder { color: var(--color-gray-light); }
+
+.settings-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    background: var(--color-white);
+}
+
+/* Prefix wrap ($) */
+.settings-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.settings-prefix {
+    position: absolute;
+    left: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    pointer-events: none;
+    user-select: none;
+}
+
+.settings-input--prefixed {
+    padding-left: 2.6rem !important;
+}
+
+
+/* ========================= SUBSECTION LABEL ========================= */
+.settings-subsection-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--color-light);
+    margin: 0;
+}
+
+
+/* ========================= TOGGLE ========================= */
+.settings-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.settings-toggle-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.settings-toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.settings-toggle-track {
+    display: block;
+    width: 4.4rem;
+    height: 2.4rem;
+    border-radius: 99px;
+    background: var(--color-light);
+    transition: background var(--transition);
+    position: relative;
+}
+
+.settings-toggle-thumb {
+    position: absolute;
+    top: 0.3rem;
+    left: 0.3rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: var(--color-gray-light);
+    transition: transform var(--transition), background var(--transition);
+}
+
+.settings-toggle-input:checked ~ .settings-toggle-track {
+    background: rgba(0, 226, 123, 0.25);
+}
+
+.settings-toggle-input:checked ~ .settings-toggle-track .settings-toggle-thumb {
+    transform: translateX(2rem);
+    background: var(--color-primary);
+}
+
+.settings-toggle-text {
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    line-height: 1.5;
+}
+
+.settings-toggle-text strong { color: var(--color-dark); }
+
+.settings-toggle-hint {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    font-weight: 400;
+}
+
+
+/* ========================= SAVE ROW ========================= */
+.settings-save-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.2rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--color-light);
+}
+
+.settings-feedback {
+    font-size: 1.05rem;
+    min-height: 1.4rem;
+    flex: 1;
+}
+
+.settings-feedback--ok  { color: var(--color-primary); }
+.settings-feedback--err { color: var(--color-danger);  }
+
+.settings-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.8rem;
+    border-radius: var(--radius-2);
+    border: none;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.settings-save-btn i { font-size: 1.3rem; color: inherit; }
+
+.settings-save-btn:hover {
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+}
+
+.settings-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ========================= PLANS (carried from plans.css) ========================= */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.plan-admin-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--radius-3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+    cursor: grab;
+}
+
+.plan-admin-card:hover {
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.plan-admin-card:active { cursor: grabbing; }
+.plan-admin-card.dragging { opacity: 0.45; box-shadow: none; transform: none; }
+.plan-admin-card.plan-inactive { opacity: 0.6; }
+.plan-admin-card.plan-inactive .plan-admin-strip { filter: grayscale(0.6); }
+
+.plan-admin-strip {
+    padding: 1.4rem var(--card-padding);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+.plan-admin-strip * { color: #fff; }
+
+.plan-admin-strip-left { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.plan-admin-name { font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1.1; }
+
+.plan-admin-badge {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-2);
+    padding: 0.3rem 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    width: fit-content;
+    color: #fff;
+}
+
+.plan-admin-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 99px;
+    padding: 0.3rem 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.plan-admin-status i { font-size: 1.1rem; color: inherit; }
+
+.plan-admin-body {
+    padding: 1.4rem var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    flex: 1;
+}
+
+.plan-admin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.05rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--color-light);
+}
+
+.plan-admin-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+.plan-admin-row-label { color: var(--color-gray-light); font-size: 1rem; }
+.plan-admin-row-value { font-weight: 600; color: var(--color-dark); text-align: right; }
+
+.plan-admin-footer { padding: 0 var(--card-padding) 1.4rem; }
+
+.plan-edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: var(--radius-2);
+    border: none;
+    background: var(--color-light);
+    color: var(--color-gray-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.plan-edit-btn i { font-size: 1.3rem; color: inherit; }
+.plan-edit-btn:hover { background: var(--color-primary); color: var(--color-dark); }
+
+.plans-order-hint {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1rem 1.6rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    flex-wrap: wrap;
+}
+
+.plans-order-hint i { font-size: 1.4rem; color: var(--color-primary); flex-shrink: 0; }
+
+.save-order-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius-2);
+    border: none;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.save-order-btn i { font-size: 1.2rem; color: inherit; }
+.save-order-btn:hover { box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35); }
+
+/* Plan tier colours */
+.plan-admin-strip.plan-basic    { background: var(--color-primary); }
+.plan-admin-strip.plan-standard { background: var(--color-dark); }
+.plan-admin-strip.plan-premium  { background: var(--color-purple); }
+.plan-admin-strip.plan-custom   { background: var(--color-warning); }
+
+
+/* ========================= PLANS MODAL (carried from plans.css) ========================= */
+.plans-modal { max-width: 58rem; gap: 1.2rem; }
+.plans-modal--narrow { max-width: 42rem; }
+
+.plans-modal-section-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 0.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-light);
+}
+
+.plans-modal-section-label:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+.plans-modal-hint {
+    font-size: 0.95rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--color-gray-light);
+}
+
+.plans-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.plans-modal-row--half { grid-template-columns: 1fr 1fr; }
+.plans-modal-field { display: flex; flex-direction: column; gap: 0.5rem; }
+.plans-modal-label { font-size: 1.05rem; font-weight: 600; color: var(--color-gray-dark); }
+
+.plans-modal-input {
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    padding: 0.95rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    color: var(--color-dark);
+    transition: var(--transition);
+    width: 100%;
+}
+
+.plans-modal-input::placeholder { color: var(--color-gray-light); }
+.plans-modal-input:focus { border-color: var(--color-primary); outline: none; background: var(--color-white); }
+
+.plans-modal-input-wrap { position: relative; display: flex; align-items: center; }
+
+.plans-modal-unit {
+    position: absolute;
+    right: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    pointer-events: none;
+    user-select: none;
+}
+
+.plans-modal-unit--prefix { right: unset; left: 1.2rem; }
+.plans-modal-input-wrap .plans-modal-input { padding-right: 3rem; }
+.plans-modal-input--prefixed { padding-left: 2.6rem !important; padding-right: 1.2rem !important; }
+
+.plans-toggle-label { display: flex; align-items: center; gap: 1.2rem; cursor: pointer; user-select: none; }
+.plans-toggle-wrap { position: relative; flex-shrink: 0; }
+.plans-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.plans-toggle-track {
+    display: block;
+    width: 4.4rem;
+    height: 2.4rem;
+    border-radius: 99px;
+    background: var(--color-light);
+    transition: background var(--transition);
+    position: relative;
+}
+
+.plans-toggle-thumb {
+    position: absolute;
+    top: 0.3rem;
+    left: 0.3rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: var(--color-gray-light);
+    transition: transform var(--transition), background var(--transition);
+}
+
+.plans-toggle-input:checked ~ .plans-toggle-track { background: rgba(0, 226, 123, 0.25); }
+.plans-toggle-input:checked ~ .plans-toggle-track .plans-toggle-thumb { transform: translateX(2rem); background: var(--color-primary); }
+.plans-toggle-text { font-size: 1.1rem; color: var(--color-gray-dark); }
+.plans-toggle-text strong { color: var(--color-dark); }
+
+.plans-modal-error { font-size: 1.05rem; color: var(--color-danger); min-height: 1.4rem; padding-left: 0.2rem; }
+
+.plans-delete-body { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; padding: 0.5rem 0; }
+
+.plans-delete-icon {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    background: var(--color-danger-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plans-delete-icon i { font-size: 2.8rem; color: var(--color-danger); }
+.plans-delete-body p { font-size: 1.2rem; color: var(--color-dark); font-weight: 500; }
+.plans-delete-warn { font-size: 1.05rem !important; color: var(--color-gray-light) !important; font-weight: 400 !important; line-height: 1.5; max-width: 32rem; }
+
+
+/* ========================= MEDIA QUERIES ========================= */
+@media screen and (max-width: 1024px) {
+    .plans-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media screen and (max-width: 600px) {
+    .plans-grid,
+    .settings-form-grid,
+    .settings-form-grid--full,
+    .plans-modal-row,
+    .plans-modal-row--half {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-section-header .settings-action-btn {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .settings-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .plans-order-hint { flex-direction: column; align-items: flex-start; }
+    .save-order-btn { margin-left: 0; width: 100%; justify-content: center; }
+    .plans-toggle-label { align-items: flex-start; }
+
+    .settings-save-row { flex-direction: column; align-items: stretch; }
+    .settings-save-btn { justify-content: center; }
+}
