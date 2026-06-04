@@ -662,3 +662,216 @@ body {
         font-size: 1.2rem;
     }
 }
+
+/* ================================================================
+   ACTIVE INVESTMENTS SECTION
+   ================================================================ */
+
+.active-invest-section {
+    margin-top: 7rem;
+    margin-right: 2vw;
+    margin-bottom: 0;
+    padding-bottom: 2rem;
+}
+
+.active-invest-section > h2 {
+    color: var(--color-dark);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+/* Push the plans section down when active investments are showing */
+.active-invest-section + .invest-section {
+    margin-top: 1rem;
+}
+
+/* Grid */
+.active-inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.4rem;
+}
+
+/* Card */
+.active-inv-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 1.3rem 1.4rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.active-inv-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1.2rem 2.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Header row */
+.active-inv-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.active-inv-plan {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-dark);
+}
+
+.active-inv-coin {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-primary-light, rgba(122, 107, 227, 0.12));
+    color: var(--color-primary);
+    border-radius: 30px;
+    padding: 0.18em 0.65em;
+    margin-left: 0.45rem;
+}
+
+.active-inv-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 30px;
+    padding: 0.22em 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.active-inv-status.active-inv {
+    background: rgba(0, 184, 148, 0.12);
+    color: #00b894;
+}
+
+.active-inv-status.matured {
+    background: rgba(0, 200, 117, 0.15);
+    color: #00c875;
+}
+
+/* Amounts */
+.active-inv-amounts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    border-top: 1px solid var(--color-light, #f0f0f0);
+    padding-top: 0.85rem;
+}
+
+.active-inv-amount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.active-inv-label {
+    font-size: 0.8rem;
+    color: var(--color-dark-variant, #677483);
+}
+
+.active-inv-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.active-inv-value.profit-green {
+    color: #00b894;
+}
+
+/* Bottom: dates + progress */
+.active-inv-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    border-top: 1px solid var(--color-light, #f0f0f0);
+    padding-top: 0.85rem;
+}
+
+.active-inv-dates {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    color: var(--color-dark-variant, #677483);
+}
+
+.active-inv-dates-sep {
+    opacity: 0.5;
+}
+
+/* Progress bar */
+.active-inv-progress-track {
+    height: 7px;
+    background: var(--color-light, #eef0f5);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.active-inv-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.active-inv-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.35rem;
+}
+
+.active-inv-days-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.active-inv-daily {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #00b894;
+    background: rgba(0, 184, 148, 0.1);
+    border-radius: 30px;
+    padding: 0.18em 0.6em;
+}
+
+/* Ref */
+.active-inv-ref {
+    font-size: 0.7rem;
+    color: var(--color-dark-variant, #a3aab5);
+    letter-spacing: 0.02em;
+}
+
+/* Empty state */
+.active-inv-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    color: var(--color-dark-variant, #677483);
+    font-size: 0.9rem;
+}
+
+.active-inv-empty i {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .active-invest-section {
+        margin-top: 5rem;
+        margin-right: 0;
+    }
+
+    .active-inv-grid {
+        grid-template-columns: 1fr;
+    }
+}

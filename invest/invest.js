@@ -400,3 +400,142 @@ function formatNum(num) {
         maximumFractionDigits: 2
     });
 }
+
+// ================================================================
+// ACTIVE INVESTMENTS — loads user's running investments and renders
+// cards with progress bar + daily profit
+// ================================================================
+
+async function loadActiveInvestments() {
+    const section  = document.getElementById('activeInvestSection');
+    const grid     = document.getElementById('activeInvestGrid');
+    const emptyEl  = document.getElementById('activeInvestEmpty');
+    if (!section || !grid) return;
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.id) return;
+
+    try {
+        const { data, error } = await db
+            .from('transactions')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .eq('type', 'investment')
+            .eq('inv_active', true)
+            .order('start_date', { ascending: true });
+
+        if (error) throw error;
+
+        const investments = (data || []).filter(inv => inv.start_date && inv.end_date);
+
+        section.style.display = 'block';
+
+        if (investments.length === 0) {
+            grid.style.display    = 'none';
+            emptyEl.style.display = 'flex';
+            return;
+        }
+
+        emptyEl.style.display = 'none';
+        grid.style.display    = 'grid';
+        grid.innerHTML        = investments.map(inv => buildActiveInvCard(inv)).join('');
+
+    } catch (err) {
+        console.error('Active investments error:', err.message);
+    }
+}
+
+function buildActiveInvCard(inv) {
+    const today     = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(inv.start_date);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate   = new Date(inv.end_date);
+    endDate.setHours(0, 0, 0, 0);
+
+    const duration   = inv.duration_days || 30;
+    const daysElapsed = Math.min(
+        Math.max(Math.floor((today - startDate) / 86400000), 0),
+        duration
+    );
+    const daysLeft   = Math.max(duration - daysElapsed, 0);
+    const progressPct = Math.min(Math.round((daysElapsed / duration) * 100), 100);
+
+    const amount       = parseFloat(inv.amount)     || 0;
+    const dailyRate    = parseFloat(inv.daily_rate)  || 0;
+    const dailyProfit  = amount * (dailyRate / 100);
+    const totalProfit  = dailyProfit * daysElapsed;
+    const totalReturn  = amount + (dailyProfit * duration);
+
+    const plan   = escapeHtml(inv.method  || 'Investment');
+    const coin   = escapeHtml((inv.coin   || '').toUpperCase());
+    const ref    = escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase());
+
+    const startFmt = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const endFmt   = new Date(inv.end_date).toLocaleDateString('en-US',   { day: '2-digit', month: 'short', year: 'numeric' });
+
+    const isMatured = daysLeft === 0;
+    const statusLabel = isMatured ? 'Matured' : 'Active';
+    const statusClass = isMatured ? 'matured' : 'active-inv';
+
+    // Progress bar colour: green when done, blue otherwise
+    const barColor = isMatured ? '#00c875' : 'var(--color-primary)';
+
+    return `
+    <div class="active-inv-card">
+        <div class="active-inv-header">
+            <div>
+                <span class="active-inv-plan">${plan}</span>
+                <span class="active-inv-coin">${coin}</span>
+            </div>
+            <span class="active-inv-status ${statusClass}">${statusLabel}</span>
+        </div>
+
+        <div class="active-inv-amounts">
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Invested</span>
+                <span class="active-inv-value">${fmtMoney(amount)}</span>
+            </div>
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Profit so far</span>
+                <span class="active-inv-value profit-green">${fmtMoney(totalProfit)}</span>
+            </div>
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Expected return</span>
+                <span class="active-inv-value">${fmtMoney(totalReturn)}</span>
+            </div>
+        </div>
+
+        <div class="active-inv-bottom">
+            <div class="active-inv-dates">
+                <span>${startFmt}</span>
+                <span class="active-inv-dates-sep">→</span>
+                <span>${endFmt}</span>
+            </div>
+
+            <div class="active-inv-progress-wrap">
+                <div class="active-inv-progress-track">
+                    <div class="active-inv-progress-fill"
+                         style="width:${progressPct}%; background:${barColor};"></div>
+                </div>
+                <div class="active-inv-progress-labels">
+                    <span class="active-inv-days-label">${daysElapsed}/${duration} days</span>
+                    <span class="active-inv-daily">+${fmtMoney(dailyProfit)}/day</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="active-inv-ref">Ref: ${ref}</div>
+    </div>`;
+}
+
+function fmtMoney(n) {
+    return '$' + parseFloat(n).toLocaleString('en-US', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}
+
+// ── Run on page load ──
+document.addEventListener('DOMContentLoaded', () => {
+    loadActiveInvestments();
+});
