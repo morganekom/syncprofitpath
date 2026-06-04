@@ -5,6 +5,35 @@
 // ================================================================
 
 
+
+// ========================= MAINTENANCE MODE CHECK =========================
+// Runs on every user-facing page (not admin).
+// If maintenance_mode is on in site_settings, replaces the page content.
+(async () => {
+    // Skip for admin pages and auth pages
+    const path = window.location.pathname;
+    if (path.includes('/admin/') || path.includes('/auth/')) return;
+    try {
+        const { data: s } = await db.from('site_settings').select('maintenance_mode').eq('id', 1).single();
+        if (s && s.maintenance_mode) {
+            document.body.innerHTML = `
+                <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;
+                    font-family:'Poppins',sans-serif;text-align:center;padding:2rem;background:var(--color-background,#f0eff5);">
+                    <div>
+                        <div style="font-size:4rem;margin-bottom:1.5rem;">🔧</div>
+                        <h2 style="font-size:2.4rem;font-weight:700;margin-bottom:1rem;color:var(--color-dark,#27282f);">
+                            We'll be back soon
+                        </h2>
+                        <p style="font-size:1.2rem;color:#888;max-width:40rem;line-height:1.6;">
+                            SyncProfitPath is currently undergoing maintenance.<br>
+                            Your funds are safe. Please check back in a little while.
+                        </p>
+                    </div>
+                </div>`;
+        }
+    } catch (e) {}
+})();
+
 // ========================= THEME TOGGLE =========================
 const themeBtn = document.querySelector('.nav_theme-btn');
 
