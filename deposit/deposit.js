@@ -266,9 +266,9 @@ function onAmountInput() {
     }
 
     const usdVal = toUSD(val);
-    if (usdVal < 10) {
+    if (usdVal < DEPOSIT_MIN) {
         amountInput.classList.add('input-error');
-        fieldError.textContent = 'Minimum deposit is $10 USD.';
+        fieldError.textContent = `Minimum deposit is $${formatNum(DEPOSIT_MIN)} USD.`;
         checkFormReady();
         updateSteps();
         return;
