@@ -91,9 +91,14 @@ async function fetchReferralStats() {
         // Stats
         referralStats.total = data.length;
         referralStats.pending = data.filter(u => (u.balance || 0) === 0).length;
-        // Flat $10 bonus per active referral (balance > 0 = they've deposited)
+        // Bonus amount from site_settings (falls back to $10)
+        let bonusAmount = 10;
+        try {
+            const { data: sd } = await db.from('site_settings').select('referral_bonus').eq('id', 1).single();
+            if (sd) bonusAmount = parseFloat(sd.referral_bonus) || 10;
+        } catch (e) {}
         const activeCount = data.filter(u => (u.balance || 0) > 0).length;
-        referralStats.earnings = activeCount * 10;
+        referralStats.earnings = activeCount * bonusAmount;
 
     } catch (err) {
         console.error('Refer fetch error:', err);
