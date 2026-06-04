@@ -13,25 +13,55 @@ let usdAmount        = 0;
 let currentQRCode    = null;
 
 // ── WALLET ADDRESSES ──
-// ================================================================
-// ▼▼▼  WALLET ADDRESSES — EDIT HERE  ▼▼▼
-// Change any address below to update what users see on the deposit page.
-// USDT and USDC use TRC-20 (Tron) — use your Tron wallet address for both.
-// ================================================================
-const WALLETS = {
-    btc:  { address: 'bc1qcm25upgkwqtf4cl7hus4srhgqt0jc4afhepd3c',     name: 'Bitcoin',  ticker: 'BTC',  icon: '₿', color: '#f7931a', bg: '#f7931a18', network: null },
-    eth:  { address: '0x45F0530a1C4e449dF5669AdCe86424b290a37BCe',      name: 'Ethereum', ticker: 'ETH',  icon: 'Ξ', color: '#627eea', bg: '#627eea18', network: 'ERC-20 network only' },
-    usdt: { address: 'TLHZivscxw9GJ4QkHQSAhWN2GKRBPgj3tF',                    name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'TRC-20 (Tron) network only' },
-    usdc: { address: 'TLHZivscxw9GJ4QkHQSAhWN2GKRBPgj3tF',                    name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'TRC-20 (Tron) network only' },
-    sol:  { address: 'F6irucMuC6YejoZshgJH8x1XPEXN3bgzE9KgB8H5LwBU',   name: 'Solana',   ticker: 'SOL',  icon: '◎', color: '#9945ff', bg: '#9945ff18', network: 'Solana network only' },
-    ltc:  { address: 'ltc1qv4r5nvyzx8m2t7h3l7c3s3tnyejm3svg0dap8j',    name: 'Litecoin', ticker: 'LTC',  icon: 'Ł', color: '#888888', bg: '#bfbbbb18', network: null },
+// Loaded dynamically from Supabase site_settings.
+// Admin can update them in Admin → Settings → Deposit.
+
+const WALLET_META = {
+    btc:  { name: 'Bitcoin',  ticker: 'BTC',  icon: '₿', color: '#f7931a', bg: '#f7931a18', network: null },
+    eth:  { name: 'Ethereum', ticker: 'ETH',  icon: 'Ξ', color: '#627eea', bg: '#627eea18', network: 'ERC-20 network only' },
+    usdt: { name: 'Tether',   ticker: 'USDT', icon: '₮', color: '#26a17b', bg: '#26a17b18', network: 'TRC-20 (Tron) network only' },
+    usdc: { name: 'USDC',     ticker: 'USDC', icon: 'Ⓤ', color: '#2775ca', bg: '#2775ca18', network: 'TRC-20 (Tron) network only' },
+    sol:  { name: 'Solana',   ticker: 'SOL',  icon: '◎', color: '#9945ff', bg: '#9945ff18', network: 'Solana network only' },
+    ltc:  { name: 'Litecoin', ticker: 'LTC',  icon: 'Ł', color: '#888888', bg: '#bfbbbb18', network: null },
 };
-// ================================================================
+
+let WALLETS     = {};
+let DEPOSIT_MIN = 10;
+
+async function loadSiteSettings() {
+    try {
+        const { data, error } = await db
+            .from('site_settings')
+            .select('wallet_btc, wallet_eth, wallet_usdt, wallet_usdc, wallet_sol, wallet_ltc, deposit_min')
+            .eq('id', 1)
+            .single();
+
+        if (error) throw error;
+
+        DEPOSIT_MIN = parseFloat(data.deposit_min) || 10;
+
+        WALLETS = {
+            btc:  { ...WALLET_META.btc,  address: data.wallet_btc  || '' },
+            eth:  { ...WALLET_META.eth,  address: data.wallet_eth  || '' },
+            usdt: { ...WALLET_META.usdt, address: data.wallet_usdt || '' },
+            usdc: { ...WALLET_META.usdc, address: data.wallet_usdc || '' },
+            sol:  { ...WALLET_META.sol,  address: data.wallet_sol  || '' },
+            ltc:  { ...WALLET_META.ltc,  address: data.wallet_ltc  || '' },
+        };
+
+    } catch (err) {
+        console.error('Failed to load site settings:', err.message);
+        WALLETS = Object.fromEntries(
+            Object.entries(WALLET_META).map(([k, v]) => [k, { ...v, address: '' }])
+        );
+    }
+}
 
 // ── DOM REFS (after DOMContentLoaded) ──
 let submitBtn, amountInput, fieldError;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadSiteSettings();
     submitBtn   = document.getElementById('submitBtn');
     amountInput = document.getElementById('amountInput');
     fieldError  = document.getElementById('amountError');
