@@ -31,7 +31,20 @@ themeBtn.addEventListener('click', () => {
 // PRE-FILL REFERRAL CODE FROM URL
 // ================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check registrations_open from site_settings
+    try {
+        const { data: s } = await db.from('site_settings').select('registrations_open, maintenance_mode').eq('id', 1).single();
+        if (s && s.maintenance_mode) {
+            document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;text-align:center;padding:2rem;"><div><h2 style="font-size:2rem;margin-bottom:1rem;">We'll be back soon</h2><p style="color:#888;">The site is currently under maintenance. Please check back later.</p></div></div>';
+            return;
+        }
+        if (s && s.registrations_open === false) {
+            document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;text-align:center;padding:2rem;"><div><h2 style="font-size:2rem;margin-bottom:1rem;">Registrations Closed</h2><p style="color:#888;">New account registrations are currently closed. Please check back later.</p></div></div>';
+            return;
+        }
+    } catch (e) {}
+
     const params  = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
     if (refCode) {
