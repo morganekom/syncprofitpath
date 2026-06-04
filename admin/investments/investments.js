@@ -145,10 +145,32 @@ function renderTable() {
         const plan   = escapeHtml(inv.method || '—');
         const coin   = escapeHtml((inv.coin || '—').toUpperCase());
 
-        // Show daily rate if already set
         const rateLabel = inv.daily_rate != null
             ? `<small class="text-muted">${inv.daily_rate}%/day</small>`
             : '';
+
+        // ── Maturity date cell ──
+        let maturityCell = '<td class="tx-date">—</td>';
+        if (inv.end_date) {
+            const endDate   = new Date(inv.end_date);
+            const today     = new Date();
+            today.setHours(0, 0, 0, 0);
+            endDate.setHours(0, 0, 0, 0);
+            const msLeft    = endDate - today;
+            const daysLeft  = Math.ceil(msLeft / 86400000);
+            const endFmt    = endDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            let daysTag = '';
+            if (daysLeft > 0) {
+                daysTag = `<small class="text-muted">${daysLeft}d left</small>`;
+            } else if (daysLeft === 0) {
+                daysTag = `<small style="color:#00c875;font-weight:600;">Matures today</small>`;
+            } else {
+                daysTag = `<small style="color:#00b894;font-weight:600;">Matured</small>`;
+            }
+
+            maturityCell = `<td class="tx-date">${endFmt}<br>${daysTag}</td>`;
+        }
 
         const actions = inv.status === 'pending'
             ? `<div class="row-actions">
@@ -173,6 +195,7 @@ function renderTable() {
                 <td>${coin}</td>
                 <td class="tx-amount-label investment">${amount}</td>
                 <td class="tx-date">${date}</td>
+                ${maturityCell}
                 <td><span class="badge ${inv.status}">${capitalise(inv.status)}</span></td>
                 <td>${actions}</td>
             </tr>
@@ -208,6 +231,20 @@ function openInvModal(id) {
     setText('miBalance',   balance);
     setText('miDate',      formatDateTime(inv.created_at));
     setText('miRate',      parsedRate != null ? parsedRate + '% daily' : '—');
+
+    // ── Maturity info in modal ──
+    if (inv.end_date) {
+        const endDate  = new Date(inv.end_date);
+        const today    = new Date();
+        today.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        const daysLeft = Math.ceil((endDate - today) / 86400000);
+        const endFmt   = endDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+        const daysStr  = daysLeft > 0 ? `(${daysLeft} days left)` : daysLeft === 0 ? '(matures today)' : '(matured)';
+        setText('miMaturity', `${endFmt} ${daysStr}`);
+    } else {
+        setText('miMaturity', '—');
+    }
     document.getElementById('miStatus').innerHTML =
         `<span class="badge ${inv.status}">${capitalise(inv.status)}</span>`;
 
