@@ -120,7 +120,7 @@
         <div id="settingsContent" style="display:none;">
 
             <!-- ══════════════════════════════════════
-                 SECTION: INVESTMENT PLANS
+                 INVESTMENT PLANS
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -155,7 +155,7 @@
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: WITHDRAWAL
+                 WITHDRAWAL LIMITS
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -185,15 +185,15 @@
                 </div>
                 <div class="settings-save-row">
                     <p class="settings-feedback" id="withdrawalFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('withdrawal')">
-                        <i class="uil uil-check-circle"></i> Save
+                    <button class="settings-save-btn settings-save-btn--idle" id="withdrawalSaveBtn" onclick="saveSection('withdrawal')">
+                        <i class="uil uil-check-circle"></i> Saved
                     </button>
                 </div>
             </div>
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: DEPOSIT
+                 DEPOSIT
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -202,56 +202,49 @@
                     </div>
                     <div>
                         <h2 class="settings-section-title">Deposit</h2>
-                        <p class="settings-section-desc">Update wallet addresses and the minimum deposit amount.</p>
+                        <p class="settings-section-desc">Wallet addresses and minimum deposit amount. Click Edit to make changes.</p>
                     </div>
-                </div>
-                <div class="settings-form-grid">
-                    <div class="settings-field">
-                        <label class="settings-label">Minimum Deposit ($)</label>
-                        <div class="settings-input-wrap">
-                            <span class="settings-prefix">$</span>
-                            <input type="number" id="depositMin" class="settings-input settings-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
-                        </div>
-                    </div>
-                </div>
-                <p class="settings-subsection-label">Wallet Addresses</p>
-                <div class="settings-form-grid settings-form-grid--full">
-                    <div class="settings-field">
-                        <label class="settings-label">Bitcoin (BTC)</label>
-                        <input type="text" id="walletBtc" class="settings-input" placeholder="bc1q…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Ethereum (ETH)</label>
-                        <input type="text" id="walletEth" class="settings-input" placeholder="0x…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Tether (USDT — TRC-20)</label>
-                        <input type="text" id="walletUsdt" class="settings-input" placeholder="T…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">USDC (TRC-20)</label>
-                        <input type="text" id="walletUsdc" class="settings-input" placeholder="T…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Solana (SOL)</label>
-                        <input type="text" id="walletSol" class="settings-input" placeholder="F6…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Litecoin (LTC)</label>
-                        <input type="text" id="walletLtc" class="settings-input" placeholder="ltc1…">
-                    </div>
-                </div>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="depositFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('deposit')">
-                        <i class="uil uil-check-circle"></i> Save
+                    <button class="plan-edit-btn settings-edit-btn" onclick="openDepositEditModal()">
+                        <i class="uil uil-edit"></i> Edit
                     </button>
+                </div>
+
+                <!-- Locked read-only view -->
+                <div class="deposit-locked-grid">
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Min Deposit</span>
+                        <span class="deposit-locked-value" id="lockedDepositMin">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Bitcoin (BTC)</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletBtc">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Ethereum (ETH)</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletEth">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Tether (USDT)</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdt">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">USDC</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdc">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Solana (SOL)</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletSol">—</span>
+                    </div>
+                    <div class="deposit-locked-row">
+                        <span class="deposit-locked-label">Litecoin (LTC)</span>
+                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletLtc">—</span>
+                    </div>
                 </div>
             </div>
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: KYC
+                 KYC  — toggle only, auto-saves
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -260,7 +253,7 @@
                     </div>
                     <div>
                         <h2 class="settings-section-title">KYC</h2>
-                        <p class="settings-section-desc">Require identity verification before users can withdraw.</p>
+                        <p class="settings-section-desc">Toggle to require identity verification before users can withdraw. Saves automatically.</p>
                     </div>
                 </div>
                 <label class="settings-toggle-label">
@@ -272,17 +265,11 @@
                     </div>
                     <span class="settings-toggle-text">KYC is <strong id="kycRequiredLabel">Required</strong> before withdrawal</span>
                 </label>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="kycFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('kyc')">
-                        <i class="uil uil-check-circle"></i> Save
-                    </button>
-                </div>
             </div>
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: REFERRAL
+                 REFERRAL
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -291,7 +278,7 @@
                     </div>
                     <div>
                         <h2 class="settings-section-title">Referral</h2>
-                        <p class="settings-section-desc">Set the bonus amount credited when a referred user signs up.</p>
+                        <p class="settings-section-desc">Set the bonus amount credited when a referred user makes their first deposit.</p>
                     </div>
                 </div>
                 <div class="settings-form-grid">
@@ -305,15 +292,15 @@
                 </div>
                 <div class="settings-save-row">
                     <p class="settings-feedback" id="referralFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('referral')">
-                        <i class="uil uil-check-circle"></i> Save
+                    <button class="settings-save-btn settings-save-btn--idle" id="referralSaveBtn" onclick="saveSection('referral')">
+                        <i class="uil uil-check-circle"></i> Saved
                     </button>
                 </div>
             </div>
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: EMAIL / NOTIFICATIONS
+                 EMAIL & NOTIFICATIONS
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -337,15 +324,15 @@
                 </div>
                 <div class="settings-save-row">
                     <p class="settings-feedback" id="emailFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('email')">
-                        <i class="uil uil-check-circle"></i> Save
+                    <button class="settings-save-btn settings-save-btn--idle" id="emailSaveBtn" onclick="saveSection('email')">
+                        <i class="uil uil-check-circle"></i> Saved
                     </button>
                 </div>
             </div>
 
 
             <!-- ══════════════════════════════════════
-                 SECTION: SITE / GENERAL
+                 SITE & GENERAL — toggles only, auto-save
             ══════════════════════════════════════ -->
             <div class="settings-section">
                 <div class="settings-section-header">
@@ -354,7 +341,7 @@
                     </div>
                     <div>
                         <h2 class="settings-section-title">Site & General</h2>
-                        <p class="settings-section-desc">Control site availability and new user registrations.</p>
+                        <p class="settings-section-desc">Control site availability and new user registrations. Both save automatically on toggle.</p>
                     </div>
                 </div>
 
@@ -383,22 +370,143 @@
                         <span class="settings-toggle-hint">— turn off to stop new signups</span>
                     </span>
                 </label>
-
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="siteFeedback"></p>
-                    <button class="settings-save-btn" onclick="saveSection('site')">
-                        <i class="uil uil-check-circle"></i> Save
-                    </button>
-                </div>
             </div>
 
         </div><!-- /settingsContent -->
-
     </main>
 
 
     <!-- ══════════════════════════════════════════
-         EDIT / ADD PLAN MODAL (carried over from plans page)
+         DEPOSIT EDIT MODAL
+    ══════════════════════════════════════════ -->
+    <div class="admin-modal-overlay" id="depositEditModal" onclick="closeDepositEditModal(event)">
+        <div class="admin-modal plans-modal">
+            <div class="admin-modal-header">
+                <h3>Edit Deposit Settings</h3>
+                <button class="admin-modal-close" onclick="closeDepositEditModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <p class="plans-modal-section-label">General</p>
+            <div class="plans-modal-row plans-modal-row--half">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Minimum Deposit ($)</label>
+                    <div class="plans-modal-input-wrap">
+                        <span class="plans-modal-unit plans-modal-unit--prefix">$</span>
+                        <input type="number" id="dmDepositMin" class="plans-modal-input plans-modal-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <p class="plans-modal-section-label">Wallet Addresses</p>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Bitcoin (BTC)</label>
+                    <input type="text" id="dmWalletBtc" class="plans-modal-input" placeholder="bc1q…">
+                </div>
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Ethereum (ETH)</label>
+                    <input type="text" id="dmWalletEth" class="plans-modal-input" placeholder="0x…">
+                </div>
+            </div>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Tether (USDT — TRC-20)</label>
+                    <input type="text" id="dmWalletUsdt" class="plans-modal-input" placeholder="T…">
+                </div>
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">USDC (TRC-20)</label>
+                    <input type="text" id="dmWalletUsdc" class="plans-modal-input" placeholder="T…">
+                </div>
+            </div>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Solana (SOL)</label>
+                    <input type="text" id="dmWalletSol" class="plans-modal-input" placeholder="F6…">
+                </div>
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Litecoin (LTC)</label>
+                    <input type="text" id="dmWalletLtc" class="plans-modal-input" placeholder="ltc1…">
+                </div>
+            </div>
+
+            <p class="plans-modal-error" id="dmError"></p>
+
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeDepositEditModal()" style="background:var(--color-light);color:var(--color-dark);">
+                    Cancel
+                </button>
+                <button class="action-btn approve" onclick="requestDepositSave()">
+                    <i class="uil uil-check-circle"></i> Review & Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════
+         DEPOSIT CONFIRM MODAL
+    ══════════════════════════════════════════ -->
+    <div class="admin-modal-overlay" id="depositConfirmModal" onclick="closeDepositConfirmModal(event)">
+        <div class="admin-modal plans-modal plans-modal--narrow">
+            <div class="admin-modal-header">
+                <h3>Confirm Deposit Changes</h3>
+                <button class="admin-modal-close" onclick="cancelDepositConfirm()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <div class="deposit-confirm-warning">
+                <i class="uil uil-exclamation-triangle"></i>
+                <p>Please review all values carefully. Incorrect wallet addresses mean users' funds will be sent to the wrong address and <strong>cannot be recovered</strong>.</p>
+            </div>
+
+            <div class="deposit-confirm-rows">
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">Min Deposit</span>
+                    <span class="deposit-confirm-value" id="confirmDepositMin">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">BTC</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletBtc">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">ETH</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletEth">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">USDT</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletUsdt">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">USDC</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletUsdc">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">SOL</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletSol">—</span>
+                </div>
+                <div class="deposit-confirm-row">
+                    <span class="deposit-confirm-label">LTC</span>
+                    <span class="deposit-confirm-value deposit-confirm-address" id="confirmWalletLtc">—</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="action-btn" onclick="cancelDepositConfirm()" style="background:var(--color-light);color:var(--color-dark);">
+                    <i class="uil uil-arrow-left"></i> Go Back
+                </button>
+                <button class="action-btn approve" id="depositConfirmBtn" onclick="confirmDepositSave()">
+                    <i class="uil uil-check-circle"></i> Reconfirm & Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════
+         INVESTMENT PLAN EDIT / ADD MODAL
     ══════════════════════════════════════════ -->
     <div class="admin-modal-overlay" id="planModal" onclick="closePlanModal(event)">
         <div class="admin-modal plans-modal">
@@ -512,6 +620,7 @@
         </div>
     </div>
 
+
     <!-- DELETE CONFIRM MODAL -->
     <div class="admin-modal-overlay" id="deleteConfirmModal" onclick="closeDeleteConfirm(event)">
         <div class="admin-modal plans-modal plans-modal--narrow">
@@ -529,7 +638,7 @@
                 <p class="plans-delete-warn">This cannot be undone. Users currently on this plan will not be affected retroactively.</p>
             </div>
             <div class="modal-actions">
-                <button class="action-btn" onclick="closeDeleteConfirm()" style="background:var(--color-light); color:var(--color-dark);">Cancel</button>
+                <button class="action-btn" onclick="closeDeleteConfirm()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
                 <button class="action-btn reject" onclick="confirmDeletePlan()">
                     <i class="uil uil-trash-alt"></i> Yes, Delete
                 </button>

@@ -1,8 +1,6 @@
 /* settings.css
    Admin — Settings page
    Loaded after style.css + admin.css
-   Covers: settings sections, form fields, toggles, save rows,
-   and carries over all plans-modal styles from plans.css
 */
 
 
@@ -64,8 +62,8 @@
     line-height: 1.5;
 }
 
-/* Push action button (e.g. Add Plan) to the right */
-.settings-section-header .settings-action-btn {
+/* Add Plan button */
+.settings-action-btn {
     margin-left: auto;
     display: inline-flex;
     align-items: center;
@@ -83,13 +81,17 @@
     white-space: nowrap;
 }
 
-.settings-section-header .settings-action-btn:hover {
+.settings-action-btn:hover {
     box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
 }
 
-.settings-section-header .settings-action-btn i {
-    font-size: 1.4rem;
-    color: inherit;
+.settings-action-btn i { font-size: 1.4rem; color: inherit; }
+
+/* Deposit Edit button — same as plan-edit-btn, pushed right */
+.settings-edit-btn {
+    margin-left: auto;
+    width: auto !important;
+    padding: 0.9rem 1.8rem !important;
 }
 
 
@@ -100,13 +102,8 @@
     gap: 1.2rem;
 }
 
-/* Full-width grid for wallet addresses (one per row on mobile anyway) */
-.settings-form-grid--full {
-    grid-template-columns: 1fr 1fr;
-}
+.settings-form-grid--full { grid-template-columns: 1fr 1fr; }
 
-
-/* ── FIELD ── */
 .settings-field {
     display: flex;
     flex-direction: column;
@@ -139,7 +136,6 @@
     background: var(--color-white);
 }
 
-/* Prefix wrap ($) */
 .settings-input-wrap {
     position: relative;
     display: flex;
@@ -156,9 +152,7 @@
     user-select: none;
 }
 
-.settings-input--prefixed {
-    padding-left: 2.6rem !important;
-}
+.settings-input--prefixed { padding-left: 2.6rem !important; }
 
 
 /* ========================= SUBSECTION LABEL ========================= */
@@ -183,10 +177,7 @@
     user-select: none;
 }
 
-.settings-toggle-wrap {
-    position: relative;
-    flex-shrink: 0;
-}
+.settings-toggle-wrap { position: relative; flex-shrink: 0; }
 
 .settings-toggle-input {
     position: absolute;
@@ -225,19 +216,9 @@
     background: var(--color-primary);
 }
 
-.settings-toggle-text {
-    font-size: 1.1rem;
-    color: var(--color-gray-dark);
-    line-height: 1.5;
-}
-
+.settings-toggle-text { font-size: 1.1rem; color: var(--color-gray-dark); line-height: 1.5; }
 .settings-toggle-text strong { color: var(--color-dark); }
-
-.settings-toggle-hint {
-    font-size: 1rem;
-    color: var(--color-gray-light);
-    font-weight: 400;
-}
+.settings-toggle-hint { font-size: 1rem; color: var(--color-gray-light); font-weight: 400; }
 
 
 /* ========================= SAVE ROW ========================= */
@@ -259,6 +240,7 @@
 .settings-feedback--ok  { color: var(--color-primary); }
 .settings-feedback--err { color: var(--color-danger);  }
 
+/* ── SAVE BUTTON — idle (color-light / "Saved") ── */
 .settings-save-btn {
     display: inline-flex;
     align-items: center;
@@ -266,20 +248,32 @@
     padding: 0.9rem 1.8rem;
     border-radius: var(--radius-2);
     border: none;
-    background: var(--color-primary);
-    color: var(--color-dark);
     font-size: 1.1rem;
     font-weight: 700;
     font-family: "Poppins", sans-serif;
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
+
+    /* Idle state */
+    background: var(--color-light);
+    color: var(--color-gray-dark);
 }
 
 .settings-save-btn i { font-size: 1.3rem; color: inherit; }
 
-.settings-save-btn:hover {
+/* Hover on idle does nothing prominent — it's already "saved" */
+.settings-save-btn:hover { opacity: 0.85; }
+
+/* ── DIRTY state — turned on by JS when user types ── */
+.settings-save-btn.dirty {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.settings-save-btn.dirty:hover {
     box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+    opacity: 1;
 }
 
 .settings-save-btn:disabled {
@@ -288,7 +282,118 @@
 }
 
 
-/* ========================= PLANS (carried from plans.css) ========================= */
+/* ========================= DEPOSIT LOCKED VIEW ========================= */
+.deposit-locked-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: var(--radius-2);
+    overflow: hidden;
+    border: 1px solid var(--color-light);
+}
+
+.deposit-locked-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--color-light);
+    gap: 1.2rem;
+}
+
+.deposit-locked-row:last-child { border-bottom: none; }
+
+.deposit-locked-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    min-width: 14rem;
+    flex-shrink: 0;
+}
+
+.deposit-locked-value {
+    font-size: 1.05rem;
+    color: var(--color-dark);
+    font-weight: 500;
+    flex: 1;
+}
+
+.deposit-locked-address {
+    font-family: monospace;
+    font-size: 1rem;
+    word-break: break-all;
+    color: var(--color-gray-dark);
+}
+
+
+/* ========================= DEPOSIT CONFIRM MODAL ========================= */
+.deposit-confirm-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 4px solid var(--color-danger);
+    border-radius: var(--radius-2);
+    padding: 1.4rem 1.6rem;
+}
+
+.deposit-confirm-warning i {
+    font-size: 2rem;
+    color: var(--color-danger);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.deposit-confirm-warning p {
+    font-size: 1.1rem;
+    color: var(--color-dark);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.deposit-confirm-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: var(--radius-2);
+    overflow: hidden;
+    border: 1px solid var(--color-light);
+}
+
+.deposit-confirm-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--color-light);
+    gap: 1.2rem;
+}
+
+.deposit-confirm-row:last-child { border-bottom: none; }
+
+.deposit-confirm-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-gray-light);
+    min-width: 6rem;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+}
+
+.deposit-confirm-value {
+    font-size: 1.05rem;
+    color: var(--color-dark);
+    font-weight: 500;
+    flex: 1;
+}
+
+.deposit-confirm-address {
+    font-family: monospace;
+    font-size: 0.95rem;
+    word-break: break-all;
+    color: var(--color-gray-dark);
+}
+
+
+/* ========================= PLANS (unchanged) ========================= */
 .plans-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -307,11 +412,7 @@
     cursor: grab;
 }
 
-.plan-admin-card:hover {
-    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
-}
-
+.plan-admin-card:hover { box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.1); transform: translateY(-3px); }
 .plan-admin-card:active { cursor: grabbing; }
 .plan-admin-card.dragging { opacity: 0.45; box-shadow: none; transform: none; }
 .plan-admin-card.plan-inactive { opacity: 0.6; }
@@ -326,14 +427,12 @@
 }
 
 .plan-admin-strip * { color: #fff; }
-
 .plan-admin-strip-left { display: flex; flex-direction: column; gap: 0.5rem; }
-
 .plan-admin-name { font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1.1; }
 
 .plan-admin-badge {
     display: inline-block;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0,0,0,0.2);
     border-radius: var(--radius-2);
     padding: 0.3rem 0.9rem;
     font-size: 1rem;
@@ -346,7 +445,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    background: rgba(0, 0, 0, 0.22);
+    background: rgba(0,0,0,0.22);
     border-radius: 99px;
     padding: 0.3rem 0.9rem;
     font-size: 1rem;
@@ -378,7 +477,6 @@
 .plan-admin-row:last-of-type { border-bottom: none; padding-bottom: 0; }
 .plan-admin-row-label { color: var(--color-gray-light); font-size: 1rem; }
 .plan-admin-row-value { font-weight: 600; color: var(--color-dark); text-align: right; }
-
 .plan-admin-footer { padding: 0 var(--card-padding) 1.4rem; }
 
 .plan-edit-btn {
@@ -435,18 +533,17 @@
 }
 
 .save-order-btn i { font-size: 1.2rem; color: inherit; }
-.save-order-btn:hover { box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35); }
+.save-order-btn:hover { box-shadow: 0 0.8rem 1.5rem rgba(0,226,123,0.35); }
 
-/* Plan tier colours */
 .plan-admin-strip.plan-basic    { background: var(--color-primary); }
 .plan-admin-strip.plan-standard { background: var(--color-dark); }
 .plan-admin-strip.plan-premium  { background: var(--color-purple); }
 .plan-admin-strip.plan-custom   { background: var(--color-warning); }
 
 
-/* ========================= PLANS MODAL (carried from plans.css) ========================= */
+/* ========================= PLANS MODAL ========================= */
 .plans-modal { max-width: 58rem; gap: 1.2rem; }
-.plans-modal--narrow { max-width: 42rem; }
+.plans-modal--narrow { max-width: 44rem; }
 
 .plans-modal-section-label {
     font-size: 1.05rem;
@@ -461,13 +558,7 @@
 
 .plans-modal-section-label:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
 
-.plans-modal-hint {
-    font-size: 0.95rem;
-    font-weight: 400;
-    text-transform: none;
-    letter-spacing: 0;
-    color: var(--color-gray-light);
-}
+.plans-modal-hint { font-size: 0.95rem; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--color-gray-light); }
 
 .plans-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 .plans-modal-row--half { grid-template-columns: 1fr 1fr; }
@@ -530,7 +621,7 @@
     transition: transform var(--transition), background var(--transition);
 }
 
-.plans-toggle-input:checked ~ .plans-toggle-track { background: rgba(0, 226, 123, 0.25); }
+.plans-toggle-input:checked ~ .plans-toggle-track { background: rgba(0,226,123,0.25); }
 .plans-toggle-input:checked ~ .plans-toggle-track .plans-toggle-thumb { transform: translateX(2rem); background: var(--color-primary); }
 .plans-toggle-text { font-size: 1.1rem; color: var(--color-gray-dark); }
 .plans-toggle-text strong { color: var(--color-dark); }
@@ -564,20 +655,11 @@
     .settings-form-grid,
     .settings-form-grid--full,
     .plans-modal-row,
-    .plans-modal-row--half {
-        grid-template-columns: 1fr;
-    }
+    .plans-modal-row--half { grid-template-columns: 1fr; }
 
-    .settings-section-header .settings-action-btn {
-        margin-left: 0;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .settings-section-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+    .settings-section-header { flex-direction: column; align-items: flex-start; }
+    .settings-action-btn,
+    .settings-edit-btn { margin-left: 0; width: 100%; justify-content: center; }
 
     .plans-order-hint { flex-direction: column; align-items: flex-start; }
     .save-order-btn { margin-left: 0; width: 100%; justify-content: center; }
@@ -585,4 +667,7 @@
 
     .settings-save-row { flex-direction: column; align-items: stretch; }
     .settings-save-btn { justify-content: center; }
+
+    .deposit-locked-label { min-width: 9rem; }
+    .deposit-confirm-label { min-width: 4.5rem; }
 }

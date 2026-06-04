@@ -1,16 +1,13 @@
 // ================================================================
 // ADMIN / SETTINGS.JS
-// Handles all admin settings sections:
-//   - Investment Plans (carried over from plans.js)
-//   - Withdrawal limits
-//   - Deposit wallet addresses + min deposit
-//   - KYC toggle
-//   - Referral bonus
-//   - Email / notifications
-//   - Site / general (maintenance, registrations)
-//
-// All non-plan settings live in the site_settings table (one row, id=1)
-// Investment plans live in the investment_plans table (unchanged)
+// Sections:
+//   Investment Plans  — edit modal (unchanged)
+//   Withdrawal        — dirty-state button (color-light → primary on change)
+//   Deposit           — locked view + edit modal + confirm modal
+//   KYC               — auto-save on toggle, no button
+//   Referral          — dirty-state button
+//   Email             — dirty-state button
+//   Site & General    — auto-save on toggle, no button
 // ================================================================
 
 
@@ -18,7 +15,7 @@
 let allPlans        = [];
 let activePlan      = null;
 let pendingDeleteId = null;
-let siteSettings    = null;   // the one row from site_settings
+let siteSettings    = null;
 
 
 // ================================================================
@@ -29,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     bindToggleLabels();
     bindPlanModalListeners();
+    bindDirtyListeners();
 });
 
 
@@ -58,7 +56,7 @@ async function loadSettings() {
 
 
 // ================================================================
-// SITE SETTINGS
+// SITE SETTINGS — LOAD & POPULATE
 // ================================================================
 
 async function loadSiteSettings() {
@@ -78,15 +76,10 @@ function populateSiteSettings(s) {
     // Withdrawal
     document.getElementById('withdrawalMin').value = s.withdrawal_min ?? '';
     document.getElementById('withdrawalMax').value = s.withdrawal_max ?? '';
+    resetDirty('withdrawal');
 
-    // Deposit
-    document.getElementById('depositMin').value  = s.deposit_min  ?? '';
-    document.getElementById('walletBtc').value   = s.wallet_btc   ?? '';
-    document.getElementById('walletEth').value   = s.wallet_eth   ?? '';
-    document.getElementById('walletUsdt').value  = s.wallet_usdt  ?? '';
-    document.getElementById('walletUsdc').value  = s.wallet_usdc  ?? '';
-    document.getElementById('walletSol').value   = s.wallet_sol   ?? '';
-    document.getElementById('walletLtc').value   = s.wallet_ltc   ?? '';
+    // Deposit — show locked view
+    populateDepositLockedView(s);
 
     // KYC
     const kycEl = document.getElementById('kycRequired');
@@ -95,10 +88,12 @@ function populateSiteSettings(s) {
 
     // Referral
     document.getElementById('referralBonus').value = s.referral_bonus ?? '';
+    resetDirty('referral');
 
     // Email
     document.getElementById('emailFromName').value = s.email_from_name ?? '';
     document.getElementById('emailSupport').value  = s.email_support   ?? '';
+    resetDirty('email');
 
     // Site
     const maintEl = document.getElementById('maintenanceMode');
@@ -109,16 +104,66 @@ function populateSiteSettings(s) {
     setText('registrationsOpenLabel', regEl.checked  ? 'Open' : 'Closed');
 }
 
+// Populate the read-only locked deposit view
+function populateDepositLockedView(s) {
+    setText('lockedDepositMin',  s.deposit_min  != null ? '$' + formatNum(s.deposit_min) : '—');
+    setText('lockedWalletBtc',   s.wallet_btc   || '—');
+    setText('lockedWalletEth',   s.wallet_eth   || '—');
+    setText('lockedWalletUsdt',  s.wallet_usdt  || '—');
+    setText('lockedWalletUsdc',  s.wallet_usdc  || '—');
+    setText('lockedWalletSol',   s.wallet_sol   || '—');
+    setText('lockedWalletLtc',   s.wallet_ltc   || '—');
+}
 
-// ── SAVE A SECTION ──
+
+// ================================================================
+// DIRTY-STATE BUTTONS
+// Sections: withdrawal, referral, email
+// Btn starts as color-light / "Saved", turns primary / "Save" on input
+// ================================================================
+
+const DIRTY_SECTIONS = ['withdrawal', 'referral', 'email'];
+
+function bindDirtyListeners() {
+    // Withdrawal inputs
+    ['withdrawalMin', 'withdrawalMax'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => markDirty('withdrawal'));
+    });
+    // Referral inputs
+    ['referralBonus'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => markDirty('referral'));
+    });
+    // Email inputs
+    ['emailFromName', 'emailSupport'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => markDirty('email'));
+    });
+}
+
+function markDirty(section) {
+    const btn = document.getElementById(section + 'SaveBtn');
+    if (!btn) return;
+    btn.classList.add('dirty');
+    btn.innerHTML = '<i class="uil uil-check-circle"></i> Save';
+}
+
+function resetDirty(section) {
+    const btn = document.getElementById(section + 'SaveBtn');
+    if (!btn) return;
+    btn.classList.remove('dirty');
+    btn.innerHTML = '<i class="uil uil-check-circle"></i> Saved';
+}
+
+
+// ================================================================
+// SAVE SECTION
+// ================================================================
 
 async function saveSection(section) {
+    const btn        = document.getElementById(section + 'SaveBtn');
     const feedbackEl = document.getElementById(section + 'Feedback');
-    const btn = feedbackEl.nextElementSibling;
 
-    feedbackEl.textContent  = '';
-    feedbackEl.className    = 'settings-feedback';
-    btn.disabled            = true;
+    if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.className = 'settings-feedback'; }
+    if (btn) btn.disabled = true;
 
     let payload = {};
 
@@ -129,26 +174,10 @@ async function saveSection(section) {
                 withdrawal_max: parseFloat(document.getElementById('withdrawalMax').value) || 0,
             };
             if (payload.withdrawal_min > payload.withdrawal_max) {
-                showFeedback(feedbackEl, 'Minimum cannot be greater than maximum.', false);
-                btn.disabled = false;
+                if (feedbackEl) showFeedback(feedbackEl, 'Minimum cannot be greater than maximum.', false);
+                if (btn) btn.disabled = false;
                 return;
             }
-            break;
-
-        case 'deposit':
-            payload = {
-                deposit_min:  parseFloat(document.getElementById('depositMin').value)    || 0,
-                wallet_btc:   document.getElementById('walletBtc').value.trim()  || null,
-                wallet_eth:   document.getElementById('walletEth').value.trim()  || null,
-                wallet_usdt:  document.getElementById('walletUsdt').value.trim() || null,
-                wallet_usdc:  document.getElementById('walletUsdc').value.trim() || null,
-                wallet_sol:   document.getElementById('walletSol').value.trim()  || null,
-                wallet_ltc:   document.getElementById('walletLtc').value.trim()  || null,
-            };
-            break;
-
-        case 'kyc':
-            payload = { kyc_required: document.getElementById('kycRequired').checked };
             break;
 
         case 'referral':
@@ -160,6 +189,10 @@ async function saveSection(section) {
                 email_from_name: document.getElementById('emailFromName').value.trim() || null,
                 email_support:   document.getElementById('emailSupport').value.trim()  || null,
             };
+            break;
+
+        case 'kyc':
+            payload = { kyc_required: document.getElementById('kycRequired').checked };
             break;
 
         case 'site':
@@ -181,44 +214,159 @@ async function saveSection(section) {
         if (error) throw error;
 
         siteSettings = { ...siteSettings, ...payload };
-        showFeedback(feedbackEl, 'Saved successfully.', true);
+
+        // Dirty-state sections: reset to "Saved"
+        if (DIRTY_SECTIONS.includes(section)) {
+            resetDirty(section);
+        }
+
+        if (feedbackEl) showFeedback(feedbackEl, 'Saved.', true);
 
     } catch (err) {
         console.error('saveSection error:', err.message);
-        showFeedback(feedbackEl, err.message || 'Save failed. Please try again.', false);
+        if (feedbackEl) showFeedback(feedbackEl, err.message || 'Save failed.', false);
     }
 
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
 }
 
 function showFeedback(el, msg, success) {
     el.textContent = msg;
     el.className   = 'settings-feedback ' + (success ? 'settings-feedback--ok' : 'settings-feedback--err');
-    setTimeout(() => { el.textContent = ''; el.className = 'settings-feedback'; }, 4000);
+    setTimeout(() => { if (el) { el.textContent = ''; el.className = 'settings-feedback'; } }, 4000);
 }
 
 
 // ================================================================
-// BIND TOGGLE LABELS
+// KYC + SITE TOGGLES — auto-save on change, no button needed
 // ================================================================
 
 function bindToggleLabels() {
     const toggles = [
-        { id: 'kycRequired',       labelId: 'kycRequiredLabel',       on: 'Required',   off: 'Not Required' },
-        { id: 'maintenanceMode',   labelId: 'maintenanceModeLabel',   on: 'On',         off: 'Off'    },
-        { id: 'registrationsOpen', labelId: 'registrationsOpenLabel', on: 'Open',       off: 'Closed' },
+        { id: 'kycRequired',       labelId: 'kycRequiredLabel',       on: 'Required', off: 'Not Required', section: 'kyc'  },
+        { id: 'maintenanceMode',   labelId: 'maintenanceModeLabel',   on: 'On',       off: 'Off',          section: 'site' },
+        { id: 'registrationsOpen', labelId: 'registrationsOpenLabel', on: 'Open',     off: 'Closed',       section: 'site' },
     ];
-    toggles.forEach(({ id, labelId, on, off }) => {
+
+    toggles.forEach(({ id, labelId, on, off, section }) => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('change', function () {
+        if (!el) return;
+        el.addEventListener('change', function () {
             setText(labelId, this.checked ? on : off);
+            saveSection(section);
         });
     });
 }
 
 
 // ================================================================
-// INVESTMENT PLANS  (identical logic to plans.js, just embedded here)
+// DEPOSIT SECTION — locked view + edit modal + confirm modal
+// ================================================================
+
+function openDepositEditModal() {
+    if (!siteSettings) return;
+    const s = siteSettings;
+
+    // Populate the edit modal fields with current values
+    document.getElementById('dmDepositMin').value  = s.deposit_min  ?? '';
+    document.getElementById('dmWalletBtc').value   = s.wallet_btc   ?? '';
+    document.getElementById('dmWalletEth').value   = s.wallet_eth   ?? '';
+    document.getElementById('dmWalletUsdt').value  = s.wallet_usdt  ?? '';
+    document.getElementById('dmWalletUsdc').value  = s.wallet_usdc  ?? '';
+    document.getElementById('dmWalletSol').value   = s.wallet_sol   ?? '';
+    document.getElementById('dmWalletLtc').value   = s.wallet_ltc   ?? '';
+    document.getElementById('dmError').textContent = '';
+
+    document.getElementById('depositEditModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDepositEditModal(event) {
+    if (event && event.target !== document.getElementById('depositEditModal')) return;
+    document.getElementById('depositEditModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// "Save" in edit modal → show confirm modal
+function requestDepositSave() {
+    const errorEl = document.getElementById('dmError');
+    errorEl.textContent = '';
+
+    const min = parseFloat(document.getElementById('dmDepositMin').value);
+    if (isNaN(min) || min < 0) {
+        errorEl.textContent = 'Minimum deposit must be a valid positive number.';
+        return;
+    }
+
+    // Pass staged values to confirm modal
+    document.getElementById('confirmDepositMin').textContent   = '$' + formatNum(min);
+    document.getElementById('confirmWalletBtc').textContent    = document.getElementById('dmWalletBtc').value.trim()  || '—';
+    document.getElementById('confirmWalletEth').textContent    = document.getElementById('dmWalletEth').value.trim()  || '—';
+    document.getElementById('confirmWalletUsdt').textContent   = document.getElementById('dmWalletUsdt').value.trim() || '—';
+    document.getElementById('confirmWalletUsdc').textContent   = document.getElementById('dmWalletUsdc').value.trim() || '—';
+    document.getElementById('confirmWalletSol').textContent    = document.getElementById('dmWalletSol').value.trim()  || '—';
+    document.getElementById('confirmWalletLtc').textContent    = document.getElementById('dmWalletLtc').value.trim()  || '—';
+
+    document.getElementById('depositEditModal').classList.remove('open');
+    document.getElementById('depositConfirmModal').classList.add('open');
+}
+
+function closeDepositConfirmModal(event) {
+    if (event && event.target !== document.getElementById('depositConfirmModal')) return;
+    // Go back to edit modal
+    document.getElementById('depositConfirmModal').classList.remove('open');
+    document.getElementById('depositEditModal').classList.add('open');
+}
+
+function cancelDepositConfirm() {
+    document.getElementById('depositConfirmModal').classList.remove('open');
+    document.getElementById('depositEditModal').classList.add('open');
+}
+
+async function confirmDepositSave() {
+    const confirmBtn = document.getElementById('depositConfirmBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
+
+    const payload = {
+        deposit_min:  parseFloat(document.getElementById('dmDepositMin').value) || 0,
+        wallet_btc:   document.getElementById('dmWalletBtc').value.trim()  || null,
+        wallet_eth:   document.getElementById('dmWalletEth').value.trim()  || null,
+        wallet_usdt:  document.getElementById('dmWalletUsdt').value.trim() || null,
+        wallet_usdc:  document.getElementById('dmWalletUsdc').value.trim() || null,
+        wallet_sol:   document.getElementById('dmWalletSol').value.trim()  || null,
+        wallet_ltc:   document.getElementById('dmWalletLtc').value.trim()  || null,
+        updated_at:   new Date().toISOString(),
+    };
+
+    try {
+        const { error } = await db
+            .from('site_settings')
+            .update(payload)
+            .eq('id', 1);
+
+        if (error) throw error;
+
+        siteSettings = { ...siteSettings, ...payload };
+        populateDepositLockedView(siteSettings);
+
+        document.getElementById('depositConfirmModal').classList.remove('open');
+        document.body.style.overflow = '';
+
+    } catch (err) {
+        console.error('confirmDepositSave error:', err.message);
+        document.getElementById('depositConfirmModal').classList.remove('open');
+        document.getElementById('depositEditModal').classList.add('open');
+        document.getElementById('dmError').textContent = err.message || 'Save failed. Please try again.';
+    }
+
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '<i class="uil uil-check-circle"></i> Reconfirm & Save';
+}
+
+
+// ================================================================
+// INVESTMENT PLANS
 // ================================================================
 
 async function loadPlans() {
@@ -268,14 +416,13 @@ function buildPlanCard(p) {
     const tierClass  = escapeHtml(p.tier_class    || 'plan-basic');
     const name       = escapeHtml(p.name          || 'Unnamed Plan');
     const badge      = escapeHtml(p.badge_label   || '');
-    const dailyRate  = p.daily_rate      != null ? p.daily_rate + '%'       : '—';
-    const roi        = p.roi_multiplier  != null ? p.roi_multiplier + '×'   : '—';
-    const minAmt     = p.min_amount      != null ? '$' + formatNum(p.min_amount) : '—';
-    const maxAmt     = p.max_amount      != null ? '$' + formatNum(p.max_amount) : '—';
+    const dailyRate  = p.daily_rate      != null ? p.daily_rate + '%'             : '—';
+    const roi        = p.roi_multiplier  != null ? p.roi_multiplier + '×'         : '—';
+    const minAmt     = p.min_amount      != null ? '$' + formatNum(p.min_amount)  : '—';
+    const maxAmt     = p.max_amount      != null ? '$' + formatNum(p.max_amount)  : '—';
     const returnType = escapeHtml(p.return_type   || '—');
     const withdraw   = escapeHtml(p.withdraw      || '—');
     const isActive   = p.is_active !== false;
-
     const statusClass = isActive ? 'active'    : 'inactive';
     const statusIcon  = isActive ? 'uil-check' : 'uil-minus';
     const statusLabel = isActive ? 'Active'    : 'Inactive';
@@ -368,10 +515,10 @@ function openAddModal() {
             el.value    = '';
             el.readOnly = false;
         });
-    document.getElementById('pmIsActive').checked          = true;
+    document.getElementById('pmIsActive').checked        = true;
     setText('pmActiveLabel', 'Active');
-    document.getElementById('pmDeleteBtn').style.display   = 'none';
-    document.getElementById('pmError').textContent         = '';
+    document.getElementById('pmDeleteBtn').style.display = 'none';
+    document.getElementById('pmError').textContent       = '';
     openPlanModal();
 }
 
@@ -416,10 +563,10 @@ async function savePlan() {
         slug,
         tier_class:     tierClass  || null,
         badge_label:    badge      || null,
-        daily_rate:     dailyRate  !== '' ? parseFloat(dailyRate)  : null,
-        roi_multiplier: roi        !== '' ? parseFloat(roi)        : null,
-        min_amount:     minAmt     !== '' ? parseFloat(minAmt)     : null,
-        max_amount:     maxAmt     !== '' ? parseFloat(maxAmt)     : null,
+        daily_rate:     dailyRate  !== '' ? parseFloat(dailyRate)   : null,
+        roi_multiplier: roi        !== '' ? parseFloat(roi)         : null,
+        min_amount:     minAmt     !== '' ? parseFloat(minAmt)      : null,
+        max_amount:     maxAmt     !== '' ? parseFloat(maxAmt)      : null,
         return_type:    retType    || null,
         withdraw:       withdraw   || null,
         cancel_time:    cancel     || null,
@@ -542,7 +689,7 @@ function initDragSort() {
 async function saveOrder() {
     const hint    = document.getElementById('plansOrderHint');
     const saveBtn = hint.querySelector('.save-order-btn');
-    saveBtn.disabled = true;
+    saveBtn.disabled  = true;
     saveBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
 
     try {
