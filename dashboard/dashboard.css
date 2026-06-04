@@ -435,33 +435,21 @@ body {
 
 
 /* ========================= PLANS SUMMARY ========================= */
-.plans-summary { display: flex; flex-direction: column; gap: 0.8rem; }
 
-.plan-summary-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.2rem;
-    border-radius: var(--radius-2);
-    transition: var(--transition);
-}
 
-.plan-basic-row    { background: rgba(0, 226, 123, 0.1); }
-.plan-standard-row { background: rgba(39, 40, 47, 0.07); }
-.plan-premium-row  { background: rgba(160, 99, 245, 0.1); }
 
-.plan-summary-row h4 { font-size: 1.2rem; }
-.plan-summary-row p  { color: var(--color-gray-light); font-size: 1rem; margin-top: 0.2rem; }
 
-.plan-rate {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    white-space: nowrap;
-}
 
-.plan-standard-row .plan-rate { color: var(--color-dark); }
-.plan-premium-row  .plan-rate { color: var(--color-purple); }
+
+
+
+
+
+
+
+
+.plan-standard-row 
+.plan-premium-row  
 
 
 /* ========================= SUPPORT ========================= */
@@ -613,4 +601,220 @@ body {
     .quick-action-icon i { font-size: 1.7rem; }
 
     .quick-action span { font-size: 1rem; }
+}
+
+
+
+
+/* ── Grid ── */
+.active-inv-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+/* ── Card ── */
+.active-inv-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    transition: var(--transition);
+}
+
+.active-inv-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.1);
+}
+
+/* ── Card top: coin icon + plan name + status badge ── */
+.active-inv-top {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.active-inv-coin-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.active-inv-top-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.active-inv-plan {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.active-inv-coin-label {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    margin-top: 0.2rem;
+}
+
+.active-inv-status {
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: var(--radius-2);
+    padding: 0.4rem 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.active-inv-status.status-active {
+    background: rgba(0, 226, 123, 0.15);
+    color: var(--color-primary);
+}
+
+.active-inv-status.status-matured {
+    background: rgba(0, 226, 123, 0.1);
+    color: var(--color-gray-dark);
+}
+
+/* ── Amount rows ── */
+.active-inv-amounts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem;
+}
+
+.active-inv-amount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.active-inv-label {
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+}
+
+.active-inv-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.active-inv-value.profit-green {
+    color: var(--color-primary);
+}
+
+/* ── Progress row: compact bar on the left, daily pill on the right ── */
+.active-inv-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.4rem;
+}
+
+.active-inv-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.active-inv-progress-track {
+    height: 5px;
+    background: var(--color-light);
+    border-radius: 99px;
+    overflow: hidden;
+    max-width: 12rem;
+}
+
+.active-inv-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.active-inv-days-label {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    white-space: nowrap;
+}
+
+.active-inv-daily {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(0, 226, 123, 0.12);
+    border-radius: var(--radius-2);
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Ref ── */
+.active-inv-ref {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+/* ── Empty state ── */
+.active-inv-empty {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+}
+
+.active-inv-empty i {
+    font-size: 2.4rem;
+    color: var(--color-gray-light);
+}
+
+.active-inv-empty p {
+    color: var(--color-gray-light);
+}
+
+/* ── Responsive: tablet ── */
+@media screen and (max-width: 1024px) {
+    .active-invest-section {
+        margin-right: 1rem;
+        padding: 0 1rem 0;
+    }
+
+    .active-invest-section + .invest-section {
+        margin-top: 0;
+    }
+}
+
+/* ── Responsive: mobile ── */
+@media screen and (max-width: 600px) {
+    .active-invest-section {
+        margin-top: 6rem;
+        margin-right: 0;
+        padding: 0 1rem 0;
+    }
+
+    .active-inv-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .active-inv-progress-track {
+        max-width: 9rem;
+    }
 }
