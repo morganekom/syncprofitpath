@@ -7,6 +7,33 @@
 // Reads from localStorage (set by login.js from Supabase)
 const AVAILABLE_BALANCE = parseFloat(localStorage.getItem('userBalance')) || 0;
 
+// ── WITHDRAWAL LIMITS ──
+// Loaded from Supabase site_settings on page load
+let WITHDRAW_MIN = 10;
+let WITHDRAW_MAX = 50000;
+
+async function loadWithdrawalLimits() {
+    try {
+        const { data, error } = await db
+            .from('site_settings')
+            .select('withdrawal_min, withdrawal_max')
+            .eq('id', 1)
+            .single();
+
+        if (error) throw error;
+
+        WITHDRAW_MIN = parseFloat(data.withdrawal_min) || 10;
+        WITHDRAW_MAX = parseFloat(data.withdrawal_max) || 50000;
+
+        // Update min hint on page if it exists
+        const minHintEl = document.getElementById('amountMin');
+        if (minHintEl) minHintEl.textContent = 'Min: $' + formatNum(WITHDRAW_MIN);
+
+    } catch (err) {
+        console.error('Failed to load withdrawal limits:', err.message);
+    }
+}
+
 // ── TRACK FORM STATE ──
 let selectedMethod    = null;   // 'bank' or 'crypto'
 let withdrawalDetails = {};     // holds saved details from settings
@@ -20,7 +47,8 @@ const amountInput = document.getElementById('withdrawAmount');
 // ON PAGE LOAD
 // ================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadWithdrawalLimits();
 
     // Update balance display
     document.getElementById('availableBalance').textContent = '$' + formatNum(AVAILABLE_BALANCE);
@@ -116,9 +144,9 @@ function validateAmount() {
         return;
     }
 
-    if (val < 10) {
+    if (val < WITHDRAW_MIN) {
         amountInput.classList.add('input-error');
-        error.textContent = 'Minimum withdrawal amount is $10.';
+        error.textContent = 'Minimum withdrawal amount is $' + formatNum(WITHDRAW_MIN) + '.';
         checkFormReady();
         return;
     }
@@ -141,7 +169,7 @@ function validateAmount() {
 function checkFormReady() {
     const val       = parseFloat(amountInput.value);
     const hasMethod = selectedMethod !== null;
-    const hasAmount = !isNaN(val) && val >= 10 && val <= AVAILABLE_BALANCE;
+    const hasAmount = !isNaN(val) && val >= WITHDRAW_MIN && val <= Math.min(AVAILABLE_BALANCE, WITHDRAW_MAX);
     const noError   = !document.getElementById('amountError').textContent;
 
     submitBtn.disabled = !(hasMethod && hasAmount && noError);
