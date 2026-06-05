@@ -176,3 +176,18 @@ function logout() {
     const prefix = '../'.repeat(depth);
     window.location.href = prefix + 'auth/login/';
 }
+
+// ================================================================
+// ADMIN BACK BUTTON — shows in sidebar only for admin users
+// ================================================================
+
+(function showAdminBackIfAdmin() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (!currentUser || currentUser.role !== 'admin') return;
+
+    // Show on DOMContentLoaded so the element exists
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('adminBackBtn');
+        if (btn) btn.style.display = '';
+    });
+})();
