@@ -34,7 +34,7 @@
                 <div class="chat-panel-header">
                     <div class="chat-panel-header-left">
                         <div class="chat-panel-avatar">
-                            <i class="uil uil-headphone"></i>
+                            <img src="../assets/chat-profile.jpg" alt="Nova" class="chat-panel-avatar-img">
                         </div>
                         <div>
                             <div class="chat-panel-title">Nova</div>
