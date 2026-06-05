@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const { data: settings } = await db.from('site_settings').select('kyc_required').eq('id', 1).single();
         if (settings && settings.kyc_required) {
-            const kycStatus = localStorage.getItem('userKycStatus') || 'pending';
+            const kycStatus = localStorage.getItem('kycStatus') || 'pending';
             if (kycStatus !== 'verified') {
                 document.getElementById('withdrawEmpty').style.display  = 'flex';
                 document.getElementById('withdrawForm').style.display   = 'none';
