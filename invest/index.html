@@ -78,6 +78,9 @@
             <i class="uil uil-setting"></i>
             <h5>Settings</h5>
         </a>
+        <a href="../admin/" class="sidebar-admin-back" id="adminBackBtn" style="display:none;">
+            <i class="uil uil-shield-check"></i><h5>Admin Panel</h5>
+        </a>
         <button class="sidebar_close-btn">
             <i class="uil uil-multiply"></i>
         </button>
@@ -135,7 +138,7 @@
                     <div class="calc-input-row">
                         <span class="calc-currency">$</span>
                         <input type="number" class="calc-input" id="calcAmount" placeholder="0.00" min="0"
-                            >
+                            oninput="calculateProfit()">
                         <span class="calc-value" id="calcAmountDisplay">$0.00</span>
                     </div>
                 </div>
