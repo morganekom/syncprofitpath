@@ -50,11 +50,28 @@ const amountInput = document.getElementById('withdrawAmount');
 document.addEventListener('DOMContentLoaded', async () => {
     await loadWithdrawalLimits();
 
-    // KYC check — if kyc_required is on and user isn't verified, block withdrawal
+    // KYC check — always fetch live status from Supabase so admin approvals
+    // take effect immediately without requiring the user to log out and back in
     try {
         const { data: settings } = await db.from('site_settings').select('kyc_required').eq('id', 1).single();
         if (settings && settings.kyc_required) {
-            const kycStatus = localStorage.getItem('kycStatus') || 'pending';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            let kycStatus = 'pending';
+
+            // Always check live DB value — localStorage can be stale after admin approves
+            if (currentUser.id) {
+                const { data: freshUser } = await db
+                    .from('users')
+                    .select('kyc_status')
+                    .eq('id', currentUser.id)
+                    .single();
+                if (freshUser) {
+                    kycStatus = freshUser.kyc_status || 'pending';
+                    // Update localStorage so other pages also see the fresh status
+                    localStorage.setItem('kycStatus', kycStatus);
+                }
+            }
+
             if (kycStatus !== 'verified') {
                 document.getElementById('withdrawEmpty').style.display  = 'flex';
                 document.getElementById('withdrawForm').style.display   = 'none';
