@@ -697,3 +697,10 @@ body {
         gap: 1.6rem;
     }
 }
+/* Fix: restore native date picker UI (overrides global appearance:none reset) */
+input[type="date"].auth-input {
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    appearance: auto;
+    cursor: pointer;
+}
