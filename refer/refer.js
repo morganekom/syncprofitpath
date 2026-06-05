@@ -52,7 +52,7 @@ function loadReferralCode() {
     // Build the referral link
     const origin = window.location.origin || (window.location.protocol + '//' + window.location.hostname);
     // Point to the signup page with the ref param pre-filled
-    referralLink = origin + '/auth/signup.html?ref=' + encodeURIComponent(referralCode);
+    referralLink = origin + '/auth/signup/?ref=' + encodeURIComponent(referralCode);
 
     // Populate UI
     const codeEl = document.getElementById('referralCode');
