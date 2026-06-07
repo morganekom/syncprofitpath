@@ -9,7 +9,7 @@
             var saved = localStorage.getItem('currrentTheme');
             var isDark = saved === 'dark-theme'
                 || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) document.documentElement.classList.add('dark-theme');
+            if (isDark) { document.documentElement.classList.add('dark-theme'); document.body.classList.add('dark-theme'); }
         })();
     </script>
     <title>Invest Dashboard</title>
