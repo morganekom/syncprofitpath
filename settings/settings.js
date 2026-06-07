@@ -337,19 +337,31 @@ function openCropModal(src) {
     const img      = document.getElementById('cropImg');
     const viewport = document.getElementById('cropViewport');
 
+    // Clear previous state
+    img.style.width = img.style.height = img.style.transform = '';
+    _cropX = 0; _cropY = 0;
+
     img.onload = () => {
         const scale = CROP_SIZE / Math.min(img.naturalWidth, img.naturalHeight);
         _cropImgW = Math.round(img.naturalWidth  * scale);
         _cropImgH = Math.round(img.naturalHeight * scale);
         img.style.width  = _cropImgW + 'px';
         img.style.height = _cropImgH + 'px';
+        // Centre the image in the viewport to start
         _cropX = Math.round((CROP_SIZE - _cropImgW) / 2);
         _cropY = Math.round((CROP_SIZE - _cropImgH) / 2);
         applyCropPosition();
     };
+
+    // Set src AFTER onload is attached (avoids race on cached images)
+    img.src = '';
     img.src = src;
+
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // Remove any stale listener before adding a fresh one
+    viewport.removeEventListener('pointerdown', onCropPointerDown);
     viewport.addEventListener('pointerdown', onCropPointerDown);
 }
 
@@ -385,7 +397,6 @@ function onCropPointerUp() {
 function cancelCrop() {
     document.getElementById('cropOverlay').classList.remove('open');
     document.body.style.overflow = '';
-    document.getElementById('cropViewport').removeEventListener('pointerdown', onCropPointerDown);
     if (_cropObjectUrl) { URL.revokeObjectURL(_cropObjectUrl); _cropObjectUrl = null; }
 }
 
@@ -411,17 +422,19 @@ async function saveCrop() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const photoKey    = currentUser.id ? `profilePhoto_${currentUser.id}` : null;
 
+    // Update UI immediately
     const preview  = document.getElementById('profilePhotoPreview');
     const navPhoto = document.querySelector('.nav_profile-photo img');
     if (preview)  preview.src  = dataUrl;
     if (navPhoto) navPhoto.src = dataUrl;
     if (photoKey) localStorage.setItem(photoKey, dataUrl);
 
+    // Close modal
     document.getElementById('cropOverlay').classList.remove('open');
     document.body.style.overflow = '';
-    document.getElementById('cropViewport').removeEventListener('pointerdown', onCropPointerDown);
     if (_cropObjectUrl) { URL.revokeObjectURL(_cropObjectUrl); _cropObjectUrl = null; }
 
+    // Persist to Supabase
     if (currentUser.id) {
         const { error } = await db
             .from('users')
@@ -438,9 +451,8 @@ async function saveCrop() {
 // ================================================================
 // APPEARANCE — system / light / dark
 // ================================================================
-
-const THEME_KEY      = 'currrentTheme';
-const THEME_PREF_KEY = 'themePreference';
+// Note: THEME_KEY and THEME_PREF_KEY are declared in main.js which
+// loads before this file — do NOT redeclare them here.
 
 function initAppearanceTab() {
     let pref = localStorage.getItem(THEME_PREF_KEY);
