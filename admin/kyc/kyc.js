@@ -116,72 +116,65 @@ function applyFilter() {
 function renderTable() {
     const loadingEl = document.getElementById('kycLoading');
     const emptyEl   = document.getElementById('kycEmpty');
-    const tableEl   = document.getElementById('kycTable');
-    const bodyEl    = document.getElementById('kycBody');
+    const listEl    = document.getElementById('kycList');
 
     loadingEl.style.display = 'none';
 
     if (filteredUsers.length === 0) {
         emptyEl.style.display = 'flex';
-        tableEl.style.display = 'none';
-
-        const emptyMessages = {
-            pending:      'No pending KYC submissions.',
-            verified:     'No verified users yet.',
-            rejected:     'No rejected submissions.',
-            unsubmitted:  'All users have submitted KYC.',
-            all:          'No users found.',
+        listEl.style.display  = 'none';
+        const msgs = {
+            pending: 'No pending KYC submissions.',
+            verified: 'No verified users yet.',
+            rejected: 'No rejected submissions.',
+            unsubmitted: 'All users have submitted KYC.',
+            all: 'No users found.',
         };
-        document.querySelector('#kycEmpty p').textContent =
-            emptyMessages[activeStatus] || 'No users found.';
+        document.querySelector('#kycEmpty p').textContent = msgs[activeStatus] || 'No users found.';
         return;
     }
 
     emptyEl.style.display = 'none';
-    tableEl.style.display = 'table';
+    listEl.style.display  = 'grid';
 
-    bodyEl.innerHTML = filteredUsers.map(u => {
-        const name    = escapeHtml(u.full_name || u.first_name || 'Unknown');
-        const email   = escapeHtml(u.email || '—');
-        const country = escapeHtml(u.country || '—');
-        const joined  = formatDate(u.created_at);
-        const status  = u.kyc_status || 'unsubmitted';
+    listEl.innerHTML = filteredUsers.map(u => {
+        const name     = escapeHtml(u.full_name || u.first_name || 'Unknown');
+        const email    = escapeHtml(u.email || '—');
+        const country  = escapeHtml(u.country || '—');
+        const joined   = formatDate(u.created_at);
+        const status   = u.kyc_status || 'unsubmitted';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
-        // "Submitted" date — we don't store a separate kyc_submitted_at,
-        // so show the account creation date for submitted users,
-        // and '—' for unsubmitted
-        const submitted = status !== 'unsubmitted' ? joined : '—';
-
-        const isPending = status === 'pending';
-
-        const actions = isPending
-            ? `<div class="row-actions">
-                   <button class="action-btn view" onclick="openKycModal('${u.id}')">
-                       <i class="uil uil-eye"></i> Review
-                   </button>
-               </div>`
-            : `<div class="row-actions">
-                   <button class="action-btn view" onclick="openKycModal('${u.id}')">
-                       <i class="uil uil-eye"></i> View
-                   </button>
-               </div>`;
+        const actionBtn = status === 'pending'
+            ? `<button class="wdr-action-btn review" onclick="openKycModal('${u.id}')">
+                   <i class="uil uil-shield-check"></i> Review
+               </button>`
+            : `<button class="wdr-action-btn view" onclick="openKycModal('${u.id}')">
+                   <i class="uil uil-eye"></i> View
+               </button>`;
 
         return `
-            <tr>
-                <td>
-                    <span class="td-name">${name}</span><br>
-                    <small class="text-muted">${email}</small>
-                </td>
-                <td>${country}</td>
-                <td class="tx-date">${joined}</td>
-                <td class="tx-date">${submitted}</td>
-                <td><span class="badge ${status}">${capitalise(status)}</span></td>
-                <td>${actions}</td>
-            </tr>
-        `;
+        <div class="adm-card">
+            <div class="wdr-card-top">
+                <div class="wdr-avatar">${initials}</div>
+                <div class="wdr-card-user">
+                    <div class="wdr-card-name">${name}</div>
+                    <div class="wdr-card-email">${email}</div>
+                </div>
+                <span class="badge ${status}">${capitalise(status)}</span>
+            </div>
+            <div class="wdr-card-body">
+                <div class="wdr-card-meta">
+                    <span class="wdr-meta-item"><i class="uil uil-map-marker"></i> ${country}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-calendar-alt"></i> Joined ${joined}</span>
+                </div>
+            </div>
+            <div class="adm-card-footer">
+                ${actionBtn}
+            </div>
+        </div>`;
     }).join('');
 }
-
 
 // ================================================================
 // OPEN MODAL
