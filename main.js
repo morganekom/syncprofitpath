@@ -35,47 +35,57 @@
 })();
 
 // ========================= THEME TOGGLE =========================
-// Priority: 1) user's manual override (localStorage)
-//           2) OS/browser system preference (prefers-color-scheme)
-//           3) default to light
+// Priority: 1) themePreference key ('system'|'light'|'dark') — set from Appearance tab
+//           2) legacy currrentTheme key (backwards compat)
+//           3) OS/browser system preference
+//           4) default to light
 
 const themeBtn     = document.querySelector('.nav_theme-btn');
-const THEME_KEY    = 'currrentTheme';   // keeping existing key name (typo preserved intentionally)
+const THEME_KEY    = 'currrentTheme';
+const THEME_PREF_KEY = 'themePreference';
 const systemDark   = window.matchMedia('(prefers-color-scheme: dark)');
 
 function applyTheme(isDark) {
-    // Apply to both documentElement (for early-script consistency) and body
     document.documentElement.classList.toggle('dark-theme', isDark);
     document.body.classList.toggle('dark-theme', isDark);
-    themeBtn.innerHTML = isDark
-        ? '<i class="uil uil-sun"></i>'
-        : '<i class="uil uil-moon"></i>';
-    // Notify chart to re-render with correct grid/tick colours
+    if (themeBtn) {
+        themeBtn.innerHTML = isDark
+            ? '<i class="uil uil-sun"></i>'
+            : '<i class="uil uil-moon"></i>';
+    }
     document.dispatchEvent(new Event('themechange'));
 }
 
 function resolveTheme() {
+    const pref = localStorage.getItem(THEME_PREF_KEY);
+    if (pref === 'dark')   return true;
+    if (pref === 'light')  return false;
+    if (pref === 'system') return systemDark.matches;
+    // Legacy fallback
     const saved = localStorage.getItem(THEME_KEY);
     if (saved === 'dark-theme') return true;
-    if (saved === '')            return false;   // user explicitly chose light
-    // No saved preference — follow the OS
+    if (saved === '')            return false;
     return systemDark.matches;
 }
 
-// Apply on load
 applyTheme(resolveTheme());
 
-// Manual toggle — saves override so OS changes don't override the user's choice
-themeBtn.addEventListener('click', () => {
+// Nav button click — toggles but keeps themePreference in sync
+themeBtn && themeBtn.addEventListener('click', () => {
     const nowDark = !document.body.classList.contains('dark-theme');
+    // Update both keys so Appearance tab stays in sync
     localStorage.setItem(THEME_KEY, nowDark ? 'dark-theme' : '');
+    localStorage.setItem(THEME_PREF_KEY, nowDark ? 'dark' : 'light');
     applyTheme(nowDark);
 });
 
-// Live OS theme changes — only apply if user hasn't manually overridden
+// Live OS changes — only follow if user chose 'system'
 systemDark.addEventListener('change', e => {
+    const pref  = localStorage.getItem(THEME_PREF_KEY);
     const saved = localStorage.getItem(THEME_KEY);
-    if (saved === null) applyTheme(e.matches); // no override → follow OS
+    if (pref === 'system' || (pref === null && saved === null)) {
+        applyTheme(e.matches);
+    }
 });
 
 
