@@ -146,6 +146,82 @@
     <script src="../../auth.js"></script>
     <script src="../../main.js"></script>
     <script src="../admin.js"></script>
+    <!-- ==================== INVESTMENT DETAIL MODAL ==================== -->
+    <div class="admin-modal-overlay" id="invModal" onclick="closeInvModal(event)">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h3>Investment Details</h3>
+                <button class="admin-modal-close" onclick="closeInvModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">User</span>
+                <span class="modal-detail-value" id="miUser">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Email</span>
+                <span class="modal-detail-value" id="miEmail">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Reference</span>
+                <span class="modal-detail-value" id="miReference">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Plan</span>
+                <span class="modal-detail-value" id="miPlan">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Coin</span>
+                <span class="modal-detail-value" id="miCoin">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Amount</span>
+                <span class="modal-detail-value" id="miAmount">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">User Balance</span>
+                <span class="modal-detail-value" id="miBalance">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Daily Rate</span>
+                <span class="modal-detail-value" id="miRate">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Maturity</span>
+                <span class="modal-detail-value" id="miMaturity">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Requested</span>
+                <span class="modal-detail-value" id="miDate">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Status</span>
+                <span class="modal-detail-value" id="miStatus">—</span>
+            </div>
+
+            <div class="modal-note-wrap" id="miNoteWrap">
+                <label class="modal-note-label">Note (optional)</label>
+                <textarea id="miNote" class="modal-note" placeholder="e.g. Investment activated."></textarea>
+            </div>
+
+            <div class="modal-actions" id="miActions">
+                <button class="action-btn reject" id="miRejectBtn" onclick="handleInvAction('rejected')">
+                    <i class="uil uil-times-circle"></i> Reject
+                </button>
+                <button class="action-btn approve" id="miApproveBtn" onclick="handleInvAction('active')">
+                    <i class="uil uil-check-circle"></i> Approve & Activate
+                </button>
+            </div>
+
+            <div id="miResolved" class="modal-resolved" style="display:none;">
+                <i class="uil uil-check-circle success"></i>
+                <p id="miResolvedMsg">Action completed.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="../../notify.js"></script>
     <script src="./investments.js"></script>
 </body>

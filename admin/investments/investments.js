@@ -127,6 +127,7 @@ function renderTable() {
     if (filteredInvestments.length === 0) {
         emptyEl.style.display = 'flex';
         listEl.style.display  = 'none';
+        listEl.innerHTML      = '';
         document.querySelector('#invEmpty p').textContent =
             activeStatus === 'pending' ? 'No pending investments.' : 'No investments found.';
         return;
