@@ -121,6 +121,7 @@ function renderTable() {
     if (filteredUsers.length === 0) {
         emptyEl.style.display = 'flex';
         listEl.style.display  = 'none';
+        listEl.innerHTML      = '';
         const msgs = {
             pending: 'No pending KYC submissions.',
             verified: 'No verified users yet.',

@@ -147,6 +147,74 @@
     <script src="../../auth.js"></script>
     <script src="../../main.js"></script>
     <script src="../admin.js"></script>
+    <!-- ==================== KYC DETAIL MODAL ==================== -->
+    <div class="admin-modal-overlay" id="kycModal" onclick="closeKycModal(event)">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h3>KYC Review</h3>
+                <button class="admin-modal-close" onclick="closeKycModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <div class="modal-detail-row" style="align-items:center; gap:1rem; padding:1.2rem 0;">
+                <div class="wdr-avatar" id="mkAvatar">?</div>
+                <div>
+                    <div style="font-weight:700; font-size:1.3rem;" id="mkName">—</div>
+                    <span class="badge unsubmitted" id="mkBadge">Unsubmitted</span>
+                </div>
+            </div>
+
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Email</span>
+                <span class="modal-detail-value" id="mkEmail">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Country</span>
+                <span class="modal-detail-value" id="mkCountry">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Date of Birth</span>
+                <span class="modal-detail-value" id="mkDob">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Phone</span>
+                <span class="modal-detail-value" id="mkPhone">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Balance</span>
+                <span class="modal-detail-value" id="mkBalance">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Joined</span>
+                <span class="modal-detail-value" id="mkJoined">—</span>
+            </div>
+
+            <div id="mkNoDocs" style="display:none; padding:1.2rem 0; color:var(--color-gray-light); font-size:1rem;">
+                User has not submitted KYC documents yet.
+            </div>
+
+            <div class="modal-note-wrap" id="mkNoteWrap">
+                <label class="modal-note-label">Note (optional)</label>
+                <textarea id="mkNote" class="modal-note" placeholder="e.g. ID document is clear and valid."></textarea>
+            </div>
+
+            <div class="modal-actions" id="mkActions">
+                <button class="action-btn reject" id="mkRejectBtn" onclick="handleKycAction('rejected')">
+                    <i class="uil uil-times-circle"></i> Reject
+                </button>
+                <button class="action-btn approve" id="mkVerifyBtn" onclick="handleKycAction('verified')">
+                    <i class="uil uil-shield-check"></i> Verify
+                </button>
+            </div>
+
+            <div id="mkResolved" class="modal-resolved" style="display:none;">
+                <i class="uil uil-check-circle success"></i>
+                <p id="mkResolvedMsg">Action completed.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="../../notify.js"></script>
     <script src="./kyc.js"></script>
 </body>
