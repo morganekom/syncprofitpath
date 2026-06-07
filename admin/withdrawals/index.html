@@ -127,8 +127,8 @@
         </div>
 
 
-        <!-- Table -->
-        <div class="admin-table-wrap">
+        <!-- Card list -->
+        <div class="wdr-list-wrap">
             <div id="wdrLoading" class="admin-loading">
                 <i class="uil uil-spinner-alt spin"></i> Loading withdrawals…
             </div>
@@ -136,20 +136,7 @@
                 <i class="uil uil-arrow-circle-up"></i>
                 <p>No withdrawals found.</p>
             </div>
-            <table class="admin-table" id="wdrTable" style="display:none;">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Reference</th>
-                        <th>Method</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="wdrBody"></tbody>
-            </table>
+            <div id="wdrList" class="wdr-list" style="display:none;"></div>
         </div>
 
     </main>
