@@ -124,61 +124,67 @@ function applyFilter() {
 function renderTable() {
     const loadingEl = document.getElementById('depositLoading');
     const emptyEl   = document.getElementById('depositEmpty');
-    const tableEl   = document.getElementById('depositTable');
-    const bodyEl    = document.getElementById('depositBody');
+    const listEl    = document.getElementById('depositList');
 
     loadingEl.style.display = 'none';
 
     if (filteredDeposits.length === 0) {
-        emptyEl.style.display  = 'flex';
-        tableEl.style.display  = 'none';
+        emptyEl.style.display = 'flex';
+        listEl.style.display  = 'none';
         document.querySelector('#depositEmpty p').textContent =
             activeStatus === 'pending' ? 'No pending deposits.' : 'No deposits found.';
         return;
     }
 
-    emptyEl.style.display  = 'none';
-    tableEl.style.display  = 'table';
+    emptyEl.style.display = 'none';
+    listEl.style.display  = 'grid';
 
-    bodyEl.innerHTML = filteredDeposits.map(d => {
-        const name    = escapeHtml(d.users?.full_name || d.users?.first_name || 'Unknown');
-        const amount  = '$' + parseFloat(d.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        const date    = formatDate(d.created_at);
-        const hasProof = !!d.proof_url;
+    listEl.innerHTML = filteredDeposits.map(d => {
+        const name     = escapeHtml(d.users?.full_name || d.users?.first_name || 'Unknown');
+        const email    = escapeHtml(d.users?.email || '');
+        const amount   = '$' + parseFloat(d.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        const date     = formatDate(d.created_at);
+        const coin     = escapeHtml((d.coin || '—').toUpperCase());
+        const ref      = escapeHtml(d.reference || '—');
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
-        const proofCell = hasProof
-            ? `<a href="${escapeHtml(d.proof_url)}" target="_blank" class="proof-link">
-                   <i class="uil uil-image"></i> View
+        const proofBtn = d.proof_url
+            ? `<a href="${escapeHtml(d.proof_url)}" target="_blank" class="adm-proof-btn">
+                   <i class="uil uil-image"></i> View Proof
                </a>`
-            : `<span class="text-muted">None</span>`;
+            : '';
 
-        const isPending = d.status === 'pending';
-        const actions = isPending
-            ? `<div class="row-actions">
-                   <button class="action-btn view" onclick="openDepositModal('${d.id}')">
-                       <i class="uil uil-eye"></i> Review
-                   </button>
-               </div>`
-            : `<div class="row-actions">
-                   <button class="action-btn view" onclick="openDepositModal('${d.id}')">
-                       <i class="uil uil-eye"></i> View
-                   </button>
-               </div>`;
+        const actionBtn = d.status === 'pending'
+            ? `<button class="wdr-action-btn review" onclick="openDepositModal('${d.id}')">
+                   <i class="uil uil-eye"></i> Review
+               </button>`
+            : `<button class="wdr-action-btn view" onclick="openDepositModal('${d.id}')">
+                   <i class="uil uil-eye"></i> View
+               </button>`;
 
         return `
-            <tr>
-                <td><span class="td-name">${name}</span><br>
-                    <small class="text-muted">${escapeHtml(d.users?.email || '')}</small>
-                </td>
-                <td class="tx-reference">${escapeHtml(d.reference || '—')}</td>
-                <td>${escapeHtml((d.coin || '—').toUpperCase())}</td>
-                <td class="tx-amount-label deposit">${amount}</td>
-                <td class="tx-date">${date}</td>
-                <td>${proofCell}</td>
-                <td><span class="badge ${d.status}">${capitalise(d.status)}</span></td>
-                <td>${actions}</td>
-            </tr>
-        `;
+        <div class="adm-card">
+            <div class="wdr-card-top">
+                <div class="wdr-avatar">${initials}</div>
+                <div class="wdr-card-user">
+                    <div class="wdr-card-name">${name}</div>
+                    <div class="wdr-card-email">${email}</div>
+                </div>
+                <span class="badge ${d.status}">${capitalise(d.status)}</span>
+            </div>
+            <div class="wdr-card-body">
+                <div class="adm-card-amount deposit">+${amount}</div>
+                <div class="wdr-card-meta">
+                    <span class="wdr-meta-item"><i class="uil uil-link"></i> ${ref}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-bitcoin-circle"></i> ${coin}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-calendar-alt"></i> ${date}</span>
+                </div>
+            </div>
+            <div class="adm-card-footer">
+                ${proofBtn}
+                ${actionBtn}
+            </div>
+        </div>`;
     }).join('');
 }
 

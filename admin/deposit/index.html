@@ -127,96 +127,16 @@
         </div>
 
 
-        <!-- Table -->
-        <div class="admin-table-wrap">
+                <!-- Card list -->
+        <div class="admin-list-wrap">
             <div id="depositLoading" class="admin-loading">
-                <i class="uil uil-spinner-alt spin"></i> Loading deposits…
+                <i class="uil uil-spinner-alt spin"></i> Loading…
             </div>
             <div id="depositEmpty" class="admin-empty" style="display:none;">
-                <i class="uil uil-arrow-circle-down"></i>
+                <i class="uil uil-inbox"></i>
                 <p>No deposits found.</p>
             </div>
-            <table class="admin-table" id="depositTable" style="display:none;">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Reference</th>
-                        <th>Coin</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Proof</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="depositBody"></tbody>
-            </table>
-        </div>
-
-    </main>
-
-
-    <!-- ── DETAIL MODAL ── -->
-    <div class="admin-modal-overlay" id="depositModal" onclick="closeDepositModal(event)">
-        <div class="admin-modal">
-            <div class="admin-modal-header">
-                <h3>Deposit Details</h3>
-                <button class="admin-modal-close" onclick="closeDepositModal()">
-                    <i class="uil uil-multiply"></i>
-                </button>
-            </div>
-
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">User</span>
-                <span class="modal-detail-value" id="mdUser">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Reference</span>
-                <span class="modal-detail-value" id="mdReference">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Coin</span>
-                <span class="modal-detail-value" id="mdCoin">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Amount</span>
-                <span class="modal-detail-value" id="mdAmount">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Submitted</span>
-                <span class="modal-detail-value" id="mdDate">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Status</span>
-                <span class="modal-detail-value" id="mdStatus">—</span>
-            </div>
-            <div class="modal-detail-row" id="mdProofRow">
-                <span class="modal-detail-label">Proof of Payment</span>
-                <a id="mdProofLink" href="#" target="_blank" class="proof-link">
-                    <i class="uil uil-image"></i> View Image
-                </a>
-            </div>
-
-            <!-- Admin note -->
-            <div class="modal-note-wrap" id="mdNoteWrap">
-                <label class="modal-note-label">Note to user (optional)</label>
-                <textarea id="mdNote" class="modal-note" placeholder="e.g. Payment confirmed. Balance updated."></textarea>
-            </div>
-
-            <div class="modal-actions" id="mdActions">
-                <button class="action-btn reject" id="mdRejectBtn" onclick="handleAction('failed')">
-                    <i class="uil uil-times-circle"></i> Reject
-                </button>
-                <button class="action-btn approve" id="mdApproveBtn" onclick="handleAction('completed')">
-                    <i class="uil uil-check-circle"></i> Approve
-                </button>
-            </div>
-
-            <!-- Resolved state — shown after action taken -->
-            <div id="mdResolved" class="modal-resolved" style="display:none;">
-                <i class="uil uil-check-circle success"></i>
-                <p id="mdResolvedMsg">Action completed.</p>
-            </div>
+            <div id="depositList" class="admin-card-list" style="display:none;"></div>
         </div>
     </div>
 
