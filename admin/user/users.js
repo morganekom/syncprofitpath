@@ -1,12 +1,15 @@
 // ================================================================
 // USERS.JS — Admin user management page
 // Load all users, filter by KYC status, search, view detail modal,
-// edit balance, approve/reject KYC
+// edit balance, approve/reject KYC, send broadcast emails
 // ================================================================
 
-let allUsers    = [];
+let allUsers     = [];
 let activeFilter = 'all';
 let activeUserId = null;
+
+// Set of selected user IDs for email broadcast
+let selectedUserIds = new Set();
 
 // ========================= INIT =========================
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,15 +57,11 @@ function getFilteredUsers() {
     const query = (document.getElementById('userSearch')?.value || '').toLowerCase().trim();
 
     return allUsers.filter(u => {
-        // KYC filter
-        const kycMatch = activeFilter === 'all' || u.kyc_status === activeFilter;
-
-        // Search filter
+        const kycMatch    = activeFilter === 'all' || u.kyc_status === activeFilter;
         const searchMatch = !query ||
-            (u.full_name  || '').toLowerCase().includes(query) ||
-            (u.email      || '').toLowerCase().includes(query) ||
-            (u.country    || '').toLowerCase().includes(query);
-
+            (u.full_name || '').toLowerCase().includes(query) ||
+            (u.email     || '').toLowerCase().includes(query) ||
+            (u.country   || '').toLowerCase().includes(query);
         return kycMatch && searchMatch;
     });
 }
@@ -82,6 +81,17 @@ function renderUsers() {
 
     tbody.innerHTML = filtered.map(u => `
         <tr>
+            <td class="col-check">
+                <input
+                    type="checkbox"
+                    class="user-checkbox row-checkbox"
+                    data-id="${u.id}"
+                    data-email="${escapeHtml(u.email || '')}"
+                    data-name="${escapeHtml(u.full_name || u.email || 'User')}"
+                    ${selectedUserIds.has(u.id) ? 'checked' : ''}
+                    onchange="handleRowCheckbox(this)"
+                >
+            </td>
             <td>
                 <div class="admin-user-cell">
                     <div class="admin-item-avatar">${getInitials(u)}</div>
@@ -106,10 +116,188 @@ function renderUsers() {
             </td>
         </tr>
     `).join('');
+
+    syncSelectAllCheckbox();
 }
 
 
-// ========================= MODAL =========================
+// ========================= SELECTION =========================
+function handleRowCheckbox(checkbox) {
+    const id = checkbox.dataset.id;
+    if (checkbox.checked) {
+        selectedUserIds.add(id);
+    } else {
+        selectedUserIds.delete(id);
+    }
+    syncToolbar();
+    syncSelectAllCheckbox();
+}
+
+function handleSelectAllCheckbox(masterCheckbox) {
+    const filtered = getFilteredUsers();
+    if (masterCheckbox.checked) {
+        filtered.forEach(u => selectedUserIds.add(u.id));
+    } else {
+        filtered.forEach(u => selectedUserIds.delete(u.id));
+    }
+    renderUsers();   // re-render to sync row checkboxes
+    syncToolbar();
+}
+
+function toggleSelectAll() {
+    const filtered  = getFilteredUsers();
+    const allSelected = filtered.every(u => selectedUserIds.has(u.id));
+    if (allSelected) {
+        filtered.forEach(u => selectedUserIds.delete(u.id));
+    } else {
+        filtered.forEach(u => selectedUserIds.add(u.id));
+    }
+    renderUsers();
+    syncToolbar();
+}
+
+function clearSelection() {
+    selectedUserIds.clear();
+    renderUsers();
+    syncToolbar();
+}
+
+function syncToolbar() {
+    const toolbar = document.getElementById('emailToolbar');
+    const label   = document.getElementById('selectedCountLabel');
+    const count   = selectedUserIds.size;
+    label.textContent = `${count} user${count !== 1 ? 's' : ''} selected`;
+    toolbar.classList.toggle('visible', count > 0);
+}
+
+function syncSelectAllCheckbox() {
+    const cb       = document.getElementById('selectAllCheckbox');
+    if (!cb) return;
+    const filtered = getFilteredUsers();
+    if (filtered.length === 0) {
+        cb.checked       = false;
+        cb.indeterminate = false;
+        return;
+    }
+    const checkedCount = filtered.filter(u => selectedUserIds.has(u.id)).length;
+    if (checkedCount === 0) {
+        cb.checked = false; cb.indeterminate = false;
+    } else if (checkedCount === filtered.length) {
+        cb.checked = true;  cb.indeterminate = false;
+    } else {
+        cb.checked = false; cb.indeterminate = true;
+    }
+}
+
+
+// ========================= COMPOSE EMAIL MODAL =========================
+function openComposeModal() {
+    if (selectedUserIds.size === 0) return;
+
+    // Populate recipients list
+    const recipients = allUsers.filter(u => selectedUserIds.has(u.id));
+    document.getElementById('recipientCount').textContent = recipients.length;
+    document.getElementById('recipientList').textContent  =
+        recipients.map(u => `${u.full_name || 'User'} <${u.email}>`).join(', ');
+
+    // Reset form
+    document.getElementById('emailSubject').value = '';
+    document.getElementById('emailBody').value     = '';
+    document.getElementById('charCount').textContent = '0';
+    setEmailFeedback('', '');
+    document.getElementById('emailSendBtn').disabled = false;
+
+    document.getElementById('emailModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('emailSubject').focus(), 100);
+}
+
+function closeComposeModal() {
+    document.getElementById('emailModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function handleEmailOverlayClick(e) {
+    if (e.target === document.getElementById('emailModalOverlay')) closeComposeModal();
+}
+
+function updateCharCount() {
+    const len = document.getElementById('emailBody').value.length;
+    document.getElementById('charCount').textContent = len;
+}
+
+function setEmailFeedback(message, type) {
+    const el = document.getElementById('emailFeedback');
+    el.textContent = message;
+    el.className   = 'email-feedback' + (type ? ` ${type}` : '');
+}
+
+
+// ========================= SEND EMAILS =========================
+async function sendBroadcastEmails() {
+    const subject = document.getElementById('emailSubject').value.trim();
+    const body    = document.getElementById('emailBody').value.trim();
+
+    if (!subject) { setEmailFeedback('Please enter a subject.', 'error'); return; }
+    if (!body)    { setEmailFeedback('Please write a message.', 'error'); return; }
+
+    const recipients = allUsers.filter(u => selectedUserIds.has(u.id));
+    if (recipients.length === 0) { closeComposeModal(); return; }
+
+    const sendBtn = document.getElementById('emailSendBtn');
+    sendBtn.disabled = true;
+    setEmailFeedback(`Sending to ${recipients.length} user${recipients.length !== 1 ? 's' : ''}…`, 'info');
+
+    let sent   = 0;
+    let failed = 0;
+
+    for (const user of recipients) {
+        try {
+            const res = await fetch(
+                'https://syqdwottzrhpclnvzdmz.supabase.co/functions/v1/send-admin-email',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'apikey':        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cWR3b3R0enJocGNsbnZ6ZG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzQyMzAsImV4cCI6MjA5MzIxMDIzMH0.YCVOAparA-_MxBrn-O_pXdZgdeFpPXGUeWdu1TkeMz0',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cWR3b3R0enJocGNsbnZ6ZG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzQyMzAsImV4cCI6MjA5MzIxMDIzMH0.YCVOAparA-_MxBrn-O_pXdZgdeFpPXGUeWdu1TkeMz0',
+                    },
+                    body: JSON.stringify({
+                        to:      user.email,
+                        name:    user.full_name || 'User',
+                        subject: subject,
+                        body:    body,
+                    }),
+                }
+            );
+            res.ok ? sent++ : failed++;
+        } catch {
+            failed++;
+        }
+
+        // Update progress live
+        setEmailFeedback(
+            `Sending… ${sent + failed} / ${recipients.length}`,
+            'info'
+        );
+    }
+
+    // Done
+    if (failed === 0) {
+        setEmailFeedback(`✓ Email sent to ${sent} user${sent !== 1 ? 's' : ''}.`, 'success');
+    } else {
+        setEmailFeedback(
+            `Sent: ${sent} • Failed: ${failed}. Check your edge function logs.`,
+            failed === recipients.length ? 'error' : 'info'
+        );
+    }
+
+    // Re-enable after a moment; keep modal open so admin can see result
+    setTimeout(() => { sendBtn.disabled = false; }, 2000);
+}
+
+
+// ========================= USER DETAIL MODAL =========================
 function openUserModal(userId) {
     const user = allUsers.find(u => u.id === userId);
     if (!user) return;
@@ -118,7 +306,6 @@ function openUserModal(userId) {
 
     document.getElementById('modalUserName').textContent = user.full_name || 'User';
 
-    // Populate modal body with user details
     document.getElementById('userModalBody').innerHTML = `
         <div class="admin-modal-profile">
             <div class="admin-item-avatar admin-item-avatar-lg">${getInitials(user)}</div>
@@ -163,17 +350,14 @@ function openUserModal(userId) {
         </div>
     `;
 
-    // Pre-fill balance fields
-    document.getElementById('editBalance').value = user.balance  || 0;
-    document.getElementById('editProfit').value  = user.profit   || 0;
-    document.getElementById('editPending').value = user.pending  || 0;
+    document.getElementById('editBalance').value = user.balance || 0;
+    document.getElementById('editProfit').value  = user.profit  || 0;
+    document.getElementById('editPending').value = user.pending || 0;
 
-    // Clear feedback
-    document.getElementById('balanceError').textContent   = '';
-    document.getElementById('balanceSuccess').textContent = '';
+    document.getElementById('balanceError').textContent    = '';
+    document.getElementById('balanceSuccess').textContent  = '';
     document.getElementById('kycActionSuccess').textContent = '';
 
-    // Show current KYC status note
     document.getElementById('kycCurrentStatus').textContent =
         `Current status: ${capitalise(user.kyc_status || 'unsubmitted')}`;
 
@@ -193,10 +377,10 @@ function closeUserModal(event) {
 async function saveBalance() {
     if (!activeUserId) return;
 
-    const balance  = parseFloat(document.getElementById('editBalance').value);
-    const profit   = parseFloat(document.getElementById('editProfit').value);
-    const pending  = parseFloat(document.getElementById('editPending').value);
-    const errorEl  = document.getElementById('balanceError');
+    const balance   = parseFloat(document.getElementById('editBalance').value);
+    const profit    = parseFloat(document.getElementById('editProfit').value);
+    const pending   = parseFloat(document.getElementById('editPending').value);
+    const errorEl   = document.getElementById('balanceError');
     const successEl = document.getElementById('balanceSuccess');
 
     errorEl.textContent   = '';
@@ -206,7 +390,6 @@ async function saveBalance() {
         errorEl.textContent = 'Please enter valid numbers for all fields.';
         return;
     }
-
     if (balance < 0 || profit < 0 || pending < 0) {
         errorEl.textContent = 'Values cannot be negative.';
         return;
@@ -220,7 +403,6 @@ async function saveBalance() {
 
         if (error) throw error;
 
-        // Update local data
         const user = allUsers.find(u => u.id === activeUserId);
         if (user) { user.balance = balance; user.profit = profit; user.pending = pending; }
 
@@ -235,14 +417,9 @@ async function saveBalance() {
 }
 
 
-// ========================= KYC ACTIONS FROM MODAL =========================
-async function modalApproveKyc() {
-    await updateKycStatus('verified');
-}
-
-async function modalRejectKyc() {
-    await updateKycStatus('rejected');
-}
+// ========================= KYC ACTIONS =========================
+async function modalApproveKyc() { await updateKycStatus('verified'); }
+async function modalRejectKyc()  { await updateKycStatus('rejected'); }
 
 async function updateKycStatus(status) {
     if (!activeUserId) return;
@@ -258,7 +435,6 @@ async function updateKycStatus(status) {
 
         if (error) throw error;
 
-        // Update local data
         const user = allUsers.find(u => u.id === activeUserId);
         if (user) user.kyc_status = status;
 
@@ -278,7 +454,7 @@ async function updateKycStatus(status) {
 
 // ========================= STATE MANAGER =========================
 function showState(state) {
-    document.getElementById('usersLoading').style.display       = state === 'loading' ? 'flex'  : 'none';
-    document.getElementById('usersEmpty').style.display         = state === 'empty'   ? 'flex'  : 'none';
-    document.getElementById('usersTableWrapper').style.display  = state === 'table'   ? 'block' : 'none';
+    document.getElementById('usersLoading').style.display      = state === 'loading' ? 'flex'  : 'none';
+    document.getElementById('usersEmpty').style.display        = state === 'empty'   ? 'flex'  : 'none';
+    document.getElementById('usersTableWrapper').style.display = state === 'table'   ? 'block' : 'none';
 }
