@@ -32,12 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadDeposits() {
     const loadingEl = document.getElementById('depositLoading');
     const emptyEl   = document.getElementById('depositEmpty');
-    const tableEl   = document.getElementById('depositTable');
     const refreshBtn = document.getElementById('refreshBtn');
 
     loadingEl.style.display = 'flex';
     emptyEl.style.display   = 'none';
-    tableEl.style.display   = 'none';
 
     if (refreshBtn) {
         refreshBtn.classList.add('spinning');
