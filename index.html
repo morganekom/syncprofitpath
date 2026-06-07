@@ -2,483 +2,566 @@
 <html lang="en">
 
 <head>
-    <!-- THIS GOES FIRST -->
-    <script>
-        (function () {
-            var saved = localStorage.getItem('currrentTheme');
-            var isDark = saved === 'dark-theme'
-                || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) { document.documentElement.classList.add('dark-theme'); document.body.classList.add('dark-theme'); }
-        })();
-    </script>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png">
-    <!-- ICONSCOUT CDN -->
+    <title>SyncProfitPath</title>
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <meta name="description" content="Earn daily returns on your crypto investments. Basic, Standard and Premium plans. Secure, transparent, instant withdrawals.">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
-    <!-- CUSTOM CSS -->
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="./settings.css">
+    <link rel="stylesheet" href="./landing.css">
 </head>
 
 <body>
 
-    <!--==================== NAVBAR ====================-->
-    <nav>
-        <div class="container nav_container">
-            <a href="../dashboard/" class="nav_logo">
-                <img src="../assets/logo.png" alt="Logo">
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="land-nav" id="landNav">
+        <div class="land-container land-nav__inner">
+            <a href="./" class="land-nav__logo">
+                <img src="./assets/logo.png" alt="SyncProfitPath">
             </a>
-            <div class="nav_search">
-                <i class="uil uil-search"></i>
-                <input type="search" placeholder="search">
+            <ul class="land-nav__links" id="navLinks">
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#plans">Plans</a></li>
+                <li><a href="#why-us">Why Us</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+            <div class="land-nav__cta">
+                <a href="./auth/login/" class="land-btn land-btn--ghost">Log In</a>
+                <a href="./auth/signup/" class="land-btn land-btn--primary">Get Started</a>
             </div>
-            <div class="nav_profile-wrapper">
-                <button class="nav_theme-btn">
-                    <i class="uil uil-moon"></i>
-                </button>
-                <div class="nav_profile">
-                    <div class="nav_profile-photo">
-                        <img src="../assets/profile-1.jpg" alt="Profile Photo" data-fallback="../assets/profile-1.jpg">
-                    </div>
-                    <h5 id="navName">User Name</h5>
-                    <i class="uil uil-angle-down"></i>
-                </div>
-                <button class="nav_menu-btn">
-                    <i class="uil uil-bars"></i>
-                </button>
-            </div>
+            <button class="land-nav__burger" id="navBurger" aria-label="Menu">
+                <i class="uil uil-bars"></i>
+            </button>
         </div>
     </nav>
 
-    <!--==================== SIDEBAR ====================-->
-    <menu class="sidebar">
-        <a href="../dashboard/">
-            <i class="uil uil-create-dashboard"></i>
-            <h5>Dashboard</h5>
-        </a>
-        <a href="../deposit/">
-            <i class="uil uil-arrow-circle-down"></i>
-            <h5>Deposit</h5>
-        </a>
-        <a href="../invest/">
-            <i class="uil uil-diamond"></i>
-            <h5>Invest</h5>
-        </a>
-        <a href="../withdraw/">
-            <i class="uil uil-arrow-circle-up"></i>
-            <h5>Withdraw</h5>
-        </a>
-        <a href="../transactions/">
-            <i class="uil uil-history"></i>
-            <h5>Transactions</h5>
-        </a>
-        <a href="../refer/">
-            <i class="uil uil-user-plus"></i>
-            <h5>Refer & Earn</h5>
-        </a>
-        <a href="./" class="active">
-            <i class="uil uil-setting"></i>
-            <h5>Settings</h5>
-        </a>
-        <a href="../admin/" class="sidebar-admin-back" id="adminBackBtn" style="display:none;">
-            <i class="uil uil-shield-check"></i><h5>Admin Panel</h5>
-        </a>
-        <button class="sidebar_close-btn">
-            <i class="uil uil-multiply"></i>
-        </button>
-        <button class="sidebar_logout-btn" onclick="logout()">
-            <i class="uil uil-sign-out-alt"></i>
-            <h5>Logout</h5>
-        </button>
-    </menu>
-
-    <!--==================== SETTINGS MAIN ====================-->
-    <section class="settings-section">
-        <h1>Settings</h1>
-
-        <!-- ── TAB NAV ── -->
-        <div class="settings-tabs">
-            <button class="tab-btn active" data-tab="profile">
-                <i class="uil uil-user-circle"></i> Profile
-            </button>
-            <button class="tab-btn" data-tab="security">
-                <i class="uil uil-lock"></i> Security
-            </button>
-            <button class="tab-btn" data-tab="kyc">
-                <i class="uil uil-shield-check"></i> KYC
-            </button>
-            <button class="tab-btn" data-tab="withdrawal" id="withdrawalTab">
-                <i class="uil uil-money-withdraw"></i> Withdrawal
-            </button>
-            <button class="tab-btn" data-tab="appearance">
-                <i class="uil uil-brightness"></i> Appearance
-            </button>
-        </div>
+    <!-- Mobile nav drawer -->
+    <div class="land-nav__drawer" id="navDrawer">
+        <a href="#how-it-works" onclick="closeDrawer()">How It Works</a>
+        <a href="#plans" onclick="closeDrawer()">Plans</a>
+        <a href="#why-us" onclick="closeDrawer()">Why Us</a>
+        <a href="#faq" onclick="closeDrawer()">FAQ</a>
+        <a href="./auth/login/" class="drawer-login">Log In</a>
+        <a href="./auth/signup/" class="land-btn land-btn--primary drawer-signup">Get Started</a>
+    </div>
+    <div class="land-nav__backdrop" id="navBackdrop" onclick="closeDrawer()"></div>
 
 
-        <!-- ══════════════════════════════════════
-             TAB 1 — PROFILE
-        ══════════════════════════════════════ -->
-        <div class="tab-content active" id="tab-profile">
-
-            <!-- Profile photo -->
-            <div class="settings-card">
-                <div class="profile-photo-section">
-                    <div class="profile-photo-wrap">
-                        <img src="../assets/profile-1.jpg" alt="Profile" id="profilePhotoPreview">
-                        <label class="photo-edit-btn" for="profilePhotoInput" title="Change photo">
-                            <i class="uil uil-camera"></i>
-                        </label>
-                        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none">
+    <!-- ==================== HERO ==================== -->
+    <section class="land-hero">
+        <div class="land-container land-hero__inner">
+            <div class="land-hero__text">
+                <span class="land-hero__eyebrow">
+                    <i class="uil uil-chart-line"></i> Live investments · Daily payouts
+                </span>
+                <h1 class="land-hero__headline">
+                    Grow Your Wealth with <span class="land-highlight">Smart Crypto</span> Investing
+                </h1>
+                <p class="land-hero__sub">
+                    SyncProfitPath gives you access to structured investment plans that generate daily returns — starting from just $100. No experience needed.
+                </p>
+                <div class="land-hero__actions">
+                    <a href="./auth/signup/" class="land-btn land-btn--primary land-btn--lg">
+                        Start Earning <i class="uil uil-arrow-right"></i>
+                    </a>
+                    <a href="#plans" class="land-btn land-btn--outline land-btn--lg">
+                        View Plans
+                    </a>
+                </div>
+                <div class="land-hero__trust">
+                    <div class="land-hero__trust-item">
+                        <i class="uil uil-shield-check"></i>
+                        <span>SSL Secured</span>
                     </div>
-                    <div class="profile-photo-info">
-                        <h3 id="profileDisplayName">Divine Godwin</h3>
-                        <p id="profileDisplayEmail">divine@example.com</p>
-                        <span class="kyc-badge" id="kycBadge">
-                            <i class="uil uil-shield-check"></i>
-                            <span id="kycBadgeText">Unverified</span>
-                        </span>
+                    <div class="land-hero__trust-item">
+                        <i class="uil uil-lock-access"></i>
+                        <span>Encrypted Funds</span>
+                    </div>
+                    <div class="land-hero__trust-item">
+                        <i class="uil uil-clock"></i>
+                        <span>24/7 Support</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Photo crop modal -->
-            <div class="crop-overlay" id="cropOverlay">
-                <div class="crop-modal">
-                    <h3 class="crop-title">Position Your Photo</h3>
-                    <p class="crop-hint">Drag the image to centre your face</p>
-                    <div class="crop-viewport" id="cropViewport">
-                        <img id="cropImg" draggable="false">
-                        <div class="crop-circle-mask"></div>
+            <div class="land-hero__visual">
+                <div class="land-hero__card">
+                    <div class="hero-card__header">
+                        <span>Your Portfolio</span>
+                        <span class="hero-card__live"><span class="live-dot"></span> Live</span>
                     </div>
-                    <div class="crop-actions">
-                        <button class="crop-cancel-btn" onclick="cancelCrop()">Cancel</button>
-                        <button class="crop-save-btn" onclick="saveCrop()">Use This Photo</button>
+                    <div class="hero-card__balance">$24,839.00</div>
+                    <div class="hero-card__growth">
+                        <i class="uil uil-arrow-up"></i> +$1,241.95 today
                     </div>
-                </div>
-            </div>
-
-            <!-- Profile form -->
-            <div class="settings-card" id="profileForm">
-                <h3 class="card-title">Personal Information</h3>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="firstName" class="settings-input" placeholder="First name">
+                    <div class="hero-card__chart">
+                        <svg viewBox="0 0 280 80" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgb(0,226,123)" stop-opacity="0.35"/>
+                                    <stop offset="100%" stop-color="rgb(0,226,123)" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M0 70 L30 60 L60 55 L90 45 L120 40 L150 30 L180 25 L210 18 L240 12 L280 5 L280 80 L0 80 Z"
+                                fill="url(#chartGrad)"/>
+                            <path d="M0 70 L30 60 L60 55 L90 45 L120 40 L150 30 L180 25 L210 18 L240 12 L280 5"
+                                fill="none" stroke="rgb(0,226,123)" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
                     </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" id="lastName" class="settings-input" placeholder="Last name">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="profileEmail" class="settings-input" placeholder="your@email.com">
-                </div>
-
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="profilePhone" class="settings-input" placeholder="+1 234 567 8900">
-                </div>
-
-                <div class="form-group">
-                    <label>Country</label>
-                    <input type="text" id="profileCountry" class="settings-input" placeholder="Your country">
-                </div>
-
-                <p class="form-error" id="profileError"></p>
-                <p class="form-success" id="profileSuccess"></p>
-
-                <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()" disabled>
-                    Save Changes
-                </button>
-            </div>
-        </div>
-
-
-        <!-- ══════════════════════════════════════
-             TAB 2 — SECURITY
-        ══════════════════════════════════════ -->
-        <div class="tab-content" id="tab-security">
-
-            <!-- Change Password -->
-            <div class="settings-card">
-                <h3 class="card-title">Change Password</h3>
-
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="currentPassword" class="settings-input"
-                            placeholder="Enter current password">
-                        <button class="toggle-pw-btn" onclick="togglePassword('currentPassword', this)">
-                            <i class="uil uil-eye"></i>
-                        </button>
+                    <div class="hero-card__plans">
+                        <div class="hero-plan-item">
+                            <span class="hero-plan-dot" style="background:#00e27b"></span>
+                            <span>Basic</span>
+                            <strong>+1.5%/day</strong>
+                        </div>
+                        <div class="hero-plan-item">
+                            <span class="hero-plan-dot" style="background:rgb(160,99,245)"></span>
+                            <span>Standard</span>
+                            <strong>+3%/day</strong>
+                        </div>
+                        <div class="hero-plan-item">
+                            <span class="hero-plan-dot" style="background:rgb(234,181,7)"></span>
+                            <span>Premium</span>
+                            <strong>+5%/day</strong>
+                        </div>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label>New Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="newPassword" class="settings-input"
-                            placeholder="At least 8 characters">
-                        <button class="toggle-pw-btn" onclick="togglePassword('newPassword', this)">
-                            <i class="uil uil-eye"></i>
-                        </button>
-                    </div>
-                    <!-- Password strength bar -->
-                    <div class="strength-bar-wrap" id="strengthWrap">
-                        <div class="strength-bar" id="strengthBar"></div>
-                    </div>
-                    <p class="strength-label" id="strengthLabel"></p>
-                </div>
-
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="confirmPassword" class="settings-input"
-                            placeholder="Repeat new password">
-                        <button class="toggle-pw-btn" onclick="togglePassword('confirmPassword', this)">
-                            <i class="uil uil-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <p class="form-error" id="passwordError"></p>
-                <p class="form-success" id="passwordSuccess"></p>
-
-                <button class="save-btn" onclick="savePassword()">Update Password</button>
-            </div>
-
-            <!-- 2FA -->
-            <div class="settings-card">
-                <div class="toggle-row">
+                <!-- Floating accent cards -->
+                <div class="land-hero__accent land-hero__accent--btc">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" width="28">
                     <div>
-                        <h3 class="card-title">Two-Factor Authentication</h3>
-                        <p class="card-subtitle">Add an extra layer of security to your account</p>
+                        <div class="accent-name">Bitcoin</div>
+                        <div class="accent-val success">+4.2%</div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="twoFAToggle" onchange="toggle2FA(this)">
-                        <span class="toggle-slider"></span>
-                    </label>
                 </div>
-                <p class="form-success" id="twoFAMsg"></p>
+                <div class="land-hero__accent land-hero__accent--eth">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" width="28">
+                    <div>
+                        <div class="accent-name">Ethereum</div>
+                        <div class="accent-val success">+2.8%</div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
-
-        <!-- ══════════════════════════════════════
-             TAB 3 — KYC
-        ══════════════════════════════════════ -->
-        <div class="tab-content" id="tab-kyc">
-
-            <!-- KYC status banner -->
-            <div class="kyc-status-banner" id="kycStatusBanner">
-                <div class="kyc-status-icon" id="kycStatusIcon">
-                    <i class="uil uil-clock" id="kycStatusIconEl"></i>
+        <!-- Stats bar -->
+        <div class="land-hero__stats">
+            <div class="land-container land-hero__stats-inner">
+                <div class="hero-stat">
+                    <h3>$12M+</h3>
+                    <p>Total Invested</p>
                 </div>
-                <div>
-                    <h3 id="kycStatusTitle">Verification Pending</h3>
-                    <p id="kycStatusDesc">Submit your documents below to verify your identity.</p>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <h3>4,800+</h3>
+                    <p>Active Investors</p>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <h3>Daily</h3>
+                    <p>Profit Payouts</p>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <h3>99.9%</h3>
+                    <p>Uptime</p>
                 </div>
             </div>
-
-            <!-- KYC form -->
-            <div class="settings-card" id="kycFormCard">
-                <h3 class="card-title">Identity Verification</h3>
-                <p class="card-subtitle">Upload a government-issued ID and proof of address to verify your account.</p>
-
-                <!-- ID Type -->
-                <div class="form-group" style="margin-top:1.4rem;">
-                    <label>ID Type</label>
-                    <select id="idType" class="settings-input settings-select">
-                        <option value="">Select ID type</option>
-                        <option value="passport">Passport</option>
-                        <option value="national_id">National ID Card</option>
-                        <option value="drivers_license">Driver's License</option>
-                    </select>
-                </div>
-
-                <!-- ID Upload -->
-                <div class="form-group">
-                    <label>Upload Government ID <span class="required">*</span></label>
-                    <label class="file-upload-label" for="kycIdFile">
-                        <i class="uil uil-id-card" style="font-size:2.4rem; color:var(--color-primary);"></i>
-                        <div class="upload-text">
-                            <strong>Click to upload ID</strong>
-                            <small>PNG, JPG or PDF — max 5MB</small>
-                        </div>
-                    </label>
-                    <input type="file" id="kycIdFile" accept="image/*,.pdf" style="display:none"
-                        onchange="showKycFileName(this, 'kycIdName')">
-                    <p class="file-chosen" id="kycIdName"></p>
-                </div>
-
-                <!-- Address proof Upload -->
-                <div class="form-group">
-                    <label>Upload Proof of Address <span class="required">*</span></label>
-                    <label class="file-upload-label" for="kycAddressFile">
-                        <i class="uil uil-map-marker" style="font-size:2.4rem; color:var(--color-primary);"></i>
-                        <div class="upload-text">
-                            <strong>Click to upload address proof</strong>
-                            <small>Utility bill, bank statement — max 5MB</small>
-                        </div>
-                    </label>
-                    <input type="file" id="kycAddressFile" accept="image/*,.pdf" style="display:none"
-                        onchange="showKycFileName(this, 'kycAddressName')">
-                    <p class="file-chosen" id="kycAddressName"></p>
-                </div>
-
-                <p class="form-error" id="kycError"></p>
-                <p class="form-success" id="kycFormSuccess"></p>
-
-                <button class="save-btn" id="kycSubmitBtn" onclick="submitKyc()">
-                    Submit for Verification
-                </button>
-            </div>
-
         </div>
-
-
-        <!-- ══════════════════════════════════════
-             TAB 4 — WITHDRAWAL DETAILS
-             id="withdrawal" allows direct link from withdraw page
-        ══════════════════════════════════════ -->
-        <div class="tab-content" id="tab-withdrawal">
-
-            <!-- Bank Account -->
-            <div class="settings-card">
-                <div class="card-title-row">
-                    <h3 class="card-title">Bank Account</h3>
-                    <span class="detail-saved-badge" id="bankSavedBadge" style="display:none;">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </span>
-                </div>
-                <p class="card-subtitle">This account will be used for bank withdrawal requests.</p>
-
-                <div class="form-group" style="margin-top:1.4rem;">
-                    <label>Account Name</label>
-                    <input type="text" id="bankAccountName" class="settings-input" placeholder="Full name on account">
-                </div>
-
-                <div class="form-group">
-                    <label>Bank Name</label>
-                    <input type="text" id="bankName" class="settings-input" placeholder="e.g. Chase, Barclays">
-                </div>
-
-                <div class="form-group">
-                    <label>Account Number</label>
-                    <input type="text" id="bankAccountNumber" class="settings-input" placeholder="Account number">
-                </div>
-
-                <div class="form-group">
-                    <label>Routing / Sort Code</label>
-                    <input type="text" id="bankRoutingCode" class="settings-input" placeholder="Routing or sort code">
-                </div>
-
-                <p class="form-error" id="bankError"></p>
-                <p class="form-success" id="bankSuccess"></p>
-
-                <button class="save-btn" id="saveBankBtn" onclick="saveBankDetails()">Save Bank Details</button>
-            </div>
-
-
-            <!-- Crypto Wallet -->
-            <div class="settings-card">
-                <div class="card-title-row">
-                    <h3 class="card-title">Crypto Withdrawal Wallet</h3>
-                    <span class="detail-saved-badge" id="cryptoSavedBadge" style="display:none;">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </span>
-                </div>
-                <p class="card-subtitle">Withdrawals via crypto will be sent to this wallet.</p>
-
-                <div class="form-group" style="margin-top:1.4rem;">
-                    <label>Coin / Network</label>
-                    <select id="withdrawCoin" class="settings-input settings-select" onchange="updateCoinName()">
-                        <option value="">Select coin</option>
-                        <option value="btc">Bitcoin (BTC)</option>
-                        <option value="eth">Ethereum (ETH)</option>
-                        <option value="usdt">Tether (USDT)</option>
-                        <option value="bnb">BNB (BNB)</option>
-                        <option value="sol">Solana (SOL)</option>
-                        <option value="ltc">Litecoin (LTC)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Wallet Address</label>
-                    <input type="text" id="cryptoWalletAddress" class="settings-input"
-                        placeholder="Your wallet address">
-                </div>
-
-                <p class="form-error" id="cryptoError"></p>
-                <p class="form-success" id="cryptoSuccess"></p>
-
-                <button class="save-btn" id="saveCryptoBtn" onclick="saveCryptoDetails()">Save Crypto Details</button>
-            </div>
-
-        </div>
-
-        <!-- ══════════════════════════════════════
-             TAB 5 — APPEARANCE
-        ══════════════════════════════════════ -->
-        <div class="tab-content" id="tab-appearance">
-
-            <div class="settings-card">
-                <h3 class="card-title">Theme</h3>
-                <p class="card-subtitle">Choose how SyncProfitPath looks for you.</p>
-
-                <div class="appearance-options" id="appearanceOptions">
-                    <label class="appearance-option" id="opt-system">
-                        <input type="radio" name="themeChoice" value="system">
-                        <div class="appearance-option-inner">
-                            <div class="appearance-preview appearance-preview--system">
-                                <div class="ap-half ap-light"></div>
-                                <div class="ap-half ap-dark"></div>
-                            </div>
-                            <span class="appearance-label">System default</span>
-                            <span class="appearance-desc">Follows your device setting</span>
-                        </div>
-                    </label>
-
-                    <label class="appearance-option" id="opt-light">
-                        <input type="radio" name="themeChoice" value="light">
-                        <div class="appearance-option-inner">
-                            <div class="appearance-preview appearance-preview--light"></div>
-                            <span class="appearance-label">Light</span>
-                            <span class="appearance-desc">Always use light mode</span>
-                        </div>
-                    </label>
-
-                    <label class="appearance-option" id="opt-dark">
-                        <input type="radio" name="themeChoice" value="dark">
-                        <div class="appearance-option-inner">
-                            <div class="appearance-preview appearance-preview--dark"></div>
-                            <span class="appearance-label">Dark</span>
-                            <span class="appearance-desc">Always use dark mode</span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-        </div>
-
     </section>
 
 
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section class="land-section" id="how-it-works">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Simple Process</span>
+                <h2>Start Earning in 3 Steps</h2>
+                <p>No finance degree required. Create an account, deposit crypto, and watch your returns grow daily.</p>
+            </div>
+            <div class="land-steps">
+                <div class="land-step">
+                    <div class="land-step__num">01</div>
+                    <div class="land-step__icon">
+                        <i class="uil uil-user-plus"></i>
+                    </div>
+                    <h3>Create Your Account</h3>
+                    <p>Sign up in under 2 minutes. Enter your details, verify your identity, and you're ready to invest.</p>
+                </div>
+                <div class="land-step__arrow"><i class="uil uil-arrow-right"></i></div>
+                <div class="land-step">
+                    <div class="land-step__num">02</div>
+                    <div class="land-step__icon">
+                        <i class="uil uil-arrow-circle-down"></i>
+                    </div>
+                    <h3>Deposit Crypto</h3>
+                    <p>Fund your account with Bitcoin, Ethereum, USDT, USDC, Solana or Litecoin. Minimum deposit is $100.</p>
+                </div>
+                <div class="land-step__arrow"><i class="uil uil-arrow-right"></i></div>
+                <div class="land-step">
+                    <div class="land-step__num">03</div>
+                    <div class="land-step__icon">
+                        <i class="uil uil-dollar-sign"></i>
+                    </div>
+                    <h3>Earn Daily Returns</h3>
+                    <p>Choose a plan, sit back, and earn. Withdraw your profits anytime — no lock-in periods.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== PLANS ==================== -->
+    <section class="land-section land-section--dark" id="plans">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Investment Plans</span>
+                <h2>Choose Your Plan</h2>
+                <p>Three tiers designed for every investor — from first-timers to serious capital builders.</p>
+            </div>
+            <div class="land-plans">
+
+                <!-- Basic -->
+                <div class="land-plan">
+                    <div class="land-plan__header">
+                        <span class="land-plan__badge">Basic</span>
+                        <div class="land-plan__rate">1.5<span>%</span></div>
+                        <div class="land-plan__rate-label">daily return</div>
+                    </div>
+                    <div class="land-plan__body">
+                        <div class="land-plan__range">$100 — $500</div>
+                        <ul class="land-plan__features">
+                            <li><i class="uil uil-check-circle"></i> Daily 1.5% profit</li>
+                            <li><i class="uil uil-check-circle"></i> 10× ROI</li>
+                            <li><i class="uil uil-check-circle"></i> Withdraw anytime</li>
+                            <li><i class="uil uil-check-circle"></i> Cancel within 30 days</li>
+                            <li><i class="uil uil-check-circle"></i> All 6 coins accepted</li>
+                        </ul>
+                        <a href="./auth/signup/" class="land-btn land-btn--primary land-btn--full">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Standard — featured -->
+                <div class="land-plan land-plan--featured">
+                    <div class="land-plan__popular">Most Popular</div>
+                    <div class="land-plan__header">
+                        <span class="land-plan__badge">Standard</span>
+                        <div class="land-plan__rate">3<span>%</span></div>
+                        <div class="land-plan__rate-label">daily return</div>
+                    </div>
+                    <div class="land-plan__body">
+                        <div class="land-plan__range">$500 — $2,000</div>
+                        <ul class="land-plan__features">
+                            <li><i class="uil uil-check-circle"></i> Daily 3% profit</li>
+                            <li><i class="uil uil-check-circle"></i> 20× ROI</li>
+                            <li><i class="uil uil-check-circle"></i> Withdraw anytime</li>
+                            <li><i class="uil uil-check-circle"></i> Cancel within 30 days</li>
+                            <li><i class="uil uil-check-circle"></i> Priority support</li>
+                        </ul>
+                        <a href="./auth/signup/" class="land-btn land-btn--dark land-btn--full">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Premium -->
+                <div class="land-plan">
+                    <div class="land-plan__header">
+                        <span class="land-plan__badge">Premium</span>
+                        <div class="land-plan__rate">5<span>%</span></div>
+                        <div class="land-plan__rate-label">daily return</div>
+                    </div>
+                    <div class="land-plan__body">
+                        <div class="land-plan__range">$2,000 — $10,000</div>
+                        <ul class="land-plan__features">
+                            <li><i class="uil uil-check-circle"></i> Daily 5% profit</li>
+                            <li><i class="uil uil-check-circle"></i> 50× ROI</li>
+                            <li><i class="uil uil-check-circle"></i> Withdraw anytime</li>
+                            <li><i class="uil uil-check-circle"></i> Cancel within 30 days</li>
+                            <li><i class="uil uil-check-circle"></i> Dedicated account manager</li>
+                        </ul>
+                        <a href="./auth/signup/" class="land-btn land-btn--primary land-btn--full">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== WHY US ==================== -->
+    <section class="land-section" id="why-us">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Why SyncProfitPath</span>
+                <h2>Built for Trust. Built to Grow.</h2>
+                <p>We built SyncProfitPath on the principle that every investor deserves transparency, security, and real returns.</p>
+            </div>
+            <div class="land-features">
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(0,226,123,0.12)">
+                        <i class="uil uil-shield-check" style="color:rgb(0,226,123)"></i>
+                    </div>
+                    <h3>Bank-Grade Security</h3>
+                    <p>All funds are secured with 256-bit SSL encryption and stored in cold wallets. Your assets are safe with us.</p>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(160,99,245,0.12)">
+                        <i class="uil uil-chart-growth" style="color:rgb(160,99,245)"></i>
+                    </div>
+                    <h3>Consistent Daily Returns</h3>
+                    <p>Our automated investment engine generates daily profits credited directly to your balance every 24 hours.</p>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(234,181,7,0.12)">
+                        <i class="uil uil-arrow-circle-up" style="color:rgb(234,181,7)"></i>
+                    </div>
+                    <h3>Instant Withdrawals</h3>
+                    <p>Withdraw your profits at any time. No lock-in, no waiting period — your money is always accessible.</p>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(34,202,75,0.12)">
+                        <i class="uil uil-eye" style="color:rgb(34,202,75)"></i>
+                    </div>
+                    <h3>Full Transparency</h3>
+                    <p>Every transaction is logged. View your complete history — deposits, profits, withdrawals — in real time.</p>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(0,226,123,0.12)">
+                        <i class="uil uil-user-plus" style="color:rgb(0,226,123)"></i>
+                    </div>
+                    <h3>Referral Rewards</h3>
+                    <p>Invite friends and earn a bonus for every successful signup. Share your link and grow together.</p>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(255,67,54,0.12)">
+                        <i class="uil uil-comments-alt" style="color:rgb(255,67,54)"></i>
+                    </div>
+                    <h3>24/7 Live Support</h3>
+                    <p>Our support team is available around the clock via live chat. Get answers in minutes, not days.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== COINS ==================== -->
+    <section class="land-section land-section--tint">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Supported Assets</span>
+                <h2>Deposit with 6 Major Coins</h2>
+            </div>
+            <div class="land-coins">
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin">
+                    <span>Bitcoin</span>
+                    <small>BTC</small>
+                </div>
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum">
+                    <span>Ethereum</span>
+                    <small>ETH</small>
+                </div>
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="Tether">
+                    <span>Tether</span>
+                    <small>USDT</small>
+                </div>
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+                    <span>USD Coin</span>
+                    <small>USDC</small>
+                </div>
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="Solana">
+                    <span>Solana</span>
+                    <small>SOL</small>
+                </div>
+                <div class="land-coin">
+                    <img src="https://cryptologos.cc/logos/litecoin-ltc-logo.png" alt="Litecoin">
+                    <span>Litecoin</span>
+                    <small>LTC</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== TESTIMONIALS ==================== -->
+    <section class="land-section land-section--dark">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Testimonials</span>
+                <h2>What Our Investors Say</h2>
+            </div>
+            <div class="land-testimonials">
+                <div class="land-testimonial">
+                    <div class="land-testimonial__stars">★★★★★</div>
+                    <p>"I started with the Basic plan just to test things out. Within two weeks I moved up to Standard. The daily returns are consistent and withdrawals are instant — exactly as promised."</p>
+                    <div class="land-testimonial__author">
+                        <div class="land-testimonial__avatar" style="background:rgb(0,226,123);color:#27282f">JA</div>
+                        <div>
+                            <strong>James A.</strong>
+                            <span>Standard Plan Investor</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="land-testimonial">
+                    <div class="land-testimonial__stars">★★★★★</div>
+                    <p>"I was skeptical at first but decided to give it a shot with $500. Best decision I made this year. The platform is clean, the support team responded within minutes, and my balance grows every single day."</p>
+                    <div class="land-testimonial__author">
+                        <div class="land-testimonial__avatar" style="background:rgb(160,99,245);color:#fff">NK</div>
+                        <div>
+                            <strong>Ngozi K.</strong>
+                            <span>Standard Plan Investor</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="land-testimonial">
+                    <div class="land-testimonial__stars">★★★★★</div>
+                    <p>"The Premium plan is genuinely worth it. 5% daily on a $5,000 deposit — the math speaks for itself. I've already referred three friends and we're all earning together."</p>
+                    <div class="land-testimonial__author">
+                        <div class="land-testimonial__avatar" style="background:rgb(234,181,7);color:#27282f">EM</div>
+                        <div>
+                            <strong>Emmanuel M.</strong>
+                            <span>Premium Plan Investor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== FAQ ==================== -->
+    <section class="land-section" id="faq">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">FAQ</span>
+                <h2>Common Questions</h2>
+            </div>
+            <div class="land-faqs">
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>Is my money safe on SyncProfitPath?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">Yes. All user funds are secured with 256-bit SSL encryption. We use cold wallet storage for the majority of assets and enforce strict security protocols to protect your investments at all times.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>What is the minimum deposit?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">The minimum deposit is $100, which qualifies you for the Basic Plan. You can deposit using Bitcoin, Ethereum, USDT, USDC, Solana, or Litecoin.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>When are profits credited?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">Profits are calculated and credited to your account balance every 24 hours. You can track your earnings in real time on your dashboard.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>Can I withdraw at any time?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">Yes. There are no lock-in periods. You can submit a withdrawal request at any time and it will be processed by our team. Minimum withdrawal is $10.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>How does the referral program work?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">Every user gets a unique referral code. When someone signs up using your code and makes a deposit, you earn a referral bonus. You can track all your referrals and earnings in the Refer & Earn section of your dashboard.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>Do I need to verify my identity?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">KYC (Know Your Customer) verification is required to unlock full account features including withdrawals. You'll need to submit a government-issued ID and proof of address. Verification typically takes 24–48 hours.</div>
+                </div>
+                <div class="land-faq" onclick="toggleFaq(this)">
+                    <div class="land-faq__q">
+                        <span>How do I upgrade my plan?</span>
+                        <i class="uil uil-angle-down"></i>
+                    </div>
+                    <div class="land-faq__a">Simply make an additional deposit that falls within a higher plan's range. The system automatically applies the corresponding plan rate to your investment.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== CTA BANNER ==================== -->
+    <section class="land-cta">
+        <div class="land-container land-cta__inner">
+            <div>
+                <h2>Ready to Start Growing?</h2>
+                <p>Join thousands of investors already earning daily on SyncProfitPath.</p>
+            </div>
+            <div class="land-cta__actions">
+                <a href="./auth/signup/" class="land-btn land-btn--primary land-btn--lg">
+                    Create Free Account <i class="uil uil-arrow-right"></i>
+                </a>
+                <a href="./auth/login/" class="land-btn land-btn--ghost-dark land-btn--lg">
+                    Log In
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="land-footer">
+        <div class="land-container land-footer__inner">
+            <div class="land-footer__brand">
+                <img src="./assets/logo.png" alt="SyncProfitPath" class="land-footer__logo">
+                <p>Smart crypto investment plans with daily returns. Secure, transparent, and always accessible.</p>
+                <div class="land-footer__socials">
+                    <a href="#" aria-label="Twitter"><i class="uil uil-twitter"></i></a>
+                    <a href="#" aria-label="Telegram"><i class="uil uil-telegram"></i></a>
+                    <a href="#" aria-label="WhatsApp"><i class="uil uil-whatsapp"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="uil uil-instagram"></i></a>
+                </div>
+            </div>
+            <div class="land-footer__col">
+                <h5>Platform</h5>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#plans">Investment Plans</a>
+                <a href="#why-us">Why Choose Us</a>
+                <a href="./auth/signup/">Get Started</a>
+            </div>
+            <div class="land-footer__col">
+                <h5>Account</h5>
+                <a href="./auth/signup/">Sign Up</a>
+                <a href="./auth/login/">Log In</a>
+                <a href="./settings/">Settings</a>
+                <a href="./refer/">Refer & Earn</a>
+            </div>
+            <div class="land-footer__col">
+                <h5>Support</h5>
+                <a href="#faq">FAQ</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="land-footer__bottom">
+            <div class="land-container">
+                <p>&copy; 2026 SyncProfitPath. All rights reserved.</p>
+                <p>Investment involves risk. Past performance is not indicative of future results.</p>
+            </div>
+        </div>
+    </footer>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../supabase.js"></script>
-    <script src="../auth.js"></script>
-    <script src="../main.js"></script>
-    <script src="../chat-widget.js"></script>
-    <script src="../notify.js"></script>
-    <script src="./settings.js"></script>
+    <script src="./supabase.js"></script>
+    <script src="./landing.js"></script>
 </body>
-
 </html>
