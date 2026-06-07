@@ -864,7 +864,7 @@ body {
     background: color-mix(in srgb, var(--tab-color, var(--color-primary)) 10%, transparent);
 }
 
-/* Time range pill group */
+/* Time range pill group — neutral green, not coin colour */
 .chart-range-tabs {
     display: flex;
     gap: 0.2rem;
@@ -891,47 +891,41 @@ body {
     color: var(--color-dark);
 }
 
+/* Active range tab always uses brand green, never coin colour */
 .chart-range-tab.active {
     background: var(--color-white);
     color: var(--color-primary);
     box-shadow: var(--box-shadow);
 }
 
-/* Status bar (loading / rate-limit / error) */
+/* Status bar */
 .chart-status {
     display: none;
     align-items: center;
     gap: 0.5rem;
     font-size: 1.05rem;
     margin-bottom: 0.5rem;
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.7rem;
     border-radius: var(--radius-2);
 }
 
 .chart-status--loading {
     color: var(--color-gray-light);
-    background: transparent;
 }
 
 .chart-status--loading::before {
     content: '';
     display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: 0.55rem;
+    height: 0.55rem;
     border-radius: 50%;
     background: var(--color-primary);
     animation: pulse 1s infinite;
     flex-shrink: 0;
 }
 
-.chart-status--warn {
-    color: #b45309;
-    background: rgba(251, 191, 36, 0.12);
-}
-
-.chart-status--warn::before {
-    content: '⚠';
-    margin-right: 0.1rem;
+.chart-status--muted {
+    color: var(--color-gray-light);
 }
 
 .chart-status--error {
@@ -939,11 +933,7 @@ body {
     background: rgba(220, 53, 69, 0.08);
 }
 
-.chart-status--muted {
-    color: var(--color-gray-light);
-}
-
-/* Canvas fade */
+/* Canvas */
 #chart {
     transition: opacity 0.2s ease;
 }

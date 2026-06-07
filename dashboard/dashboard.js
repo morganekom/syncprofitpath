@@ -1,5 +1,7 @@
 // ================================================================
 // DASHBOARD.JS  — SyncProfitPath
+// Chart data: Binance public API (no key, no rate limits)
+// Tickers:    CoinGecko simple/price (single batch call)
 // ================================================================
 
 
@@ -19,14 +21,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadActiveInvestments();
     checkKycAlert();
 
-    // Tickers: build DOM first, then fetch (single batch call)
+    // Tickers: build DOM first, then fetch prices
     buildTickerRows();
     loadCryptoPrices();
     setInterval(loadCryptoPrices, 60000);
 
-    // Chart: inject controls then load initial view
+    // Chart
     injectChartControls();
-    scheduleChartLoad('btc', '30');
+    loadChartData('btc', '30d');
 });
 
 
@@ -156,21 +158,19 @@ function checkKycAlert() {
 
 
 // ================================================================
-// CRYPTO PRICE TICKERS
-// Single batch call for all 7 coins → no rate limit issues
+// CRYPTO PRICE TICKERS — CoinGecko (single batch, all 7 coins)
 // ================================================================
 
 const TICKER_COINS = [
-    { key: 'btc',  id: 'bitcoin',     symbol: '₿', bg: '#f7931a22', color: '#f7931a', name: 'Bitcoin',  ticker: 'BTC'  },
-    { key: 'eth',  id: 'ethereum',    symbol: 'Ξ', bg: '#627eea22', color: '#627eea', name: 'Ethereum', ticker: 'ETH'  },
-    { key: 'bnb',  id: 'binancecoin', symbol: 'B', bg: '#f3ba2f22', color: '#f3ba2f', name: 'BNB',      ticker: 'BNB'  },
-    { key: 'sol',  id: 'solana',      symbol: '◎', bg: '#9945ff22', color: '#9945ff', name: 'Solana',   ticker: 'SOL'  },
-    { key: 'ltc',  id: 'litecoin',    symbol: 'Ł', bg: '#bfbbbb22', color: '#a0a0a0', name: 'Litecoin', ticker: 'LTC'  },
-    { key: 'doge', id: 'dogecoin',    symbol: 'Ð', bg: '#c2a63322', color: '#c2a633', name: 'Dogecoin', ticker: 'DOGE' },
-    { key: 'xrp',  id: 'ripple',      symbol: '✕', bg: '#00aae422', color: '#00aae4', name: 'XRP',      ticker: 'XRP'  },
+    { key: 'btc',  id: 'bitcoin',     symbol: 'BTCUSDT', bg: '#f7931a22', color: '#f7931a', name: 'Bitcoin',  ticker: 'BTC'  },
+    { key: 'eth',  id: 'ethereum',    symbol: 'ETHUSDT', bg: '#627eea22', color: '#627eea', name: 'Ethereum', ticker: 'ETH'  },
+    { key: 'bnb',  id: 'binancecoin', symbol: 'BNBUSDT', bg: '#f3ba2f22', color: '#f3ba2f', name: 'BNB',      ticker: 'BNB'  },
+    { key: 'sol',  id: 'solana',      symbol: 'SOLUSDT', bg: '#9945ff22', color: '#9945ff', name: 'Solana',   ticker: 'SOL'  },
+    { key: 'ltc',  id: 'litecoin',    symbol: 'LTCUSDT', bg: '#bfbbbb22', color: '#a0a0a0', name: 'Litecoin', ticker: 'LTC'  },
+    { key: 'doge', id: 'dogecoin',    symbol: 'DOGEUSDT',bg: '#c2a63322', color: '#c2a633', name: 'Dogecoin', ticker: 'DOGE' },
+    { key: 'xrp',  id: 'ripple',      symbol: 'XRPUSDT', bg: '#00aae422', color: '#00aae4', name: 'XRP',      ticker: 'XRP'  },
 ];
 
-// Build ticker DOM first, then fill prices in
 function buildTickerRows() {
     const container = document.querySelector('.market-tickers');
     if (!container) return;
@@ -178,7 +178,7 @@ function buildTickerRows() {
     container.innerHTML = TICKER_COINS.map(coin => `
         <div class="ticker-row">
             <div class="ticker-left">
-                <div class="ticker-icon" style="background:${coin.bg};color:${coin.color};">${coin.symbol}</div>
+                <div class="ticker-icon" style="background:${coin.bg};color:${coin.color};">${coin.symbol.charAt(0)}</div>
                 <div><h4>${coin.name}</h4><small class="text-muted">${coin.ticker}</small></div>
             </div>
             <div class="ticker-right">
@@ -203,7 +203,6 @@ async function loadCryptoPrices() {
             if (entry) setCryptoTicker(coin.key, entry.usd, entry.usd_24h_change);
         });
     } catch (err) {
-        // Silently retry on next interval
         console.warn('Ticker error:', err.message);
     }
 }
@@ -221,17 +220,13 @@ function setCryptoTicker(key, price, change) {
 
 
 // ================================================================
-// CHART — with request queue, abort control, and smart retry
+// CHART — Binance public API
 //
-// Root cause of failures: CoinGecko free tier = ~30 req/min.
-// Rapid coin switching fires many requests simultaneously → 429.
+// Endpoint: GET https://api.binance.com/api/v3/klines
+// Params:   symbol=BTCUSDT, interval=1m|1h|1d, limit=60|24|7|30
+// Response: array of candles — we use [0]=openTime, [4]=closePrice
 //
-// Solution:
-//  • Only ONE chart request in-flight at a time (queue)
-//  • Abort the previous request when user switches coin
-//  • 10-minute cache per coin+range — switching back is instant
-//  • On 429: show countdown + auto-retry after 10 seconds
-//  • Show stale cached data immediately while refreshing
+// No API key. No rate limit issues. Instant switching.
 // ================================================================
 
 const CHART_COLORS = {
@@ -244,11 +239,12 @@ const CHART_COLORS = {
     xrp:  { border: '#00aae4', fill: 'rgba(0,170,228,0.08)'   },
 };
 
+// Binance kline intervals + limits per time range
 const TIME_RANGES = [
-    { key: '1h',  label: '1H',  days: '1',  minutely: true  },
-    { key: '24h', label: '24H', days: '1',  minutely: false },
-    { key: '7d',  label: '7D',  days: '7',  minutely: false },
-    { key: '30d', label: '30D', days: '30', minutely: false },
+    { key: '1h',  label: '1H',  interval: '1m', limit: 60  },
+    { key: '24h', label: '24H', interval: '1h', limit: 24  },
+    { key: '7d',  label: '7D',  interval: '1d', limit: 7   },
+    { key: '30d', label: '30D', interval: '1d', limit: 30  },
 ];
 
 let chartInstance    = null;
@@ -256,13 +252,12 @@ let activeChartCoin  = 'btc';
 let activeChartRange = '30d';
 
 // Cache: "btc_30d" → { ts, labels, prices }
-const chartCache  = {};
-const CACHE_TTL   = 10 * 60 * 1000; // 10 minutes
+const chartCache = {};
+const CACHE_TTL  = 5 * 60 * 1000; // 5 minutes
 
-// Request control
-let currentAbortCtrl = null;   // AbortController for in-flight fetch
-let chartDebounceTimer = null; // debounce rapid tab taps
-let retryTimer = null;         // auto-retry countdown timer
+// Abort controller — cancels in-flight request on coin/range switch
+let currentAbortCtrl = null;
+let debounceTimer    = null;
 
 function injectChartControls() {
     const section = document.querySelector('.dash-chart-section');
@@ -294,100 +289,74 @@ function injectChartControls() {
     `);
 }
 
-// Entry point — debounced so rapid taps only fire once
 function scheduleChartLoad(coinKey, rangeKey) {
-    clearTimeout(chartDebounceTimer);
-    chartDebounceTimer = setTimeout(() => loadChartData(coinKey, rangeKey), 250);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => loadChartData(coinKey, rangeKey), 150);
 }
 
 async function loadChartData(coinKey, rangeKey) {
-    clearTimeout(retryTimer);
-
     const cacheKey = `${coinKey}_${rangeKey}`;
     const cached   = chartCache[cacheKey];
     const now      = Date.now();
 
-    // Fresh cache → render immediately, no fetch needed
+    // Fresh cache → instant render, no fetch
     if (cached && (now - cached.ts) < CACHE_TTL) {
         renderChart(coinKey, cached.labels, cached.prices, rangeKey);
-        setChartStatus('');
+        clearChartStatus();
         return;
     }
 
-    // Stale cache → show it instantly while we refresh in background
+    // Stale cache → show immediately while refreshing silently
     if (cached) {
         renderChart(coinKey, cached.labels, cached.prices, rangeKey);
         setChartStatus('Refreshing…', 'muted');
     } else {
-        setChartStatus('Loading chart…', 'loading');
+        setChartStatus('Loading…', 'loading');
         dimCanvas(true);
     }
 
-    // Abort any previous in-flight request
+    // Cancel any previous in-flight request
     if (currentAbortCtrl) currentAbortCtrl.abort();
     currentAbortCtrl = new AbortController();
-    const signal = currentAbortCtrl.signal;
+    const { signal } = currentAbortCtrl;
 
-    const range   = TIME_RANGES.find(r => r.key === rangeKey) || TIME_RANGES[3];
-    const geckoId = TICKER_COINS.find(c => c.key === coinKey)?.id || 'bitcoin';
-    const url     = `https://api.coingecko.com/api/v3/coins/${geckoId}/market_chart?vs_currency=usd&days=${range.days}`;
+    const range    = TIME_RANGES.find(r => r.key === rangeKey) || TIME_RANGES[3];
+    const binSymbol = TICKER_COINS.find(c => c.key === coinKey)?.symbol || 'BTCUSDT';
+    const url = `https://api.binance.com/api/v3/klines?symbol=${binSymbol}&interval=${range.interval}&limit=${range.limit}`;
 
     try {
         const res = await fetch(url, { signal });
 
-        if (signal.aborted) return; // user already switched coin — discard
+        if (signal.aborted) return;
+        if (!res.ok) throw new Error(`Binance HTTP ${res.status}`);
 
-        // Rate limited → auto-retry with countdown
-        if (res.status === 429) {
-            setChartStatus('Rate limited — retrying in 10s…', 'warn');
-            dimCanvas(false);
-            let secs = 10;
-            retryTimer = setInterval(() => {
-                secs--;
-                if (secs <= 0) {
-                    clearInterval(retryTimer);
-                    loadChartData(activeChartCoin, activeChartRange);
-                } else {
-                    setChartStatus(`Rate limited — retrying in ${secs}s…`, 'warn');
-                }
-            }, 1000);
-            return;
-        }
+        const candles = await res.json();
+        if (!Array.isArray(candles) || candles.length === 0) throw new Error('No data');
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        if (!data.prices?.length) throw new Error('No price data');
-
-        let raw = data.prices;
-
-        // Slice to appropriate resolution
-        if (rangeKey === '1h')  raw = raw.slice(-60);   // ~1 point/min
-        if (rangeKey === '24h') raw = raw.slice(-24);   // hourly points
-
-        const labels = raw.map(p => {
-            const d = new Date(p[0]);
+        // Each candle: [openTime, open, high, low, close, ...]
+        // We use openTime (ms) + close price
+        const labels = candles.map(c => {
+            const d = new Date(c[0]);
             return (rangeKey === '1h' || rangeKey === '24h')
                 ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
                 : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         });
-        const prices = raw.map(p => p[1]);
+        const prices = candles.map(c => parseFloat(c[4])); // close price
 
         chartCache[cacheKey] = { ts: now, labels, prices };
-
         renderChart(coinKey, labels, prices, rangeKey);
-        setChartStatus('');
+        clearChartStatus();
 
     } catch (err) {
-        if (err.name === 'AbortError') return; // expected — user switched coin
+        if (err.name === 'AbortError') return; // expected on coin switch
 
-        console.error('Chart fetch failed:', err.message);
+        console.error('Chart error:', err.message);
 
-        // If we had stale data, keep showing it
-        if (!cached) {
-            setChartStatus('Failed to load. Tap any coin tab to retry.', 'error');
+        if (cached) {
+            // Keep showing stale data, just note it
+            setChartStatus('Using cached data', 'muted');
         } else {
-            setChartStatus('Using cached data.', 'muted');
+            setChartStatus('Failed to load. Tap a coin to retry.', 'error');
         }
     } finally {
         dimCanvas(false);
@@ -442,7 +411,7 @@ function renderChart(coinKey, labels, prices, rangeKey) {
                 tooltip: {
                     callbacks: {
                         label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', {
-                            minimumFractionDigits: 2, maximumFractionDigits: 2
+                            minimumFractionDigits: 2, maximumFractionDigits: 4
                         })
                     }
                 }
@@ -457,7 +426,12 @@ function renderChart(coinKey, labels, prices, rangeKey) {
                     grid:        { color: gridColor },
                     ticks: {
                         color:    tickColor,
-                        callback: val => '$' + val.toLocaleString('en-US', { maximumFractionDigits: 0 })
+                        callback: val => {
+                            // Smart formatting: small coins like DOGE show decimals
+                            if (val < 1)   return '$' + val.toFixed(4);
+                            if (val < 10)  return '$' + val.toFixed(2);
+                            return '$' + val.toLocaleString('en-US', { maximumFractionDigits: 0 });
+                        }
                     }
                 }
             }
@@ -483,21 +457,25 @@ function switchChartRange(rangeKey) {
     scheduleChartLoad(activeChartCoin, rangeKey);
 }
 
-// Status bar helpers
-function setChartStatus(msg, type = '') {
+function setChartStatus(msg, type) {
     const el = document.getElementById('chartStatus');
     if (!el) return;
     el.textContent  = msg;
-    el.className    = 'chart-status' + (type ? ' chart-status--' + type : '');
-    el.style.display = msg ? 'flex' : 'none';
+    el.className    = 'chart-status chart-status--' + (type || 'muted');
+    el.style.display = 'flex';
+}
+
+function clearChartStatus() {
+    const el = document.getElementById('chartStatus');
+    if (el) { el.textContent = ''; el.style.display = 'none'; }
 }
 
 function dimCanvas(on) {
-    const canvas = document.getElementById('chart');
-    if (canvas) canvas.style.opacity = on ? '0.3' : '1';
+    const c = document.getElementById('chart');
+    if (c) c.style.opacity = on ? '0.25' : '1';
 }
 
-// Re-render on theme toggle (grid/tick colours need updating)
+// Re-render on theme toggle
 document.addEventListener('themechange', () => {
     const cached = chartCache[`${activeChartCoin}_${activeChartRange}`];
     if (cached) renderChart(activeChartCoin, cached.labels, cached.prices, activeChartRange);
