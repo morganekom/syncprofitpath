@@ -1802,13 +1802,8 @@ body {
     flex-direction: column;
     gap: 1.2rem;
     box-shadow: var(--box-shadow);
-    border-left: 3px solid transparent;
     transition: var(--transition);
 }
-
-.wdr-card.pending   { border-left-color: var(--color-warning); }
-.wdr-card.completed { border-left-color: var(--color-success); }
-.wdr-card.failed    { border-left-color: var(--color-danger);  }
 
 .wdr-card:hover {
     transform: translateY(-2px);
@@ -1920,6 +1915,94 @@ body {
 }
 
 .wdr-action-btn.view:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+
+/* ================================================================
+   SHARED APPROVAL CARDS — deposits, investments, KYC
+   Reuses .wdr-* classes from withdrawal cards for consistency
+   ================================================================ */
+
+.admin-list-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-card-list {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+}
+
+@media (min-width: 700px) {
+    .admin-card-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1100px) {
+    .admin-card-list { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Base card — same shell as .wdr-card */
+.adm-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.adm-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* Amount — colour by transaction type */
+.adm-card-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.adm-card-amount.deposit    { color: var(--color-success); }
+.adm-card-amount.investment { color: var(--color-purple);  }
+.adm-card-amount.withdrawal { color: var(--color-danger);  }
+
+/* Footer row: proof link + action button */
+.adm-card-footer {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-top: auto;
+}
+
+.adm-card-footer .wdr-action-btn {
+    flex: 1;
+}
+
+/* View Proof button */
+.adm-proof-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    background: var(--color-light);
+    color: var(--color-gray-dark);
+    text-decoration: none;
+    transition: var(--transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.adm-proof-btn:hover {
     background: var(--color-primary);
     color: var(--color-dark);
 }
