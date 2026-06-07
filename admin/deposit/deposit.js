@@ -129,6 +129,7 @@ function renderTable() {
     if (filteredDeposits.length === 0) {
         emptyEl.style.display = 'flex';
         listEl.style.display  = 'none';
+        listEl.innerHTML      = '';
         document.querySelector('#depositEmpty p').textContent =
             activeStatus === 'pending' ? 'No pending deposits.' : 'No deposits found.';
         return;

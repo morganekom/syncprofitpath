@@ -146,6 +146,66 @@
     <script src="../../auth.js"></script>
     <script src="../../main.js"></script>
     <script src="../admin.js"></script>
+    <!-- ==================== DEPOSIT DETAIL MODAL ==================== -->
+    <div class="admin-modal-overlay" id="depositModal" onclick="closeDepositModal(event)">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h3>Deposit Details</h3>
+                <button class="admin-modal-close" onclick="closeDepositModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">User</span>
+                <span class="modal-detail-value" id="mdUser">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Reference</span>
+                <span class="modal-detail-value" id="mdReference">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Coin</span>
+                <span class="modal-detail-value" id="mdCoin">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Amount</span>
+                <span class="modal-detail-value" id="mdAmount">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Date</span>
+                <span class="modal-detail-value" id="mdDate">—</span>
+            </div>
+            <div class="modal-detail-row">
+                <span class="modal-detail-label">Status</span>
+                <span class="modal-detail-value" id="mdStatus">—</span>
+            </div>
+            <div class="modal-detail-row" id="mdProofRow" style="display:none;">
+                <span class="modal-detail-label">Proof</span>
+                <a class="modal-detail-value" id="mdProofLink" href="#" target="_blank">View Image</a>
+            </div>
+
+            <div class="modal-note-wrap" id="mdNoteWrap">
+                <label class="modal-note-label">Note (optional)</label>
+                <textarea id="mdNote" class="modal-note" placeholder="e.g. Payment confirmed on chain."></textarea>
+            </div>
+
+            <div class="modal-actions" id="mdActions">
+                <button class="action-btn reject" id="mdRejectBtn" onclick="handleAction('failed')">
+                    <i class="uil uil-times-circle"></i> Reject
+                </button>
+                <button class="action-btn approve" id="mdApproveBtn" onclick="handleAction('completed')">
+                    <i class="uil uil-check-circle"></i> Approve
+                </button>
+            </div>
+
+            <div id="mdResolved" class="modal-resolved" style="display:none;">
+                <i class="uil uil-check-circle success"></i>
+                <p id="mdResolvedMsg">Action completed.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="../../notify.js"></script>
     <script src="./deposit.js"></script>
 </body>
