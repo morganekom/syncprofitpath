@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 
+/* ========================= VARIABLES ========================= */
 :root {
     --color-white: #fff;
     --color-light: #f0eff5;
@@ -26,14 +27,6 @@
     --transition: all 300ms ease;
 }
 
-/* dark theme variables */
-/* .dark-theme {
-    --color-white: #0a191e;
-    --color-light: #0d242c;
-    --color-dark: #ddd;
-    --color-gray-dark: #adacb5;
-} */
-
 :root.dark-theme,
 .dark-theme {
     --color-white: #0a191e;
@@ -42,6 +35,8 @@
     --color-gray-dark: #adacb5;
 }
 
+
+/* ========================= RESET ========================= */
 * {
     margin: 0;
     padding: 0;
@@ -54,14 +49,14 @@
     box-sizing: border-box;
 }
 
-/* Restore native checkbox/radio appearance — the global reset above hides them */
+/* Restore native checkbox/radio appearance */
 input[type="checkbox"],
 input[type="radio"] {
     appearance: auto;
     -webkit-appearance: auto;
 }
 
-html,body {
+html, body {
     overflow-x: hidden;
     max-width: 100vw;
 }
@@ -70,7 +65,6 @@ html {
     font-size: 12px;
 }
 
-/*  */
 
 /* ========================= GLOBAL CLOSE BUTTON ========================= */
 .modal-close-btn,
@@ -89,7 +83,6 @@ html {
     color: var(--color-dark);
 }
 
-/* Sidebar close button hidden on desktop — only appears on mobile */
 .sidebar_close-btn {
     display: none;
 }
@@ -106,21 +99,28 @@ html {
 }
 
 
-
-
-
-
+/* ========================= BODY — MOBILE FIRST ========================= */
 body {
     background: var(--color-light);
     font-family: "Poppins", sans-serif;
     min-height: 100vh;
     color: var(--color-gray-dark);
+    /* Mobile: single column, no sidebar in flow */
     display: grid;
-    grid-template-columns: 17rem auto 30rem;
-    gap: 2rem;
+    grid-template-columns: 1fr;
     user-select: none;
 }
 
+/* Tablet+: sidebar appears in flow, takes left column */
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto 30rem;
+        gap: 2rem;
+    }
+}
+
+
+/* ========================= UTILITIES ========================= */
 .container {
     width: 97vw;
     margin-inline: auto;
@@ -132,136 +132,42 @@ img {
     object-fit: cover;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     line-height: 1.1;
     color: var(--color-dark);
 }
 
-h1 {
-    font-size: 2.3rem;
-    font-weight: 800;
-}
+h1 { font-size: 2.3rem; font-weight: 800; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.4rem; }
+h4 { font-size: 1.2rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.8rem; }
+p  { font-size: 0.86rem; }
 
-h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
+small { font-size: 0.77rem; }
 
-h3 {
-    font-size: 1.4rem;
-}
+.text-muted  { color: var(--color-gray-light); }
+.primary     { color: var(--color-primary); }
+.danger      { color: var(--color-danger); }
+.success     { color: var(--color-success); }
+.warning     { color: var(--color-warning); }
+.purple      { color: var(--color-purple); }
 
-h4 {
-    font-size: 1.2rem;
-}
+.bg-primary       { background: var(--color-primary);     box-shadow: 0 0.8rem 0.8rem var(--color-primary-light); }
+.bg-primary-light { background: var(--color-primary-light); }
+.bg-danger        { background: var(--color-danger);      box-shadow: 0 0.8rem 0.8rem var(--color-danger-light); }
+.bg-danger-light  { background: var(--color-danger-light); }
+.bg-success       { background: var(--color-success);     box-shadow: 0 0.8rem 0.8rem var(--color-success-light); }
+.bg-success-light { background: var(--color-success-light); }
+.bg-warning       { background: var(--color-warning);     box-shadow: 0 0.8rem 0.8rem var(--color-warning-light); }
+.bg-warning-light { background: var(--color-warning-light); }
+.bg-purple        { color: var(--color-purple);           box-shadow: 0 0.8rem 0.8rem var(--color-purple-light); }
+.bg-purple-light  { background: var(--color-purple-light); }
+.bg-dark          { background: var(--color-dark);        box-shadow: 0 0.8rem 0.8rem rgb(0,0,0,0.12); }
 
-h5 {
-    font-size: 1rem;
-}
-
-h6 {
-    font-size: 0.8rem;
-}
-
-p {
-    font-size: 0.86rem;
-}
-
-small {
-    font-size: 0.77rem;
-}
-
-.text-muted {
-    color: var(--color-gray-light);
-}
-
-.primary {
-    color: var(--color-primary);
-}
-
-.bg-primary {
-    background: var(--color-primary);
-    box-shadow: 0 0.8rem 0.8rem var(--color-primary-light);
-}
-
-.bg-primary-light {
-    background: var(--color-primary-light);
-}
-
-.danger {
-    color: var(--color-danger);
-}
-
-.bg-danger {
-    background: var(--color-danger);
-    box-shadow: 0 0.8rem 0.8rem var(--color-danger-light);
-}
-
-.bg-danger-light {
-    background: var(--color-danger-light);
-}
-
-.success {
-    color: var(--color-success);
-}
-
-.bg-success {
-    background: var(--color-success);
-    box-shadow: 0 0.8rem 0.8rem var(--color-success-light);
-}
-
-.bg-success-light {
-    background: var(--color-success-light);
-}
-
-.warning {
-    color: var(--color-warning);
-}
-
-.bg-warning {
-    background: var(--color-warning);
-    box-shadow: 0 0.8rem 0.8rem var(--color-warning-light);
-}
-
-.bg-warning-light {
-    background: var(--color-warning-light);
-}
-
-.purple {
-    color: var(--color-purple);
-}
-
-.bg-purple {
-    color: var(--color-purple);
-    box-shadow: 0 0.8rem 0.8rem var(--color-purple-light);
-}
-
-.bg-purple-light {
-    background: var(--color-purple-light);
-}
-
-.bg-dark {
-    background: var(--color-dark);
-    box-shadow: 0 0.8rem 0.8rem rgb(0, 0, 0, 0.12);
-}
-
-button {
-    cursor: pointer;
-}
-
-
-
-
-
-
-
-
+button { cursor: pointer; }
 
 
 /* ========================= NAVBAR ========================= */
@@ -283,29 +189,45 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 2rem;
-    padding: 0 2rem;
+    gap: 1rem;
+    padding: 0 1.4rem;
     width: 100%;
     max-width: 100%;
 }
 
 .nav_logo {
-    width: 9rem;
+    width: 10rem;
     flex-shrink: 0;
 }
 
+/* Search bar hidden on mobile, shown on tablet+ */
 .nav_search {
+    display: none;
     background: var(--color-light);
     border-radius: var(--radius-2);
     padding: 0.6rem 1.2rem;
     flex: 1;
     max-width: 38rem;
-    display: flex;
     gap: 0.8rem;
     align-items: center;
     color: var(--color-gray-light);
     border: 1.5px solid transparent;
     transition: var(--transition);
+}
+
+@media screen and (min-width: 1024px) {
+    .nav_search {
+        display: flex;
+    }
+
+    .nav_container {
+        padding: 0 2rem;
+        gap: 2rem;
+    }
+
+    .nav_logo {
+        width: 9rem;
+    }
 }
 
 .nav_search:focus-within {
@@ -332,6 +254,19 @@ nav {
     flex-shrink: 0;
 }
 
+/* Hide name/role text on mobile */
+.nav_profile-wrapper h5,
+.nav_profile-wrapper span {
+    display: none;
+}
+
+@media screen and (min-width: 1024px) {
+    .nav_profile-wrapper h5,
+    .nav_profile-wrapper span {
+        display: block;
+    }
+}
+
 .nav_profile {
     display: flex;
     gap: 0.8rem;
@@ -339,12 +274,19 @@ nav {
 }
 
 .nav_profile-photo {
-    width: 3.2rem;
-    height: 3.2rem;
+    width: 2.8rem;
+    height: 2.8rem;
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid var(--color-light);
     flex-shrink: 0;
+}
+
+@media screen and (min-width: 1024px) {
+    .nav_profile-photo {
+        width: 3.2rem;
+        height: 3.2rem;
+    }
 }
 
 .nav_theme-btn {
@@ -363,8 +305,9 @@ nav {
     background: var(--color-primary);
 }
 
+/* Hamburger — visible on mobile, hidden on desktop */
 .nav_menu-btn {
-    display: none;
+    display: inline-flex;
     background: var(--color-light);
     border-radius: var(--radius-1);
     width: 3.6rem;
@@ -383,20 +326,67 @@ nav {
     color: var(--color-dark);
 }
 
-
-
-
-
-
+@media screen and (min-width: 1024px) {
+    .nav_menu-btn {
+        display: none;
+    }
+}
 
 
 /* ========================= SIDEBAR ========================= */
+
+/* Mobile: sidebar is an off-canvas overlay */
 .sidebar {
-    margin-top: 5rem;
-    min-height: calc(100vh - 5rem);
-    display: flex;
+    position: fixed;
+    top: 5rem;
+    bottom: 2rem;
+    left: -100%;
+    z-index: 3;
+    background: var(--color-white);
+    width: 17rem;
+    max-width: 75vw;
+    border-radius: 0 var(--radius-3) var(--radius-3) 0;
+    box-shadow: 2rem 0 4rem rgba(0,0,0,0.18);
+    display: none;
     flex-direction: column;
     gap: 0.2rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: left 300ms ease;
+    margin-top: 0.6rem;
+}
+
+@keyframes showSidebar {
+    to { left: 0; }
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 2;
+}
+
+.sidebar-backdrop.open {
+    display: block;
+}
+
+/* Desktop: sidebar is in normal document flow */
+@media screen and (min-width: 1024px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: auto;
+        max-width: none;
+        height: 100vh;
+        min-height: 100vh;
+        box-shadow: none;
+        border-radius: 0;
+        display: flex;
+        margin-top: 5rem;
+    }
 }
 
 .sidebar a {
@@ -431,7 +421,6 @@ nav {
 .sidebar a.active {
     background: var(--color-white);
     border-left: 0.5rem solid var(--color-primary);
-    /* subtract the left border width from the left padding to make the hovered icon align with the other links */
     padding-left: calc(2vw - 0.5rem);
 }
 
@@ -439,9 +428,10 @@ nav {
     color: var(--color-primary);
 }
 
+.sidebar_close-btn {
+    display: none !important;
+}
 
-
-/* ========================= LOGOUT BUTTON (sidebar) ========================= */
 .sidebar_logout-btn {
     display: flex;
     align-items: center;
@@ -454,6 +444,18 @@ nav {
     font-family: "Poppins", sans-serif;
     transition: var(--transition);
     margin-top: auto;
+}
+
+/* On mobile the logout btn sticks to the bottom of the overlay */
+@media screen and (max-width: 1023px) {
+    .sidebar_logout-btn {
+        position: sticky;
+        bottom: 0;
+        margin-top: 0;
+        background: var(--color-white);
+        border-top: 1px solid var(--color-light);
+        z-index: 1;
+    }
 }
 
 .sidebar_logout-btn i {
@@ -471,14 +473,6 @@ nav {
 }
 
 
-
-
-
-
-
-
-
-
 /* ========================= CARDS ========================= */
 .main_header {
     display: flex;
@@ -487,11 +481,26 @@ nav {
     margin-top: 7rem;
 }
 
+/* Mobile: single column */
 .main_cards {
     margin-top: 1.5rem;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
+}
+
+/* Tablet: two columns */
+@media screen and (min-width: 600px) {
+    .main_cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Desktop: three columns */
+@media screen and (min-width: 1024px) {
+    .main_cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .card {
@@ -502,22 +511,32 @@ nav {
     background: #00e27b;
     padding: var(--card-padding);
     border-radius: var(--radius-3);
-    height: 10rem;
+    height: 9rem;
     transition: var(--transition);
     gap: 1rem;
+}
+
+@media screen and (min-width: 1024px) {
+    .card {
+        height: 10rem;
+    }
 }
 
 .card-left {
     display: flex;
     flex-direction: column;
-    gap: 3.5rem;
+    gap: 1.8rem;
     font-size: 1.2rem;
     min-width: 0;
-    /* prevents flex children from overflowing */
     flex: 1;
 }
 
-/* Card label text — never wraps */
+@media screen and (min-width: 1024px) {
+    .card-left {
+        gap: 3.5rem;
+    }
+}
+
 .card-label {
     white-space: nowrap;
     overflow: hidden;
@@ -527,53 +546,42 @@ nav {
 .card-right {
     display: inline-flex;
     align-items: center;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0,0,0,0.2);
     border-radius: var(--radius-1);
     padding: 0.4rem 1rem;
     font-size: 1rem;
     font-weight: 600;
     width: fit-content;
     white-space: nowrap;
-    /* button text never wraps to second line */
     flex-shrink: 0;
-    /* button never gets squished */
 }
 
-.card * {
-    color: white;
-}
+.card * { color: white; }
 
-.card:nth-child(2) {
-    background: #e2b51c;
-    /* box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.12); */
-}
-
-.card:nth-child(3) {
-    background: #b0b9be;
-    /* box-shadow: 0 2rem 3rem var(--color-primary-light); */
-}
+.card:nth-child(2) { background: #e2b51c; }
+.card:nth-child(3) { background: #b0b9be; }
 
 .card:hover {
-    box-shadow: 0 1.5rem 2.5rem rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1.5rem 2.5rem rgba(0,0,0,0.15);
     transform: translateY(-2px);
 }
 
 
-
-
-
-
-
-
-
-
-
 /* ========================= FAST PAYMENT ========================= */
 .fastPayment {
-    margin-top: 2rem;
+    margin-top: 3rem;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 2rem;
+}
+
+@media screen and (min-width: 1024px) {
+    .fastPayment {
+        flex-direction: row;
+        margin-top: 2rem;
+        align-items: center;
+    }
 }
 
 .fastPayment_badges {
@@ -612,13 +620,6 @@ nav {
 }
 
 
-
-
-
-
-
-
-
 /* ========================= CHART ========================= */
 canvas {
     background: var(--color-white);
@@ -629,21 +630,16 @@ canvas {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-/* ========================= INVESTMENTS ========================= */
+/* ========================= RIGHT PANEL (investments etc.) ========================= */
 .right {
     margin-top: 6rem;
     margin-right: 2vw;
+}
+
+@media screen and (max-width: 1023px) {
+    .right {
+        margin-right: 1rem;
+    }
 }
 
 .investments {
@@ -681,17 +677,6 @@ canvas {
     background: var(--color-light);
     cursor: pointer;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* ========================= SUPPORT ========================= */
@@ -733,187 +718,14 @@ canvas {
 }
 
 
-
-
-
-
-
-
-
-
-
-/* ========================= MEDIA QUERIES (tablets) ========================= */
-@media screen and (max-width: 1024px) {
-    body {
-        grid-template-columns: 1fr;
-    }
-
-    .nav_search {
-        display: none;
-    }
-
-    .nav_menu-btn {
-        display: inline-flex;
-    }
-
-    main {
-        grid-template-columns: 1fr;
-        padding: 0 1rem;
-    }
-
-    .sidebar {
-        position: fixed;
-        top: 5rem;
-        bottom: 2rem;
-        left: -100%;
-        z-index: 3;
-        background: var(--color-white);
-        width: 17rem;
-        max-width: 75vw;
-        border-radius: 0 var(--radius-3) var(--radius-3) 0;
-        box-shadow: 2rem 0 4rem rgba(0, 0, 0, 0.18);
-        display: none;
-        overflow-y: auto;
-        overflow-x: hidden;
-        transition: left 300ms ease;
-        margin-top: 0.6rem;
-    }
-
-    @keyframes showSidebar {
-        to { left: 0; }
-    }
-
-    .sidebar_close-btn {
-        display: none !important;
-    }
-
-    .sidebar-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.35);
-        z-index: 2;
-    }
-
-    .sidebar-backdrop.open {
-        display: block;
-    }
-
-    .sidebar_logout-btn {
-        position: sticky;
-        bottom: 0;
-        margin-top: 0;
-        background: var(--color-white);
-        border-top: 1px solid var(--color-light);
-        z-index: 1;
-    }
-
-    .main_cards {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .right {
-        margin-right: 1rem;
-    }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
-    .nav_container {
-        padding: 0 1.4rem;
-        gap: 1rem;
-    }
-
-    .nav_logo {
-        width: 10rem;
-    }
-
-    .nav_profile-wrapper h5,
-    .nav_profile-wrapper span {
-        display: none;
-    }
-
-    .nav_profile-photo {
-        width: 2.8rem;
-        height: 2.8rem;
-    }
-
-    .main_cards {
-        grid-template-columns: 1fr;
-    }
-
-    .card {
-        height: 9rem;
-    }
-
-    .card-left {
-        gap: 1.8rem;
-    }
-
-    .fastPayment {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-top: 3rem;
-    }
-
-    /* Close button stays hidden on mobile — backdrop handles closing */
-    .sidebar_close-btn {
-        display: none !important;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* ================================================================
-   CHAT WIDGET — paste at the bottom of style.css
-   The floating button and panel that appears on all user pages.
+   CHAT WIDGET
    ================================================================ */
 
-
-/* ── FLOATING BUTTON ── */
 .chat-widget-btn {
     position: fixed;
-    bottom: 2.4rem;
-    right: 2.4rem;
+    bottom: 1.8rem;
+    right: 1.8rem;
     z-index: 999;
     width: 5.6rem;
     height: 5.6rem;
@@ -924,13 +736,20 @@ canvas {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0.8rem 2rem rgba(0, 226, 123, 0.4);
+    box-shadow: 0 0.8rem 2rem rgba(0,226,123,0.4);
     transition: var(--transition);
+}
+
+@media screen and (min-width: 1024px) {
+    .chat-widget-btn {
+        bottom: 2.4rem;
+        right: 2.4rem;
+    }
 }
 
 .chat-widget-btn:hover {
     transform: scale(1.08);
-    box-shadow: 0 1.2rem 3rem rgba(0, 226, 123, 0.5);
+    box-shadow: 0 1.2rem 3rem rgba(0,226,123,0.5);
 }
 
 .chat-widget-btn i {
@@ -938,7 +757,6 @@ canvas {
     color: var(--color-dark);
 }
 
-/* Unread badge on the button */
 .chat-unread-badge {
     position: absolute;
     top: -0.2rem;
@@ -961,29 +779,36 @@ canvas {
     display: flex;
 }
 
-
-/* ── CHAT PANEL ── */
+/* Chat panel — full-width on mobile */
 .chat-widget-panel {
     position: fixed;
-    bottom: 10rem;
-    right: 2.4rem;
+    bottom: 9rem;
+    right: 1rem;
+    left: 1rem;
     z-index: 998;
-    width: 36rem;
-    max-width: calc(100vw - 3rem);
+    width: auto;
     max-height: 52rem;
     background: var(--color-white);
     border-radius: var(--radius-3);
-    box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2rem 6rem rgba(0,0,0,0.18);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-
-    /* Hidden by default */
     opacity: 0;
     pointer-events: none;
     transform: translateY(1.5rem) scale(0.97);
     transition: opacity 250ms ease, transform 250ms ease;
     transform-origin: bottom right;
+}
+
+@media screen and (min-width: 600px) {
+    .chat-widget-panel {
+        right: 2.4rem;
+        left: auto;
+        bottom: 10rem;
+        width: 36rem;
+        max-width: calc(100vw - 3rem);
+    }
 }
 
 .chat-widget-panel.open {
@@ -992,8 +817,6 @@ canvas {
     transform: translateY(0) scale(1);
 }
 
-
-/* ── PANEL HEADER ── */
 .chat-panel-header {
     display: flex;
     align-items: center;
@@ -1013,7 +836,7 @@ canvas {
     width: 4rem;
     height: 4rem;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1033,7 +856,7 @@ canvas {
 
 .chat-panel-subtitle {
     font-size: 1rem;
-    color: rgba(0, 0, 0, 0.55);
+    color: rgba(0,0,0,0.55);
     margin-top: 0.1rem;
 }
 
@@ -1041,7 +864,7 @@ canvas {
     width: 3.2rem;
     height: 3.2rem;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.12);
+    background: rgba(0,0,0,0.12);
     border: none;
     display: flex;
     align-items: center;
@@ -1057,11 +880,9 @@ canvas {
 }
 
 .chat-panel-close:hover {
-    background: rgba(0, 0, 0, 0.22);
+    background: rgba(0,0,0,0.22);
 }
 
-
-/* ── MESSAGES AREA ── */
 .chat-panel-messages {
     flex: 1;
     overflow-y: auto;
@@ -1072,16 +893,12 @@ canvas {
     min-height: 22rem;
 }
 
-.chat-panel-messages::-webkit-scrollbar {
-    width: 4px;
-}
-
+.chat-panel-messages::-webkit-scrollbar { width: 4px; }
 .chat-panel-messages::-webkit-scrollbar-thumb {
     background: var(--color-light);
     border-radius: 99px;
 }
 
-/* Welcome state */
 .chat-panel-welcome {
     display: flex;
     flex-direction: column;
@@ -1110,7 +927,6 @@ canvas {
     max-width: 26rem;
 }
 
-/* Loading */
 .chat-panel-loading {
     display: flex;
     align-items: center;
@@ -1124,7 +940,6 @@ canvas {
     animation: spin 0.9s linear infinite;
 }
 
-/* Message bubbles */
 .widget-msg {
     display: flex;
     flex-direction: column;
@@ -1132,15 +947,8 @@ canvas {
     max-width: 80%;
 }
 
-.widget-msg.from-user {
-    align-self: flex-end;
-    align-items: flex-end;
-}
-
-.widget-msg.from-admin {
-    align-self: flex-start;
-    align-items: flex-start;
-}
+.widget-msg.from-user  { align-self: flex-end;  align-items: flex-end; }
+.widget-msg.from-admin { align-self: flex-start; align-items: flex-start; }
 
 .widget-bubble {
     padding: 1rem 1.3rem;
@@ -1168,8 +976,6 @@ canvas {
     padding: 0 0.4rem;
 }
 
-
-/* ── INPUT ROW ── */
 .chat-panel-input-row {
     display: flex;
     align-items: flex-end;
@@ -1223,33 +1029,11 @@ canvas {
     color: var(--color-dark);
 }
 
-.chat-panel-send:hover {
-    transform: scale(1.08);
-}
-
-.chat-panel-send:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
+.chat-panel-send:hover { transform: scale(1.08); }
+.chat-panel-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 
-/* ── MOBILE ── */
-@media screen and (max-width: 600px) {
-    .chat-widget-btn {
-        bottom: 1.8rem;
-        right: 1.8rem;
-    }
-
-    .chat-widget-panel {
-        right: 1rem;
-        left: 1rem;
-        width: auto;
-        bottom: 9rem;
-    }
-}
-
-/* ── Admin back button in user sidebar ── */
+/* ========================= ADMIN BACK BUTTON ========================= */
 .sidebar-admin-back {
     display: flex;
     align-items: center;
@@ -1270,6 +1054,4 @@ canvas {
     color: #fff;
 }
 
-.sidebar-admin-back i {
-    font-size: 1.3rem;
-}
+.sidebar-admin-back i { font-size: 1.3rem; }
