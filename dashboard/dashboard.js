@@ -1,7 +1,5 @@
 // ================================================================
 // DASHBOARD.JS  — SyncProfitPath
-// Tickers: BTC/ETH/BNB/SOL/LTC/DOGE/XRP (live, refresh 60s)
-// Chart:   Live price history, coin tabs + 1H/24H/7D/30D ranges
 // ================================================================
 
 
@@ -21,14 +19,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadActiveInvestments();
     checkKycAlert();
 
-    // Build tickers first (injects DOM elements), then fetch prices
+    // Tickers: build DOM first, then fetch (single batch call)
     buildTickerRows();
     loadCryptoPrices();
     setInterval(loadCryptoPrices, 60000);
 
-    // Chart (independent — doesn't block tickers)
+    // Chart: inject controls then load initial view
     injectChartControls();
-    loadChartData('btc', '30');
+    scheduleChartLoad('btc', '30');
 });
 
 
@@ -61,7 +59,6 @@ async function loadUserBalances() {
 
         setBalances(data.balance || 0, data.pending || 0, data.profit || 0);
     } catch (err) {
-        console.error('Balance fetch error:', err.message);
         setBalances(
             parseFloat(localStorage.getItem('userBalance')) || 0,
             parseFloat(localStorage.getItem('userPending')) || 0,
@@ -83,9 +80,9 @@ function setBalances(balance, pending, profit) {
 
 // ── RECENT TRANSACTIONS ─────────────────────────────────────────
 async function loadRecentTransactions() {
-    const loadingEl = document.getElementById('recentLoading');
-    const emptyEl   = document.getElementById('recentEmpty');
-    const listEl    = document.getElementById('recentList');
+    const loadingEl   = document.getElementById('recentLoading');
+    const emptyEl     = document.getElementById('recentEmpty');
+    const listEl      = document.getElementById('recentList');
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
     if (!currentUser.id) {
@@ -110,7 +107,6 @@ async function loadRecentTransactions() {
         listEl.style.display = 'block';
         listEl.innerHTML = data.map(buildRecentRow).join('');
     } catch (err) {
-        console.error('Recent tx error:', err.message);
         loadingEl.style.display = 'none';
         emptyEl.style.display   = 'flex';
     }
@@ -122,9 +118,9 @@ function buildRecentRow(t) {
         withdrawal: { icon: 'uil-arrow-circle-up',   bg: 'bg-danger-light',  color: 'danger'  },
         investment: { icon: 'uil-diamond',            bg: 'bg-purple-light', color: 'purple'  },
     };
-    const config = icons[t.type] || { icon: 'uil-exchange', bg: 'bg-primary-light', color: 'primary' };
-    const label  = t.type ? (t.type.charAt(0).toUpperCase() + t.type.slice(1)) : 'Transaction';
-    const date   = new Date(t.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const config       = icons[t.type] || { icon: 'uil-exchange', bg: 'bg-primary-light', color: 'primary' };
+    const label        = t.type ? (t.type.charAt(0).toUpperCase() + t.type.slice(1)) : 'Transaction';
+    const date         = new Date(t.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
     const amountClass  = t.type === 'deposit' ? 'success' : t.type === 'withdrawal' ? 'danger' : 'purple';
     const amountPrefix = t.type === 'deposit' ? '+' : t.type === 'withdrawal' ? '-' : '';
     const amount       = parseFloat(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
@@ -161,6 +157,7 @@ function checkKycAlert() {
 
 // ================================================================
 // CRYPTO PRICE TICKERS
+// Single batch call for all 7 coins → no rate limit issues
 // ================================================================
 
 const TICKER_COINS = [
@@ -173,7 +170,7 @@ const TICKER_COINS = [
     { key: 'xrp',  id: 'ripple',      symbol: '✕', bg: '#00aae422', color: '#00aae4', name: 'XRP',      ticker: 'XRP'  },
 ];
 
-// Build ticker DOM rows BEFORE fetching prices
+// Build ticker DOM first, then fill prices in
 function buildTickerRows() {
     const container = document.querySelector('.market-tickers');
     if (!container) return;
@@ -195,11 +192,9 @@ function buildTickerRows() {
 async function loadCryptoPrices() {
     try {
         const ids = TICKER_COINS.map(c => c.id).join(',');
-        const res  = await fetch(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`,
-            { cache: 'no-store' }
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
         );
-
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
@@ -207,10 +202,9 @@ async function loadCryptoPrices() {
             const entry = data[coin.id];
             if (entry) setCryptoTicker(coin.key, entry.usd, entry.usd_24h_change);
         });
-
     } catch (err) {
-        console.warn('Ticker fetch failed, retrying in 15s:', err.message);
-        setTimeout(loadCryptoPrices, 15000);
+        // Silently retry on next interval
+        console.warn('Ticker error:', err.message);
     }
 }
 
@@ -219,7 +213,7 @@ function setCryptoTicker(key, price, change) {
     const changeEl = document.getElementById(key + 'Change');
     if (!priceEl || !changeEl) return;
 
-    priceEl.textContent  = '$' + price.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    priceEl.textContent = '$' + price.toLocaleString('en-US', { maximumFractionDigits: 2 });
     const pos = change >= 0;
     changeEl.textContent = (pos ? '+' : '') + change.toFixed(2) + '%';
     changeEl.className   = pos ? 'success' : 'danger';
@@ -227,7 +221,17 @@ function setCryptoTicker(key, price, change) {
 
 
 // ================================================================
-// CHART — live price history with coin + time range tabs
+// CHART — with request queue, abort control, and smart retry
+//
+// Root cause of failures: CoinGecko free tier = ~30 req/min.
+// Rapid coin switching fires many requests simultaneously → 429.
+//
+// Solution:
+//  • Only ONE chart request in-flight at a time (queue)
+//  • Abort the previous request when user switches coin
+//  • 10-minute cache per coin+range — switching back is instant
+//  • On 429: show countdown + auto-retry after 10 seconds
+//  • Show stale cached data immediately while refreshing
 // ================================================================
 
 const CHART_COLORS = {
@@ -240,21 +244,25 @@ const CHART_COLORS = {
     xrp:  { border: '#00aae4', fill: 'rgba(0,170,228,0.08)'   },
 };
 
-// Time range config: label, CoinGecko days param, interval hint
 const TIME_RANGES = [
-    { key: '1',   label: '1H',  days: '1',   interval: 'minutely' },
-    { key: '24h', label: '24H', days: '1',   interval: 'hourly'   },
-    { key: '7',   label: '7D',  days: '7',   interval: 'daily'    },
-    { key: '30',  label: '30D', days: '30',  interval: 'daily'    },
+    { key: '1h',  label: '1H',  days: '1',  minutely: true  },
+    { key: '24h', label: '24H', days: '1',  minutely: false },
+    { key: '7d',  label: '7D',  days: '7',  minutely: false },
+    { key: '30d', label: '30D', days: '30', minutely: false },
 ];
 
 let chartInstance    = null;
 let activeChartCoin  = 'btc';
-let activeChartRange = '30';
+let activeChartRange = '30d';
 
-// In-memory cache: key = "coinKey_rangeKey" → { ts, labels, prices }
-const chartCache = {};
-const CACHE_TTL  = 5 * 60 * 1000; // 5 minutes
+// Cache: "btc_30d" → { ts, labels, prices }
+const chartCache  = {};
+const CACHE_TTL   = 10 * 60 * 1000; // 10 minutes
+
+// Request control
+let currentAbortCtrl = null;   // AbortController for in-flight fetch
+let chartDebounceTimer = null; // debounce rapid tab taps
+let retryTimer = null;         // auto-retry countdown timer
 
 function injectChartControls() {
     const section = document.querySelector('.dash-chart-section');
@@ -271,7 +279,7 @@ function injectChartControls() {
     `).join('');
 
     const rangeTabs = TIME_RANGES.map(r => `
-        <button class="chart-range-tab${r.key === '30' ? ' active' : ''}"
+        <button class="chart-range-tab${r.key === '30d' ? ' active' : ''}"
             data-range="${r.key}"
             onclick="switchChartRange('${r.key}')"
         >${r.label}</button>
@@ -282,88 +290,107 @@ function injectChartControls() {
             <div class="chart-tabs" id="chartTabs">${coinTabs}</div>
             <div class="chart-range-tabs" id="chartRangeTabs">${rangeTabs}</div>
         </div>
-        <div class="chart-loading" id="chartLoading">
-            <span class="chart-loading-dot"></span>
-            <span>Loading chart…</span>
-        </div>
+        <div class="chart-status" id="chartStatus"></div>
     `);
 }
 
-async function loadChartData(coinKey, rangeKey) {
-    const cacheKey  = `${coinKey}_${rangeKey}`;
-    const now       = Date.now();
-    const cached    = chartCache[cacheKey];
+// Entry point — debounced so rapid taps only fire once
+function scheduleChartLoad(coinKey, rangeKey) {
+    clearTimeout(chartDebounceTimer);
+    chartDebounceTimer = setTimeout(() => loadChartData(coinKey, rangeKey), 250);
+}
 
-    // Use cache if fresh
+async function loadChartData(coinKey, rangeKey) {
+    clearTimeout(retryTimer);
+
+    const cacheKey = `${coinKey}_${rangeKey}`;
+    const cached   = chartCache[cacheKey];
+    const now      = Date.now();
+
+    // Fresh cache → render immediately, no fetch needed
     if (cached && (now - cached.ts) < CACHE_TTL) {
         renderChart(coinKey, cached.labels, cached.prices, rangeKey);
+        setChartStatus('');
         return;
     }
 
-    const loadingEl = document.getElementById('chartLoading');
-    const canvas    = document.getElementById('chart');
-    if (!canvas) return;
+    // Stale cache → show it instantly while we refresh in background
+    if (cached) {
+        renderChart(coinKey, cached.labels, cached.prices, rangeKey);
+        setChartStatus('Refreshing…', 'muted');
+    } else {
+        setChartStatus('Loading chart…', 'loading');
+        dimCanvas(true);
+    }
 
-    if (loadingEl) loadingEl.style.display = 'flex';
-    if (canvas)    canvas.style.opacity    = '0.25';
+    // Abort any previous in-flight request
+    if (currentAbortCtrl) currentAbortCtrl.abort();
+    currentAbortCtrl = new AbortController();
+    const signal = currentAbortCtrl.signal;
 
     const range   = TIME_RANGES.find(r => r.key === rangeKey) || TIME_RANGES[3];
     const geckoId = TICKER_COINS.find(c => c.key === coinKey)?.id || 'bitcoin';
-
-    // 1H = last 2 hours at minutely to get ~60 points; others use days param
-    const url = rangeKey === '1'
-        ? `https://api.coingecko.com/api/v3/coins/${geckoId}/market_chart?vs_currency=usd&days=0.1`
-        : `https://api.coingecko.com/api/v3/coins/${geckoId}/market_chart?vs_currency=usd&days=${range.days}`;
+    const url     = `https://api.coingecko.com/api/v3/coins/${geckoId}/market_chart?vs_currency=usd&days=${range.days}`;
 
     try {
-        const res  = await fetchWithRetry(url, 2);
+        const res = await fetch(url, { signal });
+
+        if (signal.aborted) return; // user already switched coin — discard
+
+        // Rate limited → auto-retry with countdown
+        if (res.status === 429) {
+            setChartStatus('Rate limited — retrying in 10s…', 'warn');
+            dimCanvas(false);
+            let secs = 10;
+            retryTimer = setInterval(() => {
+                secs--;
+                if (secs <= 0) {
+                    clearInterval(retryTimer);
+                    loadChartData(activeChartCoin, activeChartRange);
+                } else {
+                    setChartStatus(`Rate limited — retrying in ${secs}s…`, 'warn');
+                }
+            }, 1000);
+            return;
+        }
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const data = await res.json();
+        if (!data.prices?.length) throw new Error('No price data');
 
-        if (!data.prices?.length) throw new Error('Empty response');
-
-        // For 1H: keep last 60 points; for 24H: keep last 24 hourly points
         let raw = data.prices;
-        if (rangeKey === '1')   raw = raw.slice(-60);
-        if (rangeKey === '24h') raw = raw.slice(-24);
+
+        // Slice to appropriate resolution
+        if (rangeKey === '1h')  raw = raw.slice(-60);   // ~1 point/min
+        if (rangeKey === '24h') raw = raw.slice(-24);   // hourly points
 
         const labels = raw.map(p => {
             const d = new Date(p[0]);
-            if (rangeKey === '1')   return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            if (rangeKey === '24h') return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return (rangeKey === '1h' || rangeKey === '24h')
+                ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         });
         const prices = raw.map(p => p[1]);
 
-        // Store in cache
         chartCache[cacheKey] = { ts: now, labels, prices };
 
         renderChart(coinKey, labels, prices, rangeKey);
+        setChartStatus('');
 
     } catch (err) {
-        console.error('Chart error:', err.message);
-        showChartError();
-    } finally {
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (canvas)    canvas.style.opacity    = '1';
-    }
-}
+        if (err.name === 'AbortError') return; // expected — user switched coin
 
-// Retry helper — waits 1.2s between attempts (CoinGecko rate limit)
-async function fetchWithRetry(url, attempts) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            const res = await fetch(url, { cache: 'no-store' });
-            if (res.status === 429) {
-                // Rate limited — wait longer before retry
-                await new Promise(r => setTimeout(r, 2000 * (i + 1)));
-                continue;
-            }
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res;
-        } catch (err) {
-            if (i === attempts - 1) throw err;
-            await new Promise(r => setTimeout(r, 1200));
+        console.error('Chart fetch failed:', err.message);
+
+        // If we had stale data, keep showing it
+        if (!cached) {
+            setChartStatus('Failed to load. Tap any coin tab to retry.', 'error');
+        } else {
+            setChartStatus('Using cached data.', 'muted');
         }
+    } finally {
+        dimCanvas(false);
     }
 }
 
@@ -375,16 +402,14 @@ function renderChart(coinKey, labels, prices, rangeKey) {
     const colors = CHART_COLORS[coinKey];
     const coin   = TICKER_COINS.find(c => c.key === coinKey);
     const range  = TIME_RANGES.find(r => r.key === rangeKey);
-    const label  = `${coin?.name || coinKey.toUpperCase()} (${range?.label || ''})`;
+    const label  = `${coin?.name || coinKey.toUpperCase()} · ${range?.label || ''}`;
 
     if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
     const isDark    = document.documentElement.classList.contains('dark-theme');
     const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
     const tickColor = isDark ? '#adacb5' : '#86848c';
-
-    // Fewer tick labels for 1H/24H (many data points)
-    const maxTicks = (rangeKey === '1' || rangeKey === '24h') ? 6 : 8;
+    const maxTicks  = (rangeKey === '1h' || rangeKey === '24h') ? 6 : 8;
 
     chartInstance = new Chart(ctx, {
         type: 'line',
@@ -398,7 +423,7 @@ function renderChart(coinKey, labels, prices, rangeKey) {
                 borderWidth:          2,
                 tension:              0.35,
                 fill:                 true,
-                pointRadius:          rangeKey === '1' ? 0 : 1.5,
+                pointRadius:          rangeKey === '1h' ? 0 : 1.5,
                 pointHoverRadius:     5,
                 pointBackgroundColor: colors.border,
             }]
@@ -406,7 +431,7 @@ function renderChart(coinKey, labels, prices, rangeKey) {
         options: {
             responsive:          true,
             maintainAspectRatio: true,
-            animation:           { duration: 300 },
+            animation:           { duration: 250 },
             interaction:         { mode: 'index', intersect: false },
             plugins: {
                 legend: {
@@ -415,8 +440,6 @@ function renderChart(coinKey, labels, prices, rangeKey) {
                     labels:   { usePointStyle: true, padding: 16, color: tickColor, font: { size: 12 } }
                 },
                 tooltip: {
-                    mode:      'index',
-                    intersect: false,
                     callbacks: {
                         label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', {
                             minimumFractionDigits: 2, maximumFractionDigits: 2
@@ -442,26 +465,13 @@ function renderChart(coinKey, labels, prices, rangeKey) {
     });
 }
 
-function showChartError() {
-    const canvas = document.getElementById('chart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#999';
-    ctx.font = '14px Poppins, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Unable to load chart data. Tap a coin tab to retry.', canvas.width / 2, canvas.height / 2);
-}
-
 function switchChartCoin(coinKey) {
     if (coinKey === activeChartCoin) return;
     activeChartCoin = coinKey;
     document.querySelectorAll('.chart-coin-tab').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.coin === coinKey);
     });
-    loadChartData(coinKey, activeChartRange);
+    scheduleChartLoad(coinKey, activeChartRange);
 }
 
 function switchChartRange(rangeKey) {
@@ -470,10 +480,24 @@ function switchChartRange(rangeKey) {
     document.querySelectorAll('.chart-range-tab').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.range === rangeKey);
     });
-    loadChartData(activeChartCoin, rangeKey);
+    scheduleChartLoad(activeChartCoin, rangeKey);
 }
 
-// Re-render on theme toggle
+// Status bar helpers
+function setChartStatus(msg, type = '') {
+    const el = document.getElementById('chartStatus');
+    if (!el) return;
+    el.textContent  = msg;
+    el.className    = 'chart-status' + (type ? ' chart-status--' + type : '');
+    el.style.display = msg ? 'flex' : 'none';
+}
+
+function dimCanvas(on) {
+    const canvas = document.getElementById('chart');
+    if (canvas) canvas.style.opacity = on ? '0.3' : '1';
+}
+
+// Re-render on theme toggle (grid/tick colours need updating)
 document.addEventListener('themechange', () => {
     const cached = chartCache[`${activeChartCoin}_${activeChartRange}`];
     if (cached) renderChart(activeChartCoin, cached.labels, cached.prices, activeChartRange);
@@ -563,9 +587,9 @@ function buildActiveInvCard(inv) {
         bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)',
         label: coinKey.toUpperCase()
     };
-    const isMatured   = daysLeft === 0;
-    const startFmt    = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-    const endFmt      = new Date(inv.end_date).toLocaleDateString('en-US',   { day: '2-digit', month: 'short', year: 'numeric' });
+    const isMatured = daysLeft === 0;
+    const startFmt  = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const endFmt    = new Date(inv.end_date).toLocaleDateString('en-US',   { day: '2-digit', month: 'short', year: 'numeric' });
 
     return `
     <div class="active-inv-card">
@@ -595,7 +619,8 @@ function buildActiveInvCard(inv) {
             <div class="active-inv-progress-wrap">
                 <div class="active-inv-progress-track">
                     <div class="active-inv-progress-fill"
-                         style="width:${progressPct}%;background:${isMatured ? 'var(--color-gray-light)' : 'var(--color-primary)'};"></div>
+                         style="width:${progressPct}%;background:${isMatured ? 'var(--color-gray-light)' : 'var(--color-primary)'};">
+                    </div>
                 </div>
                 <span class="active-inv-days-label">${daysElapsed} of ${duration} days</span>
             </div>

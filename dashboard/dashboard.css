@@ -821,7 +821,7 @@ body {
 
 
 /* ================================================================
-   CHART CONTROLS — coin tabs + time range tabs
+   CHART CONTROLS
    ================================================================ */
 
 .chart-controls {
@@ -830,20 +830,20 @@ body {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.8rem;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 /* Coin tabs */
 .chart-tabs {
     display: flex;
-    gap: 0.4rem;
+    gap: 0.35rem;
     flex-wrap: wrap;
 }
 
 .chart-coin-tab {
-    padding: 0.35rem 0.9rem;
+    padding: 0.3rem 0.85rem;
     border-radius: var(--radius-2);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     font-family: "Poppins", sans-serif;
     cursor: pointer;
@@ -864,17 +864,18 @@ body {
     background: color-mix(in srgb, var(--tab-color, var(--color-primary)) 10%, transparent);
 }
 
-/* Time range tabs */
+/* Time range pill group */
 .chart-range-tabs {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.2rem;
     background: var(--color-light);
     border-radius: var(--radius-2);
-    padding: 0.25rem;
+    padding: 0.2rem;
+    flex-shrink: 0;
 }
 
 .chart-range-tab {
-    padding: 0.3rem 0.8rem;
+    padding: 0.28rem 0.75rem;
     border-radius: calc(var(--radius-2) - 2px);
     font-size: 1rem;
     font-weight: 600;
@@ -896,35 +897,69 @@ body {
     box-shadow: var(--box-shadow);
 }
 
-/* Loading bar */
-.chart-loading {
+/* Status bar (loading / rate-limit / error) */
+.chart-status {
     display: none;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 1.1rem;
-    color: var(--color-gray-light);
-    margin-bottom: 0.6rem;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-2);
 }
 
-.chart-loading-dot {
-    width: 0.65rem;
-    height: 0.65rem;
+.chart-status--loading {
+    color: var(--color-gray-light);
+    background: transparent;
+}
+
+.chart-status--loading::before {
+    content: '';
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
     border-radius: 50%;
     background: var(--color-primary);
     animation: pulse 1s infinite;
+    flex-shrink: 0;
 }
 
+.chart-status--warn {
+    color: #b45309;
+    background: rgba(251, 191, 36, 0.12);
+}
+
+.chart-status--warn::before {
+    content: '⚠';
+    margin-right: 0.1rem;
+}
+
+.chart-status--error {
+    color: var(--color-danger);
+    background: rgba(220, 53, 69, 0.08);
+}
+
+.chart-status--muted {
+    color: var(--color-gray-light);
+}
+
+/* Canvas fade */
 #chart {
     transition: opacity 0.2s ease;
 }
 
-/* Ticker skeleton shimmer while prices load */
+/* Ticker skeleton shimmer */
 .ticker-skeleton {
     display: inline-block;
     width: 5.5rem;
-    height: 1.2rem;
+    height: 1.1rem;
     border-radius: 4px;
-    background: linear-gradient(90deg, var(--color-light) 25%, var(--color-white) 50%, var(--color-light) 75%);
+    background: linear-gradient(
+        90deg,
+        var(--color-light) 25%,
+        var(--color-white) 50%,
+        var(--color-light) 75%
+    );
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite;
     vertical-align: middle;
