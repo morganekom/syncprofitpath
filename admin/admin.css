@@ -1404,6 +1404,12 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.um-card-badge {
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 .um-checkbox-wrap {
@@ -1510,6 +1516,13 @@ body {
 
 .um-card-meta i { margin-right: 0.3rem; }
 
+/* Card actions row: view + quick email */
+.um-card-actions {
+    display: flex;
+    gap: 0.8rem;
+    align-items: stretch;
+}
+
 /* View button */
 .um-view-btn {
     display: flex;
@@ -1526,10 +1539,28 @@ body {
     font-family: "Poppins", sans-serif;
     cursor: pointer;
     transition: var(--transition);
-    width: 100%;
+    flex: 1;
 }
 
 .um-view-btn:hover { background: var(--color-primary); color: var(--color-dark); }
+
+/* Quick email button (per-card) */
+.um-email-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    background: var(--color-light);
+    color: var(--color-gray-dark);
+    border: none;
+    border-radius: var(--radius-1);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.um-email-btn:hover { background: var(--color-primary); color: var(--color-dark); }
 
 /* ── Modal inner sections ── */
 .um-modal-section {
