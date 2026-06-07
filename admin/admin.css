@@ -691,15 +691,16 @@ body {
 
     .admin-grid { grid-template-columns: 1fr; }
 
-    .admin-main { margin-right: 2.9vw; }
+    .admin-main { margin-right: 1.4rem; margin-left: 1.4rem; }
 }
 
 
 /* ========================= MEDIA QUERIES (mobile) ========================= */
 @media screen and (max-width: 600px) {
     .admin-main {
-        margin-top: 6rem;
-        margin-left: 2.9vw;
+        margin-top: 6.5rem;
+        margin-left: 1.4rem;
+        margin-right: 1.4rem;
         gap: 1.4rem;
     }
 
@@ -1419,11 +1420,12 @@ body {
 }
 
 .um-checkbox {
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.8rem;
+    height: 1.8rem;
     cursor: pointer;
     accent-color: var(--color-primary);
     flex-shrink: 0;
+    border-radius: 4px;
 }
 
 .um-avatar {
