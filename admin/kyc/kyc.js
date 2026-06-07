@@ -30,12 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadKyc() {
     const loadingEl  = document.getElementById('kycLoading');
     const emptyEl    = document.getElementById('kycEmpty');
-    const tableEl    = document.getElementById('kycTable');
     const refreshBtn = document.getElementById('refreshBtn');
 
     loadingEl.style.display = 'flex';
     emptyEl.style.display   = 'none';
-    tableEl.style.display   = 'none';
 
     if (refreshBtn) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
 
