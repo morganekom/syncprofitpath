@@ -90,7 +90,7 @@ function renderUsers() {
                     <div class="um-card-name">${escapeHtml(u.full_name || '—')}</div>
                     <div class="um-card-email">${escapeHtml(u.email || '—')}</div>
                 </div>
-                <span class="badge ${kyc}">${capitalise(kyc)}</span>
+                <span class="badge ${kyc} um-card-badge">${capitalise(kyc)}</span>
             </div>
 
             <div class="um-card-stats">
@@ -113,9 +113,14 @@ function renderUsers() {
                 <span><i class="uil uil-calendar-alt"></i> ${formatDate(u.created_at)}</span>
             </div>
 
-            <button class="um-view-btn" onclick="openUserModal('${u.id}')">
-                <i class="uil uil-eye"></i> View Details
-            </button>
+            <div class="um-card-actions">
+                <button class="um-view-btn" onclick="openUserModal('${u.id}')">
+                    <i class="uil uil-eye"></i> View Details
+                </button>
+                <button class="um-email-btn" onclick="quickEmailUser('${u.id}')" title="Send email to this user">
+                    <i class="uil uil-envelope-alt"></i>
+                </button>
+            </div>
         </div>`;
     }).join('');
 }
@@ -159,6 +164,17 @@ function syncToolbar() {
     const count   = selectedUserIds.size;
     label.textContent = `${count} user${count !== 1 ? 's' : ''} selected`;
     toolbar.classList.toggle('um-toolbar--visible', count > 0);
+}
+
+
+// ========================= QUICK EMAIL (single user) =========================
+function quickEmailUser(userId) {
+    // Select just this one user, then open compose modal
+    selectedUserIds.clear();
+    selectedUserIds.add(userId);
+    renderUsers();
+    syncToolbar();
+    openComposeModal();
 }
 
 
