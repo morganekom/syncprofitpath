@@ -7,9 +7,8 @@
         (function () {
             const theme = localStorage.getItem('currrentTheme');
             if (theme) document.documentElement.classList.add(theme);
-        })();
-    </script>
-        <meta charset="UTF-8">
+        })();</script>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
     <link rel="icon" type="image/png" href="../../assets/favicon.png">
@@ -94,12 +93,11 @@
 
         <header class="admin-header">
             <div>
-                <h1>User Management</h1>
-                <p class="admin-subtitle">Manage all registered users</p>
+                <h1>Users</h1>
+                <p class="admin-subtitle">Total: <strong id="userCountLabel">—</strong></p>
             </div>
             <div class="admin-header-actions">
-                <span class="admin-count-label">Total: <strong id="userCountLabel">—</strong></span>
-                <button class="select-all-btn" onclick="toggleSelectAll()">
+                <button class="um-select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">
                     <i class="uil uil-check-square"></i> Select All
                 </button>
             </div>
@@ -107,20 +105,21 @@
 
         <!-- Filter tabs -->
         <div class="admin-filter-tabs">
-            <button class="admin-filter-tab active" data-filter="all" onclick="setFilter('all', this)">All Users</button>
+            <button class="admin-filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
             <button class="admin-filter-tab" data-filter="verified" onclick="setFilter('verified', this)">Verified</button>
             <button class="admin-filter-tab" data-filter="unsubmitted" onclick="setFilter('unsubmitted', this)">Unverified</button>
             <button class="admin-filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
         </div>
 
-        <!-- Email broadcast toolbar (shown when users are selected) -->
-        <div class="email-toolbar" id="emailToolbar">
-            <div class="email-toolbar-left">
-                <span class="email-selected-count" id="selectedCountLabel">0 selected</span>
-                <button class="email-toolbar-clear" onclick="clearSelection()">Clear selection</button>
+        <!-- Email broadcast toolbar -->
+        <div class="um-email-toolbar" id="emailToolbar">
+            <div class="um-toolbar-left">
+                <i class="uil uil-envelope-alt"></i>
+                <span id="selectedCountLabel">0 selected</span>
+                <button class="um-clear-btn" onclick="clearSelection()">Clear</button>
             </div>
-            <button class="email-compose-btn" onclick="openComposeModal()">
-                <i class="uil uil-envelope-alt"></i> Compose Email
+            <button class="um-compose-btn" onclick="openComposeModal()">
+                Compose Email
             </button>
         </div>
 
@@ -138,26 +137,8 @@
             <p>No users found.</p>
         </div>
 
-        <!-- Table -->
-        <div class="admin-table-wrapper" id="usersTableWrapper" style="display:none;">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th class="col-check">
-                            <input type="checkbox" class="user-checkbox" id="selectAllCheckbox" onchange="handleSelectAllCheckbox(this)">
-                        </th>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Country</th>
-                        <th>Balance</th>
-                        <th>KYC</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody"></tbody>
-            </table>
-        </div>
+        <!-- User cards grid -->
+        <div class="um-grid" id="usersGrid" style="display:none;"></div>
 
     </main>
 
@@ -172,86 +153,84 @@
                 </button>
             </div>
 
-            <div class="admin-modal-body" id="userModalBody">
-                <!-- Populated by JS -->
-            </div>
+            <div id="userModalBody"></div>
 
-            <!-- Edit balance section -->
-            <div class="admin-modal-section">
+            <!-- Edit balance -->
+            <div class="um-modal-section">
                 <h4>Adjust Balance</h4>
-                <div class="admin-balance-row">
-                    <div class="admin-balance-field">
+                <div class="um-balance-row">
+                    <div class="um-balance-field">
                         <label>Balance ($)</label>
-                        <input type="number" id="editBalance" class="admin-input" placeholder="0.00" min="0">
+                        <input type="number" id="editBalance" class="um-input" placeholder="0.00" min="0">
                     </div>
-                    <div class="admin-balance-field">
+                    <div class="um-balance-field">
                         <label>Profit ($)</label>
-                        <input type="number" id="editProfit" class="admin-input" placeholder="0.00" min="0">
+                        <input type="number" id="editProfit" class="um-input" placeholder="0.00" min="0">
                     </div>
-                    <div class="admin-balance-field">
+                    <div class="um-balance-field">
                         <label>Pending ($)</label>
-                        <input type="number" id="editPending" class="admin-input" placeholder="0.00" min="0">
+                        <input type="number" id="editPending" class="um-input" placeholder="0.00" min="0">
                     </div>
                 </div>
-                <p class="admin-modal-error" id="balanceError"></p>
-                <p class="admin-modal-success" id="balanceSuccess"></p>
-                <button class="admin-btn-primary" onclick="saveBalance()">Save Balance</button>
+                <p class="um-error" id="balanceError"></p>
+                <p class="um-success" id="balanceSuccess"></p>
+                <button class="um-btn-primary" onclick="saveBalance()">Save Balance</button>
             </div>
 
             <!-- KYC action -->
-            <div class="admin-modal-section" id="kycActionSection">
+            <div class="um-modal-section" id="kycActionSection">
                 <h4>KYC Action</h4>
-                <p class="admin-modal-note" id="kycCurrentStatus"></p>
-                <div class="admin-action-btns">
-                    <button class="admin-approve-btn" onclick="modalApproveKyc()">
-                        <i class="uil uil-shield-check"></i> Verify KYC
+                <p class="um-note" id="kycCurrentStatus"></p>
+                <div class="um-action-btns">
+                    <button class="action-btn approve" onclick="modalApproveKyc()">
+                        <i class="uil uil-shield-check"></i> Verify
                     </button>
-                    <button class="admin-reject-btn" onclick="modalRejectKyc()">
-                        <i class="uil uil-shield-slash"></i> Reject KYC
+                    <button class="action-btn reject" onclick="modalRejectKyc()">
+                        <i class="uil uil-shield-slash"></i> Reject
                     </button>
                 </div>
-                <p class="admin-modal-success" id="kycActionSuccess"></p>
+                <p class="um-success" id="kycActionSuccess"></p>
             </div>
 
-            <div class="admin-modal-footer">
-                <button class="admin-btn-outline" onclick="closeUserModal()">Close</button>
+            <div class="um-modal-footer">
+                <button class="um-btn-outline" onclick="closeUserModal()">Close</button>
             </div>
 
         </div>
     </div>
 
     <!-- ==================== COMPOSE EMAIL MODAL ==================== -->
-    <div class="email-modal-overlay" id="emailModalOverlay" onclick="handleEmailOverlayClick(event)">
-        <div class="email-modal">
+    <div class="admin-modal-overlay" id="emailModalOverlay" onclick="handleEmailOverlayClick(event)">
+        <div class="admin-modal">
 
-            <div class="email-modal-header">
+            <div class="admin-modal-header">
                 <h3><i class="uil uil-envelope-alt"></i> Send Email</h3>
                 <button class="modal-close-btn" onclick="closeComposeModal()">
                     <i class="uil uil-multiply"></i>
                 </button>
             </div>
 
-            <div class="email-field">
-                <label>Recipients (<span id="recipientCount">0</span>)</label>
-                <div class="email-recipients-box" id="recipientList">—</div>
+            <div class="um-modal-section">
+                <label class="um-label">Recipients (<span id="recipientCount">0</span>)</label>
+                <div class="um-recipients-box" id="recipientList">—</div>
             </div>
 
-            <div class="email-field">
-                <label for="emailSubject">Subject</label>
-                <input type="text" id="emailSubject" placeholder="e.g. Important update from SyncProfitPath" maxlength="150">
+            <div class="um-modal-section">
+                <label class="um-label" for="emailSubject">Subject</label>
+                <input type="text" id="emailSubject" class="um-input" placeholder="e.g. Important update from SyncProfitPath" maxlength="150">
             </div>
 
-            <div class="email-field">
-                <label for="emailBody">Message</label>
-                <textarea id="emailBody" placeholder="Write your message here…" maxlength="3000" oninput="updateCharCount()"></textarea>
-                <div class="email-char-count"><span id="charCount">0</span> / 3000</div>
+            <div class="um-modal-section">
+                <label class="um-label" for="emailBody">Message</label>
+                <textarea id="emailBody" class="um-textarea" placeholder="Write your message here…" maxlength="3000" oninput="updateCharCount()"></textarea>
+                <div class="um-char-count"><span id="charCount">0</span> / 3000</div>
             </div>
 
-            <div class="email-feedback" id="emailFeedback"></div>
+            <p class="um-feedback" id="emailFeedback"></p>
 
-            <div class="email-modal-footer">
-                <button class="email-cancel-btn" onclick="closeComposeModal()">Cancel</button>
-                <button class="email-send-btn" id="emailSendBtn" onclick="sendBroadcastEmails()">
+            <div class="um-modal-footer">
+                <button class="um-btn-outline" onclick="closeComposeModal()">Cancel</button>
+                <button class="um-btn-primary" id="emailSendBtn" onclick="sendBroadcastEmails()">
                     <i class="uil uil-message"></i> Send
                 </button>
             </div>
