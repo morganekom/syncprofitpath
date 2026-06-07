@@ -64,8 +64,11 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelector('[data-tab="withdrawal"]').click();
     }
     loadAllSavedData();
-    loadNavPhoto();   // populate nav avatar for current user (admin or regular)
+    loadNavPhoto();
     updateKycStatus();
+    initAppearanceTab();
+    // Capture original values after data loads (slight delay for async profile load)
+    setTimeout(captureOriginalProfile, 600);
 });
 
 
@@ -270,52 +273,218 @@ async function saveProfile() {
     document.getElementById('navName').textContent             = fullName;
 
     successEl.textContent = '✓ Profile updated successfully.';
+    captureOriginalProfile();   // reset dirty baseline so button disables
+    checkProfileDirty();
     setTimeout(() => successEl.textContent = '', 3000);
 }
 
 
 // ================================================================
-// PROFILE PHOTO PREVIEW
+// DIRTY TRACKING — Save Changes button only active when form changed
 // ================================================================
+
+let _originalProfile = {};
+
+function captureOriginalProfile() {
+    _originalProfile = {
+        firstName: document.getElementById('firstName').value,
+        lastName:  document.getElementById('lastName').value,
+        email:     document.getElementById('profileEmail').value,
+        phone:     document.getElementById('profilePhone').value,
+        country:   document.getElementById('profileCountry').value,
+    };
+}
+
+function checkProfileDirty() {
+    const btn = document.getElementById('saveProfileBtn');
+    const isDirty =
+        document.getElementById('firstName').value      !== _originalProfile.firstName ||
+        document.getElementById('lastName').value       !== _originalProfile.lastName  ||
+        document.getElementById('profileEmail').value   !== _originalProfile.email     ||
+        document.getElementById('profilePhone').value   !== _originalProfile.phone     ||
+        document.getElementById('profileCountry').value !== _originalProfile.country;
+    btn.disabled = !isDirty;
+}
+
+['firstName','lastName','profileEmail','profilePhone','profileCountry'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', checkProfileDirty);
+});
+
+
+// ================================================================
+// PROFILE PHOTO — drag-to-position crop modal
+// ================================================================
+
+let _cropObjectUrl = null;
 
 document.getElementById('profilePhotoInput').addEventListener('change', function () {
     if (!this.files[0]) return;
-    const reader  = new FileReader();
-    reader.onload = async e => {
-        const dataUrl     = e.target.result;
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const photoKey    = currentUser.id ? `profilePhoto_${currentUser.id}` : null;
-
-        // ── Show new photo instantly everywhere on this page ──
-        const preview  = document.getElementById('profilePhotoPreview');
-        const navPhoto = document.querySelector('.nav_profile-photo img');
-        if (preview)  { preview.src  = dataUrl; preview.style.display  = ''; }
-        if (navPhoto) { navPhoto.src = dataUrl; navPhoto.style.display = ''; }
-
-        // ── Cache locally so other pages show it instantly without waiting for DB ──
-        if (photoKey) localStorage.setItem(photoKey, dataUrl);
-
-        // ── Save to Supabase so it persists across logins and devices ──
-        if (currentUser.id) {
-            const { error } = await db
-                .from('users')
-                .update({ avatar_url: dataUrl })
-                .eq('id', currentUser.id);
-            if (error) console.error('Photo save error:', error.message);
-            else {
-                // Keep currentUser in sync
-                const updatedUser = { ...currentUser, avatar_url: dataUrl };
-                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-            }
-        }
-    };
-    reader.readAsDataURL(this.files[0]);
+    if (_cropObjectUrl) { URL.revokeObjectURL(_cropObjectUrl); _cropObjectUrl = null; }
+    _cropObjectUrl = URL.createObjectURL(this.files[0]);
+    openCropModal(_cropObjectUrl);
+    this.value = '';
 });
+
+let _cropImgW = 0, _cropImgH = 0;
+let _cropX = 0, _cropY = 0;
+let _cropDragging = false;
+let _cropStartX = 0, _cropStartY = 0;
+const CROP_SIZE = 240;
+
+function openCropModal(src) {
+    const overlay  = document.getElementById('cropOverlay');
+    const img      = document.getElementById('cropImg');
+    const viewport = document.getElementById('cropViewport');
+
+    img.onload = () => {
+        const scale = CROP_SIZE / Math.min(img.naturalWidth, img.naturalHeight);
+        _cropImgW = Math.round(img.naturalWidth  * scale);
+        _cropImgH = Math.round(img.naturalHeight * scale);
+        img.style.width  = _cropImgW + 'px';
+        img.style.height = _cropImgH + 'px';
+        _cropX = Math.round((CROP_SIZE - _cropImgW) / 2);
+        _cropY = Math.round((CROP_SIZE - _cropImgH) / 2);
+        applyCropPosition();
+    };
+    img.src = src;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    viewport.addEventListener('pointerdown', onCropPointerDown);
+}
+
+function applyCropPosition() {
+    const img = document.getElementById('cropImg');
+    _cropX = Math.min(0, Math.max(CROP_SIZE - _cropImgW, _cropX));
+    _cropY = Math.min(0, Math.max(CROP_SIZE - _cropImgH, _cropY));
+    img.style.transform = `translate(${_cropX}px, ${_cropY}px)`;
+}
+
+function onCropPointerDown(e) {
+    _cropDragging = true;
+    _cropStartX = e.clientX - _cropX;
+    _cropStartY = e.clientY - _cropY;
+    document.addEventListener('pointermove', onCropPointerMove);
+    document.addEventListener('pointerup',   onCropPointerUp);
+    e.preventDefault();
+}
+
+function onCropPointerMove(e) {
+    if (!_cropDragging) return;
+    _cropX = e.clientX - _cropStartX;
+    _cropY = e.clientY - _cropStartY;
+    applyCropPosition();
+}
+
+function onCropPointerUp() {
+    _cropDragging = false;
+    document.removeEventListener('pointermove', onCropPointerMove);
+    document.removeEventListener('pointerup',   onCropPointerUp);
+}
+
+function cancelCrop() {
+    document.getElementById('cropOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('cropViewport').removeEventListener('pointerdown', onCropPointerDown);
+    if (_cropObjectUrl) { URL.revokeObjectURL(_cropObjectUrl); _cropObjectUrl = null; }
+}
+
+async function saveCrop() {
+    const img    = document.getElementById('cropImg');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = CROP_SIZE;
+    const ctx    = canvas.getContext('2d');
+
+    const scaleX = img.naturalWidth  / _cropImgW;
+    const scaleY = img.naturalHeight / _cropImgH;
+    const srcX   = (-_cropX) * scaleX;
+    const srcY   = (-_cropY) * scaleY;
+    const srcW   = CROP_SIZE * scaleX;
+    const srcH   = CROP_SIZE * scaleY;
+
+    ctx.beginPath();
+    ctx.arc(CROP_SIZE / 2, CROP_SIZE / 2, CROP_SIZE / 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, CROP_SIZE, CROP_SIZE);
+
+    const dataUrl     = canvas.toDataURL('image/jpeg', 0.88);
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const photoKey    = currentUser.id ? `profilePhoto_${currentUser.id}` : null;
+
+    const preview  = document.getElementById('profilePhotoPreview');
+    const navPhoto = document.querySelector('.nav_profile-photo img');
+    if (preview)  preview.src  = dataUrl;
+    if (navPhoto) navPhoto.src = dataUrl;
+    if (photoKey) localStorage.setItem(photoKey, dataUrl);
+
+    document.getElementById('cropOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('cropViewport').removeEventListener('pointerdown', onCropPointerDown);
+    if (_cropObjectUrl) { URL.revokeObjectURL(_cropObjectUrl); _cropObjectUrl = null; }
+
+    if (currentUser.id) {
+        const { error } = await db
+            .from('users')
+            .update({ avatar_url: dataUrl })
+            .eq('id', currentUser.id);
+        if (error) console.error('Photo save error:', error.message);
+        else {
+            localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, avatar_url: dataUrl }));
+        }
+    }
+}
+
+
+// ================================================================
+// APPEARANCE — system / light / dark
+// ================================================================
+
+const THEME_KEY      = 'currrentTheme';
+const THEME_PREF_KEY = 'themePreference';
+
+function initAppearanceTab() {
+    let pref = localStorage.getItem(THEME_PREF_KEY);
+    if (!pref) {
+        const old = localStorage.getItem(THEME_KEY);
+        if (old === 'dark-theme') pref = 'dark';
+        else if (old === '')      pref = 'light';
+        else                      pref = 'system';
+        localStorage.setItem(THEME_PREF_KEY, pref);
+    }
+    const radio = document.querySelector(`input[name="themeChoice"][value="${pref}"]`);
+    if (radio) radio.checked = true;
+    highlightAppearanceOption(pref);
+
+    document.querySelectorAll('input[name="themeChoice"]').forEach(r => {
+        r.addEventListener('change', () => applyAppearancePref(r.value));
+    });
+}
+
+function highlightAppearanceOption(val) {
+    document.querySelectorAll('.appearance-option').forEach(el => {
+        el.classList.toggle('appearance-option--active',
+            el.querySelector('input').value === val);
+    });
+}
+
+function applyAppearancePref(pref) {
+    localStorage.setItem(THEME_PREF_KEY, pref);
+    highlightAppearanceOption(pref);
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let isDark;
+    if      (pref === 'dark')  { isDark = true;       localStorage.setItem(THEME_KEY, 'dark-theme'); }
+    else if (pref === 'light') { isDark = false;       localStorage.setItem(THEME_KEY, ''); }
+    else                       { isDark = systemDark; localStorage.removeItem(THEME_KEY); }
+    document.documentElement.classList.toggle('dark-theme', isDark);
+    document.body.classList.toggle('dark-theme', isDark);
+    if (typeof applyTheme === 'function') applyTheme(isDark);
+}
 
 
 // ================================================================
 // PASSWORD — updates in Supabase users table
 // ================================================================
+
 
 function togglePassword(inputId, btn) {
     const input    = document.getElementById(inputId);

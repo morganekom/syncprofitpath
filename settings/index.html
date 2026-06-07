@@ -112,6 +112,9 @@
             <button class="tab-btn" data-tab="withdrawal" id="withdrawalTab">
                 <i class="uil uil-money-withdraw"></i> Withdrawal
             </button>
+            <button class="tab-btn" data-tab="appearance">
+                <i class="uil uil-brightness"></i> Appearance
+            </button>
         </div>
 
 
@@ -133,11 +136,26 @@
                     <div class="profile-photo-info">
                         <h3 id="profileDisplayName">Divine Godwin</h3>
                         <p id="profileDisplayEmail">divine@example.com</p>
-                        <!-- KYC verified badge — green when admin approves -->
                         <span class="kyc-badge" id="kycBadge">
                             <i class="uil uil-shield-check"></i>
                             <span id="kycBadgeText">Unverified</span>
                         </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo crop modal -->
+            <div class="crop-overlay" id="cropOverlay">
+                <div class="crop-modal">
+                    <h3 class="crop-title">Position Your Photo</h3>
+                    <p class="crop-hint">Drag the image to centre your face</p>
+                    <div class="crop-viewport" id="cropViewport">
+                        <img id="cropImg" draggable="false">
+                        <div class="crop-circle-mask"></div>
+                    </div>
+                    <div class="crop-actions">
+                        <button class="crop-cancel-btn" onclick="cancelCrop()">Cancel</button>
+                        <button class="crop-save-btn" onclick="saveCrop()">Use This Photo</button>
                     </div>
                 </div>
             </div>
@@ -175,7 +193,7 @@
                 <p class="form-error" id="profileError"></p>
                 <p class="form-success" id="profileSuccess"></p>
 
-                <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()">
+                <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()" disabled>
                     Save Changes
                 </button>
             </div>
@@ -402,6 +420,50 @@
                 <p class="form-success" id="cryptoSuccess"></p>
 
                 <button class="save-btn" id="saveCryptoBtn" onclick="saveCryptoDetails()">Save Crypto Details</button>
+            </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════
+             TAB 5 — APPEARANCE
+        ══════════════════════════════════════ -->
+        <div class="tab-content" id="tab-appearance">
+
+            <div class="settings-card">
+                <h3 class="card-title">Theme</h3>
+                <p class="card-subtitle">Choose how SyncProfitPath looks for you.</p>
+
+                <div class="appearance-options" id="appearanceOptions">
+                    <label class="appearance-option" id="opt-system">
+                        <input type="radio" name="themeChoice" value="system">
+                        <div class="appearance-option-inner">
+                            <div class="appearance-preview appearance-preview--system">
+                                <div class="ap-half ap-light"></div>
+                                <div class="ap-half ap-dark"></div>
+                            </div>
+                            <span class="appearance-label">System default</span>
+                            <span class="appearance-desc">Follows your device setting</span>
+                        </div>
+                    </label>
+
+                    <label class="appearance-option" id="opt-light">
+                        <input type="radio" name="themeChoice" value="light">
+                        <div class="appearance-option-inner">
+                            <div class="appearance-preview appearance-preview--light"></div>
+                            <span class="appearance-label">Light</span>
+                            <span class="appearance-desc">Always use light mode</span>
+                        </div>
+                    </label>
+
+                    <label class="appearance-option" id="opt-dark">
+                        <input type="radio" name="themeChoice" value="dark">
+                        <div class="appearance-option-inner">
+                            <div class="appearance-preview appearance-preview--dark"></div>
+                            <span class="appearance-label">Dark</span>
+                            <span class="appearance-desc">Always use dark mode</span>
+                        </div>
+                    </label>
+                </div>
             </div>
 
         </div>
