@@ -35,25 +35,48 @@
 })();
 
 // ========================= THEME TOGGLE =========================
-const themeBtn = document.querySelector('.nav_theme-btn');
+// Priority: 1) user's manual override (localStorage)
+//           2) OS/browser system preference (prefers-color-scheme)
+//           3) default to light
 
+const themeBtn     = document.querySelector('.nav_theme-btn');
+const THEME_KEY    = 'currrentTheme';   // keeping existing key name (typo preserved intentionally)
+const systemDark   = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme(isDark) {
+    // Apply to both documentElement (for early-script consistency) and body
+    document.documentElement.classList.toggle('dark-theme', isDark);
+    document.body.classList.toggle('dark-theme', isDark);
+    themeBtn.innerHTML = isDark
+        ? '<i class="uil uil-sun"></i>'
+        : '<i class="uil uil-moon"></i>';
+    // Notify chart to re-render with correct grid/tick colours
+    document.dispatchEvent(new Event('themechange'));
+}
+
+function resolveTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'dark-theme') return true;
+    if (saved === '')            return false;   // user explicitly chose light
+    // No saved preference — follow the OS
+    return systemDark.matches;
+}
+
+// Apply on load
+applyTheme(resolveTheme());
+
+// Manual toggle — saves override so OS changes don't override the user's choice
 themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    if (document.body.classList.contains('dark-theme')) {
-        themeBtn.innerHTML = '<i class="uil uil-sun"></i>';
-        localStorage.setItem('currrentTheme', 'dark-theme');
-    } else {
-        themeBtn.innerHTML = '<i class="uil uil-moon"></i>';
-        localStorage.setItem('currrentTheme', '');
-    }
+    const nowDark = !document.body.classList.contains('dark-theme');
+    localStorage.setItem(THEME_KEY, nowDark ? 'dark-theme' : '');
+    applyTheme(nowDark);
 });
 
-document.body.className = localStorage.getItem('currrentTheme') || '';
-if (document.body.classList.contains('dark-theme')) {
-    themeBtn.innerHTML = '<i class="uil uil-sun"></i>';
-} else {
-    themeBtn.innerHTML = '<i class="uil uil-moon"></i>';
-}
+// Live OS theme changes — only apply if user hasn't manually overridden
+systemDark.addEventListener('change', e => {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === null) applyTheme(e.matches); // no override → follow OS
+});
 
 
 // ========================= SIDEBAR TOGGLE =========================
