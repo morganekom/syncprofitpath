@@ -111,7 +111,6 @@ body {
     display: grid;
     grid-template-columns: 17rem auto 30rem;
     gap: 2rem;
-    transition: var(--transition);
     user-select: none;
 }
 
