@@ -108,6 +108,7 @@ function renderCards() {
     if (filteredWithdrawals.length === 0) {
         emptyEl.style.display = 'flex';
         listEl.style.display  = 'none';
+        listEl.innerHTML      = '';
         document.querySelector('#wdrEmpty p').textContent =
             activeStatus === 'pending' ? 'No pending withdrawals.' : 'No withdrawals found.';
         return;
