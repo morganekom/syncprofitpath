@@ -820,16 +820,28 @@ body {
 }
 
 
-/* ========================= CHART COIN TABS ========================= */
-.chart-tabs {
+/* ================================================================
+   CHART CONTROLS — coin tabs + time range tabs
+   ================================================================ */
+
+.chart-controls {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
+    gap: 0.8rem;
     margin-bottom: 1.2rem;
 }
 
+/* Coin tabs */
+.chart-tabs {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
 .chart-coin-tab {
-    padding: 0.4rem 1.1rem;
+    padding: 0.35rem 0.9rem;
     border-radius: var(--radius-2);
     font-size: 1.1rem;
     font-weight: 600;
@@ -837,39 +849,88 @@ body {
     cursor: pointer;
     transition: var(--transition);
     color: var(--color-gray-dark);
-    background: var(--color-light);
-    border: 1.5px solid transparent;
+    background: transparent;
+    border: 1.5px solid var(--color-light);
 }
 
 .chart-coin-tab:hover {
     color: var(--tab-color, var(--color-primary));
-    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--tab-color, var(--color-primary));
 }
 
 .chart-coin-tab.active {
     color: var(--tab-color, var(--color-primary));
-    background: transparent;
     border-color: var(--tab-color, var(--color-primary));
+    background: color-mix(in srgb, var(--tab-color, var(--color-primary)) 10%, transparent);
 }
 
-/* Loading indicator below tabs */
+/* Time range tabs */
+.chart-range-tabs {
+    display: flex;
+    gap: 0.3rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 0.25rem;
+}
+
+.chart-range-tab {
+    padding: 0.3rem 0.8rem;
+    border-radius: calc(var(--radius-2) - 2px);
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--color-gray-light);
+    background: transparent;
+    border: none;
+}
+
+.chart-range-tab:hover {
+    color: var(--color-dark);
+}
+
+.chart-range-tab.active {
+    background: var(--color-white);
+    color: var(--color-primary);
+    box-shadow: var(--box-shadow);
+}
+
+/* Loading bar */
 .chart-loading {
     display: none;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.6rem;
     font-size: 1.1rem;
     color: var(--color-gray-light);
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
 }
 
 .chart-loading-dot {
-    width: 0.7rem;
-    height: 0.7rem;
+    width: 0.65rem;
+    height: 0.65rem;
     border-radius: 50%;
     background: var(--color-primary);
     animation: pulse 1s infinite;
 }
 
 #chart {
-    transition: opacity 0.25s ease;
+    transition: opacity 0.2s ease;
+}
+
+/* Ticker skeleton shimmer while prices load */
+.ticker-skeleton {
+    display: inline-block;
+    width: 5.5rem;
+    height: 1.2rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--color-light) 25%, var(--color-white) 50%, var(--color-light) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    vertical-align: middle;
+}
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
