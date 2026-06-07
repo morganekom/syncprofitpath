@@ -122,87 +122,80 @@ function applyFilter() {
 function renderTable() {
     const loadingEl = document.getElementById('invLoading');
     const emptyEl   = document.getElementById('invEmpty');
-    const tableEl   = document.getElementById('invTable');
-    const bodyEl    = document.getElementById('invBody');
+    const listEl    = document.getElementById('invList');
 
     loadingEl.style.display = 'none';
 
     if (filteredInvestments.length === 0) {
         emptyEl.style.display = 'flex';
-        tableEl.style.display = 'none';
+        listEl.style.display  = 'none';
         document.querySelector('#invEmpty p').textContent =
             activeStatus === 'pending' ? 'No pending investments.' : 'No investments found.';
         return;
     }
 
     emptyEl.style.display = 'none';
-    tableEl.style.display = 'table';
+    listEl.style.display  = 'grid';
 
-    bodyEl.innerHTML = filteredInvestments.map(inv => {
-        const name   = escapeHtml(inv.users?.full_name || inv.users?.first_name || 'Unknown');
-        const amount = '$' + parseFloat(inv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        const date   = formatDate(inv.created_at);
-        const plan   = escapeHtml(inv.method || '—');
-        const coin   = escapeHtml((inv.coin || '—').toUpperCase());
+    listEl.innerHTML = filteredInvestments.map(inv => {
+        const name     = escapeHtml(inv.users?.full_name || inv.users?.first_name || 'Unknown');
+        const email    = escapeHtml(inv.users?.email || '');
+        const amount   = '$' + parseFloat(inv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        const date     = formatDate(inv.created_at);
+        const plan     = escapeHtml(inv.method || '—');
+        const coin     = escapeHtml((inv.coin || '—').toUpperCase());
+        const ref      = escapeHtml(inv.reference || '—');
+        const rate     = inv.daily_rate != null ? inv.daily_rate + '%/day' : '—';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
-        const rateLabel = inv.daily_rate != null
-            ? `<small class="text-muted">${inv.daily_rate}%/day</small>`
-            : '';
-
-        // ── Maturity date cell ──
-        let maturityCell = '<td class="tx-date">—</td>';
+        // Maturity tag
+        let maturityTag = '';
         if (inv.end_date) {
-            const endDate   = new Date(inv.end_date);
-            const today     = new Date();
-            today.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
-            const msLeft    = endDate - today;
-            const daysLeft  = Math.ceil(msLeft / 86400000);
-            const endFmt    = endDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-
-            let daysTag = '';
-            if (daysLeft > 0) {
-                daysTag = `<small class="text-muted">${daysLeft}d left</small>`;
-            } else if (daysLeft === 0) {
-                daysTag = `<small style="color:#00c875;font-weight:600;">Matures today</small>`;
-            } else {
-                daysTag = `<small style="color:#00b894;font-weight:600;">Matured</small>`;
-            }
-
-            maturityCell = `<td class="tx-date">${endFmt}<br>${daysTag}</td>`;
+            const endDate  = new Date(inv.end_date);
+            const today    = new Date(); today.setHours(0,0,0,0); endDate.setHours(0,0,0,0);
+            const daysLeft = Math.ceil((endDate - today) / 86400000);
+            const endFmt   = endDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+            const tag = daysLeft > 0
+                ? `${endFmt} · ${daysLeft}d left`
+                : daysLeft === 0 ? `${endFmt} · Matures today`
+                : `${endFmt} · Matured`;
+            maturityTag = `<span class="wdr-meta-item"><i class="uil uil-hourglass"></i> ${tag}</span>`;
         }
 
-        const actions = inv.status === 'pending'
-            ? `<div class="row-actions">
-                   <button class="action-btn view" onclick="openInvModal('${inv.id}')">
-                       <i class="uil uil-eye"></i> Review
-                   </button>
-               </div>`
-            : `<div class="row-actions">
-                   <button class="action-btn view" onclick="openInvModal('${inv.id}')">
-                       <i class="uil uil-eye"></i> View
-                   </button>
-               </div>`;
+        const actionBtn = inv.status === 'pending'
+            ? `<button class="wdr-action-btn review" onclick="openInvModal('${inv.id}')">
+                   <i class="uil uil-eye"></i> Review
+               </button>`
+            : `<button class="wdr-action-btn view" onclick="openInvModal('${inv.id}')">
+                   <i class="uil uil-eye"></i> View
+               </button>`;
 
         return `
-            <tr>
-                <td>
-                    <span class="td-name">${name}</span><br>
-                    <small class="text-muted">${escapeHtml(inv.users?.email || '')}</small>
-                </td>
-                <td class="tx-reference">${escapeHtml(inv.reference || '—')}</td>
-                <td>${plan}<br>${rateLabel}</td>
-                <td>${coin}</td>
-                <td class="tx-amount-label investment">${amount}</td>
-                <td class="tx-date">${date}</td>
-                ${maturityCell}
-                <td><span class="badge ${inv.status}">${capitalise(inv.status)}</span></td>
-                <td>${actions}</td>
-            </tr>
-        `;
+        <div class="adm-card">
+            <div class="wdr-card-top">
+                <div class="wdr-avatar">${initials}</div>
+                <div class="wdr-card-user">
+                    <div class="wdr-card-name">${name}</div>
+                    <div class="wdr-card-email">${email}</div>
+                </div>
+                <span class="badge ${inv.status}">${capitalise(inv.status)}</span>
+            </div>
+            <div class="wdr-card-body">
+                <div class="adm-card-amount investment">${amount}</div>
+                <div class="wdr-card-meta">
+                    <span class="wdr-meta-item"><i class="uil uil-link"></i> ${ref}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-diamond"></i> ${plan} · ${coin}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-chart-line"></i> ${rate}</span>
+                    <span class="wdr-meta-item"><i class="uil uil-calendar-alt"></i> ${date}</span>
+                    ${maturityTag}
+                </div>
+            </div>
+            <div class="adm-card-footer">
+                ${actionBtn}
+            </div>
+        </div>`;
     }).join('');
 }
-
 
 // ================================================================
 // OPEN MODAL

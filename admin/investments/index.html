@@ -127,110 +127,16 @@
         </div>
 
 
-        <!-- Table -->
-        <div class="admin-table-wrap">
+                <!-- Card list -->
+        <div class="admin-list-wrap">
             <div id="invLoading" class="admin-loading">
-                <i class="uil uil-spinner-alt spin"></i> Loading investments…
+                <i class="uil uil-spinner-alt spin"></i> Loading…
             </div>
             <div id="invEmpty" class="admin-empty" style="display:none;">
-                <i class="uil uil-diamond"></i>
+                <i class="uil uil-inbox"></i>
                 <p>No investments found.</p>
             </div>
-            <table class="admin-table" id="invTable" style="display:none;">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Reference</th>
-                        <th>Plan</th>
-                        <th>Coin</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Matures</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="invBody"></tbody>
-            </table>
-        </div>
-
-    </main>
-
-
-    <!-- ── DETAIL MODAL ── -->
-    <div class="admin-modal-overlay" id="invModal" onclick="closeInvModal(event)">
-        <div class="admin-modal">
-            <div class="admin-modal-header">
-                <h3>Investment Details</h3>
-                <button class="admin-modal-close" onclick="closeInvModal()">
-                    <i class="uil uil-multiply"></i>
-                </button>
-            </div>
-
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">User</span>
-                <span class="modal-detail-value" id="miUser">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Email</span>
-                <span class="modal-detail-value" id="miEmail">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Reference</span>
-                <span class="modal-detail-value" id="miReference">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Plan</span>
-                <span class="modal-detail-value" id="miPlan">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Daily Rate</span>
-                <span class="modal-detail-value" id="miRate">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Coin</span>
-                <span class="modal-detail-value" id="miCoin">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Amount</span>
-                <span class="modal-detail-value" id="miAmount">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">User Balance</span>
-                <span class="modal-detail-value" id="miBalance">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Requested</span>
-                <span class="modal-detail-value" id="miDate">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Matures On</span>
-                <span class="modal-detail-value" id="miMaturity" style="font-weight:600;">—</span>
-            </div>
-            <div class="modal-detail-row">
-                <span class="modal-detail-label">Status</span>
-                <span class="modal-detail-value" id="miStatus">—</span>
-            </div>
-
-            <!-- Admin note -->
-            <div class="modal-note-wrap" id="miNoteWrap">
-                <label class="modal-note-label">Note (optional)</label>
-                <textarea id="miNote" class="modal-note" placeholder="e.g. Investment activated. Returns will accrue daily."></textarea>
-            </div>
-
-            <div class="modal-actions" id="miActions">
-                <button class="action-btn reject" id="miRejectBtn" onclick="handleInvAction('failed')">
-                    <i class="uil uil-times-circle"></i> Reject
-                </button>
-                <button class="action-btn approve" id="miApproveBtn" onclick="handleInvAction('completed')">
-                    <i class="uil uil-check-circle"></i> Approve & Deduct
-                </button>
-            </div>
-
-            <div id="miResolved" class="modal-resolved" style="display:none;">
-                <i class="uil uil-check-circle success"></i>
-                <p id="miResolvedMsg">Action completed.</p>
-            </div>
+            <div id="invList" class="admin-card-list" style="display:none;"></div>
         </div>
     </div>
 
