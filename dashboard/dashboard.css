@@ -818,3 +818,58 @@ body {
         max-width: 9rem;
     }
 }
+
+
+/* ========================= CHART COIN TABS ========================= */
+.chart-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+
+.chart-coin-tab {
+    padding: 0.4rem 1.1rem;
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--color-gray-dark);
+    background: var(--color-light);
+    border: 1.5px solid transparent;
+}
+
+.chart-coin-tab:hover {
+    color: var(--tab-color, var(--color-primary));
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.chart-coin-tab.active {
+    color: var(--tab-color, var(--color-primary));
+    background: transparent;
+    border-color: var(--tab-color, var(--color-primary));
+}
+
+/* Loading indicator below tabs */
+.chart-loading {
+    display: none;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+    margin-bottom: 0.8rem;
+}
+
+.chart-loading-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    animation: pulse 1s infinite;
+}
+
+#chart {
+    transition: opacity 0.25s ease;
+}

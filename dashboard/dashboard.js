@@ -1,7 +1,8 @@
 // ================================================================
 // DASHBOARD.JS
 // Handles: greeting, balances from Supabase, recent transactions,
-// crypto price tickers, KYC alert
+// crypto price tickers (BTC/ETH/BNB/SOL/LTC/DOGE/XRP),
+// live 30-day chart from CoinGecko, KYC alert
 // ================================================================
 
 
@@ -26,30 +27,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadRecentTransactions();
     loadActiveInvestments();
     checkKycAlert();
-    loadCryptoPrices();
+    await loadCryptoPrices();
+    initChart();
 });
 
 
 // ================================================================
 // LOAD USER BALANCES FROM SUPABASE
-// Fetches the real balance, profit, and pending from the users table
-// Falls back to localStorage if not logged in or fetch fails
 // ================================================================
 
 async function loadUserBalances() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const userId = currentUser.id;
 
-    const balanceEl = document.getElementById('dashBalance');
-    const pendingEl = document.getElementById('dashPending');
-    const profitEl  = document.getElementById('dashProfit');
-
     if (!userId) {
-        // Not logged in — show localStorage fallback values
         setBalances(
-            parseFloat(localStorage.getItem('userBalance'))  || 0,
-            parseFloat(localStorage.getItem('userPending'))  || 0,
-            parseFloat(localStorage.getItem('userProfit'))   || 0
+            parseFloat(localStorage.getItem('userBalance')) || 0,
+            parseFloat(localStorage.getItem('userPending')) || 0,
+            parseFloat(localStorage.getItem('userProfit'))  || 0
         );
         return;
     }
@@ -63,7 +58,6 @@ async function loadUserBalances() {
 
         if (error) throw error;
 
-        // Update localStorage so other pages stay in sync
         localStorage.setItem('userBalance', String(data.balance || 0));
         localStorage.setItem('userProfit',  String(data.profit  || 0));
         localStorage.setItem('userPending', String(data.pending || 0));
@@ -72,11 +66,10 @@ async function loadUserBalances() {
 
     } catch (err) {
         console.error('Balance fetch error:', err.message);
-        // Fall back to last known values from localStorage
         setBalances(
-            parseFloat(localStorage.getItem('userBalance'))  || 0,
-            parseFloat(localStorage.getItem('userPending'))  || 0,
-            parseFloat(localStorage.getItem('userProfit'))   || 0
+            parseFloat(localStorage.getItem('userBalance')) || 0,
+            parseFloat(localStorage.getItem('userPending')) || 0,
+            parseFloat(localStorage.getItem('userProfit'))  || 0
         );
     }
 }
@@ -180,119 +173,275 @@ function buildRecentRow(t) {
 
 // ================================================================
 // KYC ALERT
-// Shows a warning if user's KYC is not verified
 // ================================================================
 
 function checkKycAlert() {
     const kycStatus = localStorage.getItem('kycStatus') || 'unsubmitted';
     const alertEl   = document.getElementById('kycAlert');
     if (!alertEl) return;
-
-    if (kycStatus !== 'verified') {
-        alertEl.style.display = 'flex';
-    }
+    if (kycStatus !== 'verified') alertEl.style.display = 'flex';
 }
 
 
 // ================================================================
 // CRYPTO PRICE TICKERS
-// Uses CoinGecko public API — free, no key needed
-// Updates every 60 seconds
+// BTC, ETH, BNB, SOL, LTC, DOGE, XRP — updates every 60 seconds
 // ================================================================
+
+// Coin config: id = CoinGecko id, color = brand color
+const TICKER_COINS = [
+    { key: 'btc',  id: 'bitcoin',      symbol: '₿',  bg: '#f7931a22', color: '#f7931a', name: 'Bitcoin',  ticker: 'BTC'  },
+    { key: 'eth',  id: 'ethereum',     symbol: 'Ξ',  bg: '#627eea22', color: '#627eea', name: 'Ethereum', ticker: 'ETH'  },
+    { key: 'bnb',  id: 'binancecoin',  symbol: 'B',  bg: '#f3ba2f22', color: '#f3ba2f', name: 'BNB',      ticker: 'BNB'  },
+    { key: 'sol',  id: 'solana',       symbol: '◎',  bg: '#9945ff22', color: '#9945ff', name: 'Solana',   ticker: 'SOL'  },
+    { key: 'ltc',  id: 'litecoin',     symbol: 'Ł',  bg: '#bfbbbb22', color: '#a0a0a0', name: 'Litecoin', ticker: 'LTC'  },
+    { key: 'doge', id: 'dogecoin',     symbol: 'Ð',  bg: '#c2a63322', color: '#c2a633', name: 'Dogecoin', ticker: 'DOGE' },
+    { key: 'xrp',  id: 'ripple',       symbol: '✕',  bg: '#00aae422', color: '#00aae4', name: 'XRP',      ticker: 'XRP'  },
+];
+
+// Cache for latest prices (used by chart too)
+const livePrices = {};
 
 async function loadCryptoPrices() {
     try {
+        const ids = TICKER_COINS.map(c => c.id).join(',');
         const res  = await fetch(
-            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana&vs_currencies=usd&include_24hr_change=true'
+            `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
         );
         const data = await res.json();
 
-        setCryptoTicker('btc', data.bitcoin?.usd, data.bitcoin?.usd_24h_change);
-        setCryptoTicker('eth', data.ethereum?.usd, data.ethereum?.usd_24h_change);
-        setCryptoTicker('bnb', data.binancecoin?.usd, data.binancecoin?.usd_24h_change);
-        setCryptoTicker('sol', data.solana?.usd, data.solana?.usd_24h_change);
+        TICKER_COINS.forEach(coin => {
+            const entry = data[coin.id];
+            if (entry) {
+                livePrices[coin.key] = { price: entry.usd, change: entry.usd_24h_change };
+                setCryptoTicker(coin.key, entry.usd, entry.usd_24h_change);
+            }
+        });
 
     } catch (err) {
-        // API failed silently — tickers stay as dashes
         console.log('Crypto prices unavailable:', err.message);
     }
 }
 
-function setCryptoTicker(coin, price, change) {
-    const priceEl  = document.getElementById(coin + 'Price');
-    const changeEl = document.getElementById(coin + 'Change');
+function setCryptoTicker(key, price, change) {
+    const priceEl  = document.getElementById(key + 'Price');
+    const changeEl = document.getElementById(key + 'Change');
     if (!priceEl || !changeEl) return;
 
-    if (price) {
+    if (price !== undefined) {
         priceEl.textContent = '$' + price.toLocaleString('en-US', { maximumFractionDigits: 2 });
     }
-
     if (change !== undefined) {
-        const isPositive = change >= 0;
-        changeEl.textContent = (isPositive ? '+' : '') + change.toFixed(2) + '%';
-        changeEl.className   = isPositive ? 'success' : 'danger';
+        const pos = change >= 0;
+        changeEl.textContent = (pos ? '+' : '') + change.toFixed(2) + '%';
+        changeEl.className   = pos ? 'success' : 'danger';
     }
 }
 
-// Refresh prices every 60 seconds
+// Refresh tickers every 60 seconds
 setInterval(loadCryptoPrices, 60000);
 
 
 // ================================================================
-// CHART — BTC & ETH price history (static demo data)
-// Replace with real historical data from CoinGecko when ready
+// BUILD TICKER HTML (injected — replaces static HTML in right panel)
+// Renders all 7 coins with proper ids so setCryptoTicker() works
 // ================================================================
 
-const chartCanvas = document.getElementById('chart');
-if (chartCanvas) {
-    new Chart(chartCanvas.getContext('2d'), {
+function buildTickerRows() {
+    const container = document.querySelector('.market-tickers');
+    if (!container) return;
+
+    container.innerHTML = TICKER_COINS.map(coin => `
+        <div class="ticker-row">
+            <div class="ticker-left">
+                <div class="ticker-icon" style="background:${coin.bg};color:${coin.color};">${coin.symbol}</div>
+                <div><h4>${coin.name}</h4><small class="text-muted">${coin.ticker}</small></div>
+            </div>
+            <div class="ticker-right">
+                <h4 id="${coin.key}Price">—</h4>
+                <small id="${coin.key}Change" class="text-muted">—</small>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+// ================================================================
+// CHART — Live 30-day price history from CoinGecko
+// Coin selector tabs injected above the canvas
+// ================================================================
+
+let chartInstance = null;
+let activeChartCoin = 'btc';
+
+// Map coin key → CoinGecko market_chart id
+const CHART_COIN_IDS = {
+    btc:  'bitcoin',
+    eth:  'ethereum',
+    bnb:  'binancecoin',
+    sol:  'solana',
+    ltc:  'litecoin',
+    doge: 'dogecoin',
+    xrp:  'ripple',
+};
+
+// Brand colors per coin (border + fill)
+const CHART_COLORS = {
+    btc:  { border: '#f7931a', fill: 'rgba(247,147,26,0.08)' },
+    eth:  { border: '#627eea', fill: 'rgba(98,126,234,0.08)'  },
+    bnb:  { border: '#f3ba2f', fill: 'rgba(243,186,47,0.08)'  },
+    sol:  { border: '#9945ff', fill: 'rgba(153,69,255,0.08)'  },
+    ltc:  { border: '#a0a0a0', fill: 'rgba(160,160,160,0.08)' },
+    doge: { border: '#c2a633', fill: 'rgba(194,166,51,0.08)'  },
+    xrp:  { border: '#00aae4', fill: 'rgba(0,170,228,0.08)'   },
+};
+
+function initChart() {
+    buildTickerRows();     // render all 7 ticker rows
+    injectChartControls(); // inject coin tabs above canvas
+    loadChartData('btc');  // load initial chart
+}
+
+function injectChartControls() {
+    const section = document.querySelector('.dash-chart-section');
+    if (!section) return;
+
+    const header = section.querySelector('.dash-chart-header');
+    if (!header) return;
+
+    // Build tab strip
+    const tabs = TICKER_COINS.map(coin => `
+        <button
+            class="chart-coin-tab${coin.key === 'btc' ? ' active' : ''}"
+            data-coin="${coin.key}"
+            onclick="switchChartCoin('${coin.key}')"
+            style="--tab-color:${CHART_COLORS[coin.key].border}"
+        >${coin.ticker}</button>
+    `).join('');
+
+    // Insert tabs + loading indicator
+    header.insertAdjacentHTML('afterend', `
+        <div class="chart-tabs" id="chartTabs">${tabs}</div>
+        <div class="chart-loading" id="chartLoading">
+            <span class="chart-loading-dot"></span>
+            <span>Loading chart data…</span>
+        </div>
+    `);
+}
+
+async function loadChartData(coinKey) {
+    const loadingEl = document.getElementById('chartLoading');
+    const canvas    = document.getElementById('chart');
+    if (!canvas) return;
+
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (canvas)    canvas.style.opacity    = '0.3';
+
+    try {
+        const geckoId = CHART_COIN_IDS[coinKey];
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/coins/${geckoId}/market_chart?vs_currency=usd&days=30&interval=daily`
+        );
+        const data = await res.json();
+
+        if (!data.prices || data.prices.length === 0) throw new Error('No data');
+
+        // data.prices = [[timestamp, price], ...]
+        const labels = data.prices.map(p => {
+            const d = new Date(p[0]);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        const prices = data.prices.map(p => p[1]);
+
+        renderChart(coinKey, labels, prices);
+
+    } catch (err) {
+        console.error('Chart data error:', err.message);
+        // Fallback: show a simple error state on canvas
+        if (chartInstance) {
+            chartInstance.data.labels = [];
+            chartInstance.data.datasets[0].data = [];
+            chartInstance.update();
+        }
+    } finally {
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (canvas)    canvas.style.opacity    = '1';
+    }
+}
+
+function renderChart(coinKey, labels, prices) {
+    const canvas = document.getElementById('chart');
+    if (!canvas) return;
+
+    const ctx    = canvas.getContext('2d');
+    const colors = CHART_COLORS[coinKey];
+    const coin   = TICKER_COINS.find(c => c.key === coinKey);
+    const label  = coin ? coin.name + ' (30d)' : coinKey.toUpperCase();
+
+    // Destroy previous instance
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+
+    // Detect dark theme for grid/tick colors
+    const isDark    = document.documentElement.classList.contains('dark-theme');
+    const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+    const tickColor = isDark ? '#adacb5' : '#86848c';
+
+    chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [
-                {
-                    label: 'BTC',
-                    data: [29374, 33537, 49631, 59095, 57828, 36684, 33572, 39972, 39974, 48847, 48116, 61004],
-                    borderColor: '#f7931a',
-                    backgroundColor: 'rgba(247,147,26,0.05)',
-                    borderWidth: 2.5,
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                },
-                {
-                    label: 'ETH',
-                    data: [1500, 2700, 3800, 2600, 3100, 1800, 1200, 1600, 1900, 2200, 2800, 2400],
-                    borderColor: '#627eea',
-                    backgroundColor: 'rgba(98,126,234,0.05)',
-                    borderWidth: 2.5,
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                }
-            ],
+            labels,
+            datasets: [{
+                label,
+                data:            prices,
+                borderColor:     colors.border,
+                backgroundColor: colors.fill,
+                borderWidth:     2.5,
+                tension:         0.4,
+                fill:            true,
+                pointRadius:     2,
+                pointHoverRadius: 6,
+                pointBackgroundColor: colors.border,
+            }]
         },
         options: {
-            responsive: true,
+            responsive:          true,
             maintainAspectRatio: true,
-            interaction: { mode: 'index', intersect: false },
+            animation:           { duration: 400, easing: 'easeInOutQuart' },
+            interaction:         { mode: 'index', intersect: false },
             plugins: {
                 legend: {
-                    display: true,
+                    display:  true,
                     position: 'top',
-                    labels: { usePointStyle: true, padding: 20 }
+                    labels:   { usePointStyle: true, padding: 20, color: tickColor }
                 },
-                tooltip: { mode: 'index', intersect: false }
+                tooltip: {
+                    mode:      'index',
+                    intersect: false,
+                    callbacks: {
+                        label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', {
+                            minimumFractionDigits: 2, maximumFractionDigits: 2
+                        })
+                    }
+                }
             },
             scales: {
-                x: { grid: { display: false } },
+                x: {
+                    grid:  { display: false },
+                    ticks: {
+                        color:       tickColor,
+                        maxTicksLimit: 8,
+                        maxRotation: 0,
+                    }
+                },
                 y: {
                     beginAtZero: false,
-                    grid: { color: 'rgba(0,0,0,0.04)' },
+                    grid:        { color: gridColor },
                     ticks: {
-                        callback: val => '$' + val.toLocaleString()
+                        color:    tickColor,
+                        callback: val => '$' + val.toLocaleString('en-US', { maximumFractionDigits: 0 })
                     }
                 }
             }
@@ -300,8 +449,26 @@ if (chartCanvas) {
     });
 }
 
-// ACTIVE INVESTMENTS — loads user's running investments and renders
-// cards with progress bar + daily profit
+function switchChartCoin(coinKey) {
+    if (coinKey === activeChartCoin) return;
+    activeChartCoin = coinKey;
+
+    // Update active tab
+    document.querySelectorAll('.chart-coin-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.coin === coinKey);
+    });
+
+    loadChartData(coinKey);
+}
+
+// Re-render chart on theme toggle to fix colors
+document.addEventListener('themechange', () => {
+    if (activeChartCoin) loadChartData(activeChartCoin);
+});
+
+
+// ================================================================
+// ACTIVE INVESTMENTS
 // ================================================================
 
 async function loadActiveInvestments() {
@@ -337,14 +504,13 @@ async function loadActiveInvestments() {
         emptyEl.style.display = 'none';
         grid.style.display    = 'grid';
         grid.style.gridTemplateColumns = '1fr';
-        grid.innerHTML        = investments.map(inv => buildActiveInvCard(inv)).join('');
+        grid.innerHTML = investments.map(inv => buildActiveInvCard(inv)).join('');
 
     } catch (err) {
         console.error('Active investments error:', err.message);
     }
 }
 
-// ── Coin icon map — matches the modal and dashboard ticker styles ──
 const COIN_ICONS = {
     btc:  { symbol: '₿',  bg: '#f7931a22', color: '#f7931a', label: 'Bitcoin'   },
     eth:  { symbol: 'Ξ',  bg: '#627eea22', color: '#627eea', label: 'Ethereum'  },
@@ -382,21 +548,24 @@ function buildActiveInvCard(inv) {
     const totalReturn = amount + (dailyProfit * duration);
 
     const coinKey  = (inv.coin || '').toLowerCase();
-    const coinData = COIN_ICONS[coinKey] || { symbol: coinKey.toUpperCase().slice(0,2) || '?', bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)', label: coinKey.toUpperCase() };
+    const coinData = COIN_ICONS[coinKey] || {
+        symbol: coinKey.toUpperCase().slice(0, 2) || '?',
+        bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)',
+        label: coinKey.toUpperCase()
+    };
 
     const plan     = escapeHtml(inv.method || 'Investment');
     const ref      = escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase());
     const startFmt = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
     const endFmt   = new Date(inv.end_date).toLocaleDateString('en-US',   { day: '2-digit', month: 'short', year: 'numeric' });
 
-    const isMatured    = daysLeft === 0;
-    const statusLabel  = isMatured ? 'Matured' : 'Active';
-    const statusClass  = isMatured ? 'status-matured' : 'status-active';
-    const barColor     = isMatured ? 'var(--color-gray-light)' : 'var(--color-primary)';
+    const isMatured   = daysLeft === 0;
+    const statusLabel = isMatured ? 'Matured' : 'Active';
+    const statusClass = isMatured ? 'status-matured' : 'status-active';
+    const barColor    = isMatured ? 'var(--color-gray-light)' : 'var(--color-primary)';
 
     return `
     <div class="active-inv-card">
-
         <div class="active-inv-top">
             <div class="active-inv-coin-icon" style="background:${coinData.bg}; color:${coinData.color};">
                 ${coinData.symbol}
