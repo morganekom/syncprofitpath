@@ -105,15 +105,15 @@ body {
     font-family: "Poppins", sans-serif;
     min-height: 100vh;
     color: var(--color-gray-dark);
-    /* Mobile: single column, no sidebar in flow */
-    display: grid;
-    grid-template-columns: 1fr;
+    /* Mobile: block flow — no grid tracks, no ghost spaces from fixed elements */
+    display: block;
     user-select: none;
 }
 
-/* Tablet+: sidebar appears in flow, takes left column */
+/* Desktop: 3-column grid with sidebar in flow */
 @media screen and (min-width: 1024px) {
     body {
+        display: grid;
         grid-template-columns: 17rem auto 30rem;
         gap: 2rem;
     }
