@@ -69,14 +69,25 @@ async function loadUserBalances() {
     }
 }
 
-function setBalances(balance, pending, profit) {
+function revealAmount(elId, skelId, value) {
+    const el   = document.getElementById(elId);
+    const skel = document.getElementById(skelId);
+    if (!el) return;
     const fmt = n => '$' + parseFloat(n).toLocaleString('en-US', {
         minimumFractionDigits: 2, maximumFractionDigits: 2
     });
-    const el = id => document.getElementById(id);
-    if (el('dashBalance')) el('dashBalance').textContent = fmt(balance);
-    if (el('dashPending')) el('dashPending').textContent = fmt(pending);
-    if (el('dashProfit'))  el('dashProfit').textContent  = fmt(profit);
+    el.textContent = fmt(value);
+    if (skel) skel.style.display = 'none';
+    el.style.display   = '';
+    el.style.opacity   = '0';
+    el.style.transition = 'opacity 300ms ease';
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+}
+
+function setBalances(balance, pending, profit) {
+    revealAmount('dashBalance', 'skelBalance', balance);
+    revealAmount('dashPending', 'skelPending', pending);
+    revealAmount('dashProfit',  'skelProfit',  profit);
 }
 
 
@@ -487,13 +498,20 @@ document.addEventListener('themechange', () => {
 // ================================================================
 
 async function loadActiveInvestments() {
-    const section = document.getElementById('activeInvestSection');
-    const grid    = document.getElementById('activeInvestGrid');
-    const emptyEl = document.getElementById('activeInvestEmpty');
+    const section  = document.getElementById('activeInvestSection');
+    const skelEl   = document.getElementById('activeInvestSkeleton');
+    const grid     = document.getElementById('activeInvestGrid');
+    const emptyEl  = document.getElementById('activeInvestEmpty');
     if (!section || !grid) return;
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser.id) return;
+
+    // Show the section immediately with skeleton visible
+    section.style.display  = 'block';
+    if (skelEl) skelEl.style.display = 'flex';
+    grid.style.display     = 'none';
+    emptyEl.style.display  = 'none';
 
     try {
         const { data, error } = await db
@@ -507,20 +525,26 @@ async function loadActiveInvestments() {
         if (error) throw error;
 
         const investments = (data || []).filter(inv => inv.start_date && inv.end_date);
-        section.style.display = 'block';
+
+        // Hide skeleton
+        if (skelEl) skelEl.style.display = 'none';
 
         if (investments.length === 0) {
-            grid.style.display    = 'none';
             emptyEl.style.display = 'flex';
             return;
         }
 
-        emptyEl.style.display          = 'none';
         grid.style.display             = 'grid';
         grid.style.gridTemplateColumns = '1fr';
+        grid.style.opacity             = '0';
+        grid.style.transition          = 'opacity 300ms ease';
         grid.innerHTML = investments.map(buildActiveInvCard).join('');
+        requestAnimationFrame(() => { grid.style.opacity = '1'; });
+
     } catch (err) {
         console.error('Active investments error:', err.message);
+        if (skelEl) skelEl.style.display = 'none';
+        emptyEl.style.display = 'flex';
     }
 }
 

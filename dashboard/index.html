@@ -120,7 +120,10 @@
                     <p class="dash-card-label">Available Balance</p>
                     <div class="dash-card-icon"><i class="uil uil-wallet"></i></div>
                 </div>
-                <h1 class="dash-card-amount" id="dashBalance">$0.00</h1>
+                <div class="dash-card-amount-wrap">
+                    <h1 class="dash-card-amount" id="dashBalance" style="display:none;">$0.00</h1>
+                    <div class="skeleton-amount" id="skelBalance"></div>
+                </div>
                 <div class="dash-card-actions">
                     <a href="../deposit/" class="dash-card-btn">
                         <i class="uil uil-plus"></i> Add Cash
@@ -136,7 +139,10 @@
                     <p class="dash-card-label">Pending Deposit</p>
                     <div class="dash-card-icon"><i class="uil uil-clock"></i></div>
                 </div>
-                <h1 class="dash-card-amount" id="dashPending">$0.00</h1>
+                <div class="dash-card-amount-wrap">
+                    <h1 class="dash-card-amount" id="dashPending" style="display:none;">$0.00</h1>
+                    <div class="skeleton-amount" id="skelPending"></div>
+                </div>
                 <div class="dash-card-actions">
                     <a href="../transactions/" class="dash-card-btn">
                         <i class="uil uil-eye"></i> View
@@ -149,7 +155,10 @@
                     <p class="dash-card-label">Investment Profit</p>
                     <div class="dash-card-icon"><i class="uil uil-chart-line"></i></div>
                 </div>
-                <h1 class="dash-card-amount" id="dashProfit">$0.00</h1>
+                <div class="dash-card-amount-wrap">
+                    <h1 class="dash-card-amount" id="dashProfit" style="display:none;">$0.00</h1>
+                    <div class="skeleton-amount" id="skelProfit"></div>
+                </div>
                 <div class="dash-card-actions">
                     <a href="../invest/" class="dash-card-btn">
                         <i class="uil uil-diamond"></i> Invest More
@@ -288,7 +297,11 @@
                 <h2>Active Investments</h2>
                 <a href="../invest/" class="dash-see-all">New Investment</a>
             </div>
-            <div class="active-inv-grid" id="activeInvestGrid"></div>
+            <div class="active-inv-skeleton" id="activeInvestSkeleton">
+                <div class="inv-skel-card skeleton-panel"></div>
+                <div class="inv-skel-card skeleton-panel"></div>
+            </div>
+            <div class="active-inv-grid" id="activeInvestGrid" style="display:none;"></div>
             <div class="active-inv-empty" id="activeInvestEmpty" style="display:none;">
                 <i class="uil uil-diamond"></i>
                 <p>No active investments yet. <a href="../invest/">Start investing →</a></p>
