@@ -110,6 +110,13 @@
 .deposit-card.upload-card { order: 4; }
 .submit-btn               { order: 5; }
 
+/* deposit-left is a regular div on mobile — needs flex+gap for card spacing */
+.deposit-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
 @media screen and (min-width: 1024px) {
     .deposit-layout {
         display: grid;
