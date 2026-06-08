@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notifications — SyncProfitPath</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../notifications/notifications.css">
+    <link rel="stylesheet" href="../admin.css">
+    <script>
+        (function () {
+            var saved = localStorage.getItem('currrentTheme');
+            var isDark = saved === 'dark-theme'
+                || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) document.documentElement.classList.add('dark-theme');
+        })();
+    </script>
+</head>
+<body>
+
+    <!--==================== NAVBAR ====================-->
+    <nav>
+        <div class="container nav_container">
+            <button class="nav_menu-btn nav_menu-btn--mobile"><i class="uil uil-bars"></i></button>
+            <a href="../" class="nav_logo">
+                <img src="../../assets/logo.png" alt="Logo">
+            </a>
+            <div class="nav_search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="Search users, transactions…">
+            </div>
+            <div class="nav_profile-wrapper">
+                <div class="nav_bell-wrap" id="navBellWrap">
+                    <button class="nav_bell-btn" id="navBellBtn" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+                        <i class="uil uil-bell"></i>
+                        <span class="nav_bell-badge" id="navBellBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-dropdown-header">
+                            <span>Notifications</span>
+                            <button class="notif-mark-read" onclick="markAllRead()">Mark all read</button>
+                        </div>
+                        <div class="notif-dropdown-list" id="notifDropdownList">
+                            <div class="notif-loading"><i class="uil uil-spinner-alt spin"></i></div>
+                        </div>
+                        <a class="notif-see-all" href="../notifications/">See all notifications</a>
+                    </div>
+                </div>
+                <div class="nav_profile">
+                    <div class="nav_profile-photo">
+                        <img src="../../assets/profile-1.jpg" alt="Admin">
+                    </div>
+                    <h5 id="navName">Admin</h5>
+                    <span class="admin-badge">Admin</span>
+                </div>
+                <button class="nav_menu-btn nav_menu-btn--desktop"><i class="uil uil-bars"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!--==================== SIDEBAR ====================-->
+    <menu class="sidebar">
+        <a href="../"><i class="uil uil-create-dashboard"></i><h5>Dashboard</h5></a>
+        <a href="../user/"><i class="uil uil-users-alt"></i><h5>Users</h5></a>
+        <a href="../deposit/"><i class="uil uil-arrow-circle-down"></i><h5>Deposits</h5></a>
+        <a href="../withdrawals/"><i class="uil uil-arrow-circle-up"></i><h5>Withdrawals</h5></a>
+        <a href="../investments/"><i class="uil uil-diamond"></i><h5>Investments</h5></a>
+        <a href="../kyc/"><i class="uil uil-shield-check"></i><h5>KYC</h5></a>
+        <a href="../chat/"><i class="uil uil-chat"></i><h5>Chat</h5></a>
+        <a href="../settings/"><i class="uil uil-setting"></i><h5>Settings</h5></a>
+        <button class="sidebar_close-btn"><i class="uil uil-multiply"></i></button>
+        <button class="sidebar_logout-btn" onclick="logout()">
+            <i class="uil uil-sign-out-alt"></i><h5>Logout</h5>
+        </button>
+    </menu>
+
+    <!--==================== MAIN ====================-->
+    <main class="notif-main">
+        <div class="notif-page-header">
+            <div>
+                <h1>Notifications</h1>
+                <p>Pending actions requiring your attention</p>
+            </div>
+            <button class="notif-mark-all-btn" onclick="markAllReadPage()">
+                <i class="uil uil-check-circle"></i> Mark all read
+            </button>
+        </div>
+
+        <div class="notif-page-loading" id="notifPageLoading">
+            <i class="uil uil-spinner-alt spin"></i> Loading…
+        </div>
+        <div class="notif-page-empty" id="notifPageEmpty" style="display:none;">
+            <i class="uil uil-check-circle"></i>
+            <p>All caught up — no pending actions</p>
+        </div>
+        <div class="notif-page-list" id="notifPageList" style="display:none;"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../supabase.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../../admin/admin.js"></script>
+    <script src="../../notify-inapp.js"></script>
+    <script src="./notifications.js"></script>
+</body>
+</html>
