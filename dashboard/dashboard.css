@@ -13,7 +13,7 @@
 /* ========================= MAIN LAYOUT ========================= */
 .dash-main {
     margin-top: 5rem;
-    padding: 1.6rem 1rem 6rem;
+    padding: 1.6rem 1rem 0;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -391,6 +391,9 @@
 .dash-right {
     margin-top: 0;
     padding: 0 1rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 @media screen and (min-width: 1024px) {
@@ -399,12 +402,6 @@
         margin-right: 2vw;
         padding: 2rem 0 6rem;
     }
-}
-
-.dash-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
 }
 
 .dash-panel-card {
