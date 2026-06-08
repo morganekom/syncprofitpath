@@ -90,8 +90,7 @@ systemDark.addEventListener('change', e => {
 
 
 // ========================= SIDEBAR TOGGLE =========================
-const sidebar      = document.querySelector('.sidebar');
-const openSidebarBtn = document.querySelector('.nav_menu-btn');
+const sidebar = document.querySelector('.sidebar');
 
 // Create backdrop element once and append to body
 const sidebarBackdrop = document.createElement('div');
@@ -109,13 +108,13 @@ function closeSidebar() {
     sidebar.style.left = '-100%';
     sidebarBackdrop.classList.remove('open');
     document.body.style.overflow = '';
-    // wait for transition before hiding
     setTimeout(() => { sidebar.style.display = 'none'; }, 300);
 }
 
-if (openSidebarBtn) {
-    openSidebarBtn.addEventListener('click', openSidebar);
-}
+// Both mobile (left) and desktop (right) hamburger buttons open the sidebar
+document.querySelectorAll('.nav_menu-btn--mobile, .nav_menu-btn--desktop').forEach(btn => {
+    btn.addEventListener('click', openSidebar);
+});
 
 // Tap backdrop to close
 sidebarBackdrop.addEventListener('click', closeSidebar);
