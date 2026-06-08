@@ -244,7 +244,7 @@
 
 .from-admin .chat-bubble {
     background: var(--color-primary);
-    color: var(--color-white);
+    color: var(--color-black);
     border-bottom-right-radius: 0.3rem;
 }
 
