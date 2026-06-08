@@ -5,9 +5,10 @@
 :root {
     --color-white: #fff;
     --color-light: #f0eff5;
-    --color-gray-light: #86848c;
-    --color-gray-dark: #56555e;
     --color-dark: #27282f;
+    --color-gray-dark: #56555e;
+    --color-gray-light: #86848c;
+    --color-black: #000;
     --color-primary: rgb(0, 226, 123);
     --color-success: rgb(34, 202, 75);
     --color-danger: rgb(255, 67, 54);
