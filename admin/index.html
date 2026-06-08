@@ -23,6 +23,7 @@
     <!--==================== NAVBAR ====================-->
     <nav>
         <div class="container nav_container">
+            <button class="nav_menu-btn nav_menu-btn--mobile"><i class="uil uil-bars"></i></button>
             <a href="./" class="nav_logo">
                 <img src="../assets/logo.png" alt="Logo">
             </a>
@@ -31,9 +32,22 @@
                 <input type="search" id="adminSearch" placeholder="Search users, transactions…">
             </div>
             <div class="nav_profile-wrapper">
-                <button class="nav_theme-btn">
-                    <i class="uil uil-moon"></i>
-                </button>
+                <div class="nav_bell-wrap" id="navBellWrap">
+                    <button class="nav_bell-btn" id="navBellBtn" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+                        <i class="uil uil-bell"></i>
+                        <span class="nav_bell-badge" id="navBellBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-dropdown-header">
+                            <span>Notifications</span>
+                            <button class="notif-mark-read" onclick="markAllRead()">Mark all read</button>
+                        </div>
+                        <div class="notif-dropdown-list" id="notifDropdownList">
+                            <div class="notif-loading"><i class="uil uil-spinner-alt spin"></i></div>
+                        </div>
+                        <a class="notif-see-all" href="../admin/notifications/">See all notifications</a>
+                    </div>
+                </div>
                 <div class="nav_profile">
                     <div class="nav_profile-photo">
                         <img src="../assets/profile-1.jpg" alt="Admin">
@@ -41,9 +55,7 @@
                     <h5 id="navName">Admin</h5>
                     <span class="admin-badge">Admin</span>
                 </div>
-                <button class="nav_menu-btn">
-                    <i class="uil uil-bars"></i>
-                </button>
+                <button class="nav_menu-btn nav_menu-btn--desktop"><i class="uil uil-bars"></i></button>
             </div>
         </div>
     </nav>
@@ -287,6 +299,7 @@
     <script src="../main.js"></script>
     <script src="./admin.js"></script>
     <script src="./overview.js"></script>
+    <script src="../notify-inapp.js"></script>
 </body>
 
 </html>
