@@ -27,7 +27,8 @@
 /* ── SECTION HEADER ── */
 .settings-section-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
     gap: 1.4rem;
     flex-wrap: wrap;
 }
@@ -64,7 +65,9 @@
 
 /* Add Plan button */
 .settings-action-btn {
-    margin-left: auto;
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
@@ -89,20 +92,21 @@
 
 /* Deposit Edit button — same as plan-edit-btn, pushed right */
 .settings-edit-btn {
-    margin-left: auto;
-    width: auto !important;
+    margin-left: 0;
+    width: 100% !important;
     padding: 0.9rem 1.8rem !important;
+    justify-content: center;
 }
 
 
 /* ========================= FORM GRID ========================= */
 .settings-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.2rem;
 }
 
-.settings-form-grid--full { grid-template-columns: 1fr 1fr; }
+.settings-form-grid--full { grid-template-columns: 1fr; }
 
 .settings-field {
     display: flex;
@@ -224,7 +228,8 @@
 /* ========================= SAVE ROW ========================= */
 .settings-save-row {
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    flex-direction: column;
     justify-content: flex-end;
     gap: 1.2rem;
     padding-top: 0.4rem;
@@ -244,6 +249,7 @@
 .settings-save-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     padding: 0.9rem 1.8rem;
     border-radius: var(--radius-2);
@@ -306,7 +312,7 @@
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--color-gray-light);
-    min-width: 14rem;
+    min-width: 9rem;
     flex-shrink: 0;
 }
 
@@ -373,7 +379,7 @@
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--color-gray-light);
-    min-width: 6rem;
+    min-width: 4.5rem;
     flex-shrink: 0;
     padding-top: 0.1rem;
 }
@@ -396,7 +402,7 @@
 /* ========================= PLANS (unchanged) ========================= */
 .plans-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     align-items: start;
 }
@@ -502,7 +508,8 @@
 
 .plans-order-hint {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
     gap: 1rem;
     background: var(--color-light);
     border-radius: var(--radius-2);
@@ -517,8 +524,10 @@
 .save-order-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    margin-left: auto;
+    margin-left: 0;
+    width: 100%;
     padding: 0.7rem 1.4rem;
     border-radius: var(--radius-2);
     border: none;
@@ -560,8 +569,8 @@
 
 .plans-modal-hint { font-size: 0.95rem; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--color-gray-light); }
 
-.plans-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-.plans-modal-row--half { grid-template-columns: 1fr 1fr; }
+.plans-modal-row { display: grid; grid-template-columns: 1fr; gap: 1.2rem; }
+.plans-modal-row--half { grid-template-columns: 1fr; }
 .plans-modal-field { display: flex; flex-direction: column; gap: 0.5rem; }
 .plans-modal-label { font-size: 1.05rem; font-weight: 600; color: var(--color-gray-dark); }
 
@@ -596,7 +605,7 @@
 .plans-modal-input-wrap .plans-modal-input { padding-right: 3rem; }
 .plans-modal-input--prefixed { padding-left: 2.6rem !important; padding-right: 1.2rem !important; }
 
-.plans-toggle-label { display: flex; align-items: center; gap: 1.2rem; cursor: pointer; user-select: none; }
+.plans-toggle-label { display: flex; align-items: flex-start; gap: 1.2rem; cursor: pointer; user-select: none; }
 .plans-toggle-wrap { position: relative; flex-shrink: 0; }
 .plans-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
 
@@ -645,29 +654,31 @@
 .plans-delete-warn { font-size: 1.05rem !important; color: var(--color-gray-light) !important; font-weight: 400 !important; line-height: 1.5; max-width: 32rem; }
 
 
-/* ========================= MEDIA QUERIES ========================= */
-@media screen and (max-width: 1024px) {
+/* ========================= MEDIA QUERIES (tablet) ========================= */
+@media screen and (min-width: 600px) {
     .plans-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media screen and (max-width: 600px) {
-    .plans-grid,
+/* ========================= MEDIA QUERIES (desktop) ========================= */
+@media screen and (min-width: 1024px) {
     .settings-form-grid,
     .settings-form-grid--full,
     .plans-modal-row,
-    .plans-modal-row--half { grid-template-columns: 1fr; }
+    .plans-modal-row--half { grid-template-columns: 1fr 1fr; }
 
-    .settings-section-header { flex-direction: column; align-items: flex-start; }
+    .plans-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .settings-section-header { flex-direction: row; align-items: center; }
     .settings-action-btn,
-    .settings-edit-btn { margin-left: 0; width: 100%; justify-content: center; }
+    .settings-edit-btn { margin-left: auto; width: auto; justify-content: flex-start; }
 
-    .plans-order-hint { flex-direction: column; align-items: flex-start; }
-    .save-order-btn { margin-left: 0; width: 100%; justify-content: center; }
-    .plans-toggle-label { align-items: flex-start; }
+    .plans-order-hint { flex-direction: row; align-items: center; }
+    .save-order-btn { margin-left: auto; width: auto; justify-content: flex-start; }
+    .plans-toggle-label { align-items: center; }
 
-    .settings-save-row { flex-direction: column; align-items: stretch; }
-    .settings-save-btn { justify-content: center; }
+    .settings-save-row { flex-direction: row; align-items: center; }
+    .settings-save-btn { justify-content: flex-start; }
 
-    .deposit-locked-label { min-width: 9rem; }
-    .deposit-confirm-label { min-width: 4.5rem; }
+    .deposit-locked-label { min-width: 14rem; }
+    .deposit-confirm-label { min-width: 6rem; }
 }
