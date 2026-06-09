@@ -1,18 +1,40 @@
 /* withdraw.css
    Follows the same variable system and patterns as deposit.css
-   Desktop first → tablet → mobile
+   Mobile first
 */
 
 body {
-    grid-template-columns: 17rem auto;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
 /* ========================= WITHDRAW SECTION ========================= */
 .withdraw-section {
-    margin-top: 7rem;
-    margin-right: 2vw;
+    margin-top: 6rem;
+    margin-left: 2.9vw;
     padding-bottom: 5rem;
+}
+
+@media screen and (min-width: 600px) {
+    .withdraw-section {
+        margin-top: 7rem;
+        margin-left: 0;
+        margin-right: 1rem;
+        padding: 0 1rem 5rem;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .withdraw-section {
+        margin-right: 2vw;
+        padding: 0 0 5rem;
+    }
 }
 
 .withdraw-section>h1 {
@@ -22,7 +44,6 @@ body {
 
 
 /* ========================= SHARED FORM CARD ========================= */
-/* Matches .form-card pattern from deposit.css */
 .form-card {
     margin-bottom: 1.5rem;
 }
@@ -34,7 +55,6 @@ body {
 
 
 /* ========================= EMPTY STATE ========================= */
-/* Shown when user has no withdrawal details in settings */
 .withdraw-empty {
     display: flex;
     flex-direction: column;
@@ -75,7 +95,6 @@ body {
     line-height: 1.7;
 }
 
-/* Button linking to settings */
 .empty-settings-btn {
     display: inline-flex;
     align-items: center;
@@ -127,8 +146,14 @@ body {
 }
 
 .balance-info h1 {
-    font-size: 2.8rem;
+    font-size: 2rem;
     font-weight: 800;
+}
+
+@media screen and (min-width: 600px) {
+    .balance-info h1 {
+        font-size: 2.8rem;
+    }
 }
 
 .balance-icon {
@@ -170,12 +195,10 @@ body {
     border-color: var(--color-gray-light);
 }
 
-/* Selected state — green border */
 .method-option.selected {
     border-color: var(--color-primary);
 }
 
-/* Disabled state — when method has no saved details */
 .method-option.disabled {
     opacity: 0.45;
     cursor: not-allowed;
@@ -208,7 +231,6 @@ body {
     font-size: 1.1rem;
 }
 
-/* Radio circle on the right of each method */
 .method-radio {
     width: 1.8rem;
     height: 1.8rem;
@@ -218,14 +240,12 @@ body {
     flex-shrink: 0;
 }
 
-/* Filled radio when selected */
 .method-option.selected .method-radio {
     border-color: var(--color-primary);
     background: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 226, 123, 0.2);
 }
 
-/* Warning shown if selected method has no saved details */
 .method-warning {
     font-size: 1.1rem;
     color: var(--color-warning);
@@ -238,7 +258,6 @@ body {
 
 
 /* ========================= AMOUNT INPUT ========================= */
-/* Matches deposit.css pattern exactly */
 .amount-wrapper {
     position: relative;
 }
@@ -276,7 +295,6 @@ body {
     border-color: var(--color-primary);
 }
 
-/* Error state — red border */
 .amount-input.input-error {
     border-color: var(--color-danger);
 }
@@ -287,6 +305,17 @@ body {
     align-items: center;
     margin-top: 0.6rem;
     padding: 0 0.4rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+@media screen and (min-width: 600px) {
+    .amount-hints {
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+    }
 }
 
 .field-error {
@@ -322,7 +351,6 @@ body {
     box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
 }
 
-/* Disabled state */
 .submit-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -402,12 +430,32 @@ body {
     background: var(--color-white);
     border-radius: var(--radius-3);
     width: 100%;
-    max-width: 42rem;
+    max-width: 100%;
+    margin: 0 1rem;
     padding: var(--card-padding);
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
     animation: slideUp 250ms ease;
+}
+
+@media screen and (min-width: 600px) {
+    .modal {
+        max-width: 42rem;
+        margin: 0;
+    }
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 600px) {
+    .modal-footer {
+        flex-direction: row;
+    }
 }
 
 @keyframes slideUp {
@@ -428,7 +476,6 @@ body {
     align-items: center;
 }
 
-/* Global close button style — matches across all pages */
 .modal-close-btn {
     background: var(--color-light);
     border: none;
@@ -478,7 +525,6 @@ body {
     font-weight: 600;
 }
 
-/* Info note above footer buttons */
 .modal-note {
     display: flex;
     align-items: center;
@@ -494,11 +540,6 @@ body {
     font-size: 1.4rem;
     color: var(--color-warning);
     flex-shrink: 0;
-}
-
-.modal-footer {
-    display: flex;
-    gap: 1rem;
 }
 
 .modal-cancel-btn {
@@ -536,47 +577,4 @@ body {
 
 .modal-confirm-btn:hover {
     box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
-}
-
-
-/* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    body {
-        grid-template-columns: 1fr;
-    }
-
-    .withdraw-section {
-        margin-right: 1rem;
-        padding: 0 1rem 5rem;
-    }
-}
-
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
-    .withdraw-section {
-        margin-left: 2.9vw;
-    }
-    .withdraw-section {
-        margin-top: 6rem;
-    }
-
-    .balance-info h1 {
-        font-size: 2rem;
-    }
-
-    .modal {
-        margin: 0 1rem;
-        max-width: 100%;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-    }
-
-    .amount-hints {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.3rem;
-    }
 }
