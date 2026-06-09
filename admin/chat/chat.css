@@ -2,14 +2,14 @@
 
 
 /* ========================= CHAT LAYOUT ========================= */
-/* Override admin-main to be a two-column chat layout */
+/* Override admin-main to be a two-column chat layout (desktop only) */
 .chat-layout {
     display: grid;
-    grid-template-columns: 32rem 1fr;
+    grid-template-columns: 1fr;
     gap: 0;
     padding: 0;
-    height: calc(100vh - 5rem);
-    overflow: hidden;
+    height: auto;
+    overflow: visible;
 }
 
 
@@ -20,6 +20,8 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    max-height: 40vh;
+    overflow-y: auto;
 }
 
 .chat-sidebar-header {
@@ -142,6 +144,7 @@
     flex-direction: column;
     background: var(--color-light);
     overflow: hidden;
+    min-height: 60vh;
 }
 
 /* Placeholder when nothing selected */
@@ -310,20 +313,20 @@
 }
 
 
-/* ========================= MEDIA QUERIES ========================= */
-@media screen and (max-width: 1024px) {
+/* ========================= MEDIA QUERIES (desktop) ========================= */
+@media screen and (min-width: 1024px) {
     .chat-layout {
-        grid-template-columns: 1fr;
-        height: auto;
-        overflow: visible;
+        grid-template-columns: 32rem 1fr;
+        height: calc(100vh - 5rem);
+        overflow: hidden;
     }
 
     .chat-sidebar {
-        max-height: 40vh;
-        overflow-y: auto;
+        max-height: none;
+        overflow-y: hidden;
     }
 
     .chat-thread {
-        min-height: 60vh;
+        min-height: 0;
     }
 }
