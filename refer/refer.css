@@ -1,20 +1,41 @@
 /* refer.css
    Follows the same variable system, card style, and layout patterns as settings.css
+   Mobile first
 */
 
 body {
-    grid-template-columns: 17rem auto;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
 /* ========================= REFER SECTION ========================= */
 .refer-section {
-    margin-top: 7rem;
+    margin-top: 6rem;
+    margin-left: 2.9vw;
     margin-right: 2.9vw;
     padding-bottom: 6rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+}
+
+@media screen and (min-width: 600px) {
+    .refer-section {
+        margin-top: 7rem;
+        margin-left: 0;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .refer-section {
+        margin-right: 2.9vw;
+    }
 }
 
 .refer-section>h1 {
@@ -32,31 +53,56 @@ body {
 /* ========================= HOW IT WORKS ========================= */
 .how-it-works {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0;
     background: var(--color-white);
     border-radius: var(--radius-3);
-    padding: var(--card-padding) 2rem;
+    padding: var(--card-padding) 1rem;
+}
+
+@media screen and (min-width: 600px) {
+    .how-it-works {
+        flex-direction: row;
+        align-items: center;
+        padding: var(--card-padding) 2rem;
+    }
 }
 
 .how-step {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
     gap: 0.8rem;
-    padding: 1rem;
+    padding: 0.6rem 0;
+}
+
+@media screen and (min-width: 600px) {
+    .how-step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+    }
 }
 
 .how-icon {
-    width: 5rem;
-    height: 5rem;
+    width: 4rem;
+    height: 4rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+@media screen and (min-width: 600px) {
+    .how-icon {
+        width: 5rem;
+        height: 5rem;
+    }
 }
 
 .how-icon i {
@@ -76,18 +122,34 @@ body {
 
 .how-divider {
     color: var(--color-gray-light);
-    font-size: 2.4rem;
+    font-size: 1.8rem;
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    transform: rotate(90deg);
+    margin-left: 1.8rem;
+}
+
+@media screen and (min-width: 600px) {
+    .how-divider {
+        font-size: 2.4rem;
+        transform: none;
+        margin-left: 0;
+    }
 }
 
 
 /* ========================= STATS ROW ========================= */
 .refer-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
+}
+
+@media screen and (min-width: 600px) {
+    .refer-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .refer-stat-card {
@@ -96,8 +158,14 @@ body {
     padding: var(--card-padding);
     display: flex;
     align-items: center;
-    gap: 1.4rem;
+    gap: 1rem;
     transition: var(--transition);
+}
+
+@media screen and (min-width: 600px) {
+    .refer-stat-card {
+        gap: 1.4rem;
+    }
 }
 
 .refer-stat-card:hover {
@@ -135,9 +203,15 @@ body {
 /* ========================= MAIN GRID ========================= */
 .refer-grid {
     display: grid;
-    grid-template-columns: 1fr 38rem;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     align-items: start;
+}
+
+@media screen and (min-width: 1024px) {
+    .refer-grid {
+        grid-template-columns: 1fr 38rem;
+    }
 }
 
 .refer-left {
@@ -173,11 +247,30 @@ body {
 /* ========================= CODE DISPLAY ========================= */
 .code-display {
     display: flex;
-    align-items: center;
-    gap: 1.2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
     background: var(--color-light);
     border-radius: var(--radius-2);
     padding: 1.2rem 1.6rem;
+}
+
+@media screen and (min-width: 600px) {
+    .code-display {
+        flex-direction: row;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    .code-display .copy-btn {
+        width: auto;
+        justify-content: flex-start;
+    }
+}
+
+.code-display .copy-btn {
+    width: 100%;
+    justify-content: center;
 }
 
 .code-value {
@@ -192,12 +285,21 @@ body {
 /* ========================= LINK ROW ========================= */
 .link-row {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    align-items: center;
+    align-items: stretch;
+}
+
+@media screen and (min-width: 600px) {
+    .link-row {
+        flex-direction: row;
+        align-items: center;
+    }
 }
 
 .refer-input {
     flex: 1;
+    width: 100%;
     background: var(--color-light);
     border-radius: var(--radius-2);
     padding: 1.2rem 1.4rem;
@@ -231,6 +333,15 @@ body {
     transition: var(--transition);
     white-space: nowrap;
     flex-shrink: 0;
+    width: 100%;
+    justify-content: center;
+}
+
+@media screen and (min-width: 600px) {
+    .copy-btn {
+        width: auto;
+        justify-content: flex-start;
+    }
 }
 
 .copy-btn i {
@@ -264,13 +375,21 @@ body {
 
 .share-actions {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+@media screen and (min-width: 600px) {
+    .share-actions {
+        flex-direction: row;
+    }
 }
 
 .share-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     padding: 1rem 1.6rem;
     border-radius: var(--radius-2);
@@ -281,6 +400,14 @@ body {
     border: none;
     transition: var(--transition);
     white-space: nowrap;
+    width: 100%;
+}
+
+@media screen and (min-width: 600px) {
+    .share-btn {
+        width: auto;
+        justify-content: flex-start;
+    }
 }
 
 .share-btn i {
@@ -322,7 +449,6 @@ body {
     gap: 1rem;
 }
 
-/* Empty state */
 .refer-empty {
     display: flex;
     flex-direction: column;
@@ -434,102 +560,15 @@ body {
     color: var(--color-warning);
 }
 
-
-/* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    body {
-        grid-template-columns: 1fr;
-    }
-
-    .refer-section {
-        margin-right: 2.9vw;
-    }
-
-    .refer-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .refer-stats {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .how-it-works {
-        gap: 0;
-        padding: var(--card-padding) 1rem;
-    }
+/* ========================= SKELETON LOADER ========================= */
+@keyframes shimmer {
+    0%   { background-position: -60rem 0; }
+    100% { background-position:  60rem 0; }
 }
 
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
-    .refer-section {
-        margin-top: 6rem;
-        margin-left: 2.9vw;
-    }
-
-    .refer-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .refer-stat-card {
-        gap: 1rem;
-    }
-
-    .how-it-works {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .how-step {
-        flex-direction: row;
-        text-align: left;
-        align-items: flex-start;
-        padding: 0.6rem 0;
-    }
-
-    .how-icon {
-        width: 4rem;
-        height: 4rem;
-        flex-shrink: 0;
-    }
-
-    .how-divider {
-        transform: rotate(90deg);
-        margin-left: 1.8rem;
-        font-size: 1.8rem;
-    }
-
-    .link-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .refer-input {
-        width: 100%;
-    }
-
-    .copy-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .code-display {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .code-display .copy-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .share-actions {
-        flex-direction: column;
-    }
-
-    .share-btn {
-        width: 100%;
-        justify-content: center;
-    }
+.skeleton {
+    background: linear-gradient(90deg, var(--color-light) 25%, #e0dfe8 50%, var(--color-light) 75%);
+    background-size: 120rem 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-1);
 }

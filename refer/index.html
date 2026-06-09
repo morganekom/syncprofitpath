@@ -142,13 +142,39 @@
 
 
         <!-- ── STATS ROW ── -->
-        <div class="refer-stats">
+        <!-- Skeleton shown while stats load -->
+        <div class="refer-stats" id="referStatsSkeleton">
+            <div class="refer-stat-card">
+                <div class="stat-icon skeleton" style="border-radius:var(--radius-2);"></div>
+                <div class="stat-info" style="flex:1;">
+                    <div class="skeleton" style="height:2.4rem;width:6rem;border-radius:var(--radius-1);margin-bottom:0.5rem;"></div>
+                    <div class="skeleton" style="height:1.2rem;width:9rem;border-radius:var(--radius-1);"></div>
+                </div>
+            </div>
+            <div class="refer-stat-card">
+                <div class="stat-icon skeleton" style="border-radius:var(--radius-2);"></div>
+                <div class="stat-info" style="flex:1;">
+                    <div class="skeleton" style="height:2.4rem;width:8rem;border-radius:var(--radius-1);margin-bottom:0.5rem;"></div>
+                    <div class="skeleton" style="height:1.2rem;width:8rem;border-radius:var(--radius-1);"></div>
+                </div>
+            </div>
+            <div class="refer-stat-card">
+                <div class="stat-icon skeleton" style="border-radius:var(--radius-2);"></div>
+                <div class="stat-info" style="flex:1;">
+                    <div class="skeleton" style="height:2.4rem;width:4rem;border-radius:var(--radius-1);margin-bottom:0.5rem;"></div>
+                    <div class="skeleton" style="height:1.2rem;width:6rem;border-radius:var(--radius-1);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real stats — hidden until data loads -->
+        <div class="refer-stats" id="referStatsReal" style="display:none;">
             <div class="refer-stat-card">
                 <div class="stat-icon bg-primary-light">
                     <i class="uil uil-users-alt primary"></i>
                 </div>
                 <div class="stat-info">
-                    <h2 id="statReferrals">0</h2>
+                    <h2 id="statReferrals">—</h2>
                     <p>Total Referrals</p>
                 </div>
             </div>
@@ -157,7 +183,7 @@
                     <i class="uil uil-money-bill success"></i>
                 </div>
                 <div class="stat-info">
-                    <h2 id="statEarnings">$0.00</h2>
+                    <h2 id="statEarnings">—</h2>
                     <p>Total Earned</p>
                 </div>
             </div>
@@ -166,7 +192,7 @@
                     <i class="uil uil-clock danger"></i>
                 </div>
                 <div class="stat-info">
-                    <h2 id="statPending">0</h2>
+                    <h2 id="statPending">—</h2>
                     <p>Pending</p>
                 </div>
             </div>

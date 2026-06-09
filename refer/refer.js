@@ -24,6 +24,13 @@ let referralHistory = [];
 window.addEventListener('DOMContentLoaded', async () => {
     loadReferralCode();
     await fetchReferralStats();
+
+    // Hide skeleton, reveal real stats
+    const skelEl = document.getElementById('referStatsSkeleton');
+    const realEl = document.getElementById('referStatsReal');
+    if (skelEl) skelEl.style.display = 'none';
+    if (realEl) realEl.style.display = '';
+
     renderStats();
     renderHistory();
 });
