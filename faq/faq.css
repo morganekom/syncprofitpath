@@ -1,16 +1,36 @@
-/* faq.css */
+/* faq.css — Mobile first */
 
 body {
-    grid-template-columns: 17rem auto;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
 /* ========================= MAIN ========================= */
 .faq-main {
-    margin-top: 7rem;
-    margin-right: 2.9vw;
+    margin-top: 6rem;
+    margin-right: 1.5rem;
+    margin-left: 1.5rem;
     padding-bottom: 6rem;
     max-width: 780px;
+}
+
+@media screen and (min-width: 600px) {
+    .faq-main {
+        margin-top: 7rem;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .faq-main {
+        margin-right: 2.9vw;
+        margin-left: 0;
+    }
 }
 
 
@@ -18,9 +38,15 @@ body {
 .faq-hero {
     display: flex;
     align-items: flex-start;
-    gap: 1.4rem;
+    gap: 1rem;
     margin-bottom: 2.4rem;
     flex-wrap: wrap;
+}
+
+@media screen and (min-width: 600px) {
+    .faq-hero {
+        gap: 1.4rem;
+    }
 }
 
 .faq-hero-icon {
@@ -62,6 +88,7 @@ body {
 .faq-chat-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     padding: 0.9rem 1.8rem;
     background: var(--color-primary);
@@ -75,6 +102,14 @@ body {
     transition: var(--transition);
     white-space: nowrap;
     flex-shrink: 0;
+    width: 100%;
+}
+
+@media screen and (min-width: 600px) {
+    .faq-chat-btn {
+        width: auto;
+        justify-content: flex-start;
+    }
 }
 
 .faq-chat-btn:hover {
@@ -90,7 +125,7 @@ body {
 /* ========================= TAB NAV ========================= */
 .faq-tabs {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     background: var(--color-white);
     border-radius: var(--radius-3);
     padding: 0.6rem;
@@ -98,13 +133,19 @@ body {
     flex-wrap: wrap;
 }
 
+@media screen and (min-width: 600px) {
+    .faq-tabs {
+        gap: 0.5rem;
+    }
+}
+
 .faq-tab {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.9rem 1.6rem;
+    padding: 0.8rem 1rem;
     border-radius: var(--radius-2);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--color-gray-dark);
     background: transparent;
@@ -113,6 +154,21 @@ body {
     transition: var(--transition);
     font-family: "Poppins", sans-serif;
     white-space: nowrap;
+}
+
+.faq-tab span {
+    display: none;
+}
+
+@media screen and (min-width: 600px) {
+    .faq-tab {
+        padding: 0.9rem 1.6rem;
+        font-size: 1.2rem;
+    }
+
+    .faq-tab span {
+        display: inline;
+    }
 }
 
 .faq-tab i {
@@ -265,18 +321,7 @@ body {
     font-size: 1.1rem;
 }
 
-
-/* ========================= RESPONSIVE ========================= */
-@media screen and (max-width: 1024px) {
-    body { grid-template-columns: 1fr; }
-    .faq-main { margin-right: 1.5rem; margin-left: 1.5rem; }
-}
-
-@media screen and (max-width: 600px) {
-    .faq-tabs { gap: 0.4rem; }
-    .faq-tab { padding: 0.8rem 1rem; font-size: 1.1rem; }
-    .faq-tab span { display: none; }
-    .faq-hero { gap: 1rem; }
-    .faq-chat-btn { width: 100%; justify-content: center; }
-    .faq-still-help-inner .faq-chat-btn { width: 100%; justify-content: center; }
+.faq-still-help-inner .faq-chat-btn {
+    width: 100%;
+    justify-content: center;
 }
