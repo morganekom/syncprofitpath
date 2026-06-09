@@ -26,7 +26,12 @@ let selectedModalCoin = null;
 // ================================================================
 
 async function loadPlans() {
-    const grid = document.getElementById('plansGrid');
+    const grid    = document.getElementById('plansGrid');
+    const skelEl  = document.getElementById('plansLoading');
+
+    // Show skeleton, hide grid until data is ready
+    if (skelEl) skelEl.style.display = '';
+    grid.style.display = 'none';
 
     try {
         const { data, error } = await db
@@ -94,6 +99,10 @@ async function loadPlans() {
             </article>`;
         }).join('');
 
+        // ── Hide skeleton, show grid ──
+        if (skelEl) skelEl.style.display = 'none';
+        grid.style.display = '';
+
         // ── Re-attach invest button listeners ──
         grid.querySelectorAll('.invest-now-btn').forEach(btn => {
             btn.addEventListener('click', () => openInvestModal(btn));
@@ -113,6 +122,8 @@ async function loadPlans() {
 
     } catch (err) {
         console.error('Failed to load investment plans:', err.message);
+        if (skelEl) skelEl.style.display = 'none';
+        grid.style.display = '';
         grid.innerHTML = '<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>';
     }
 }

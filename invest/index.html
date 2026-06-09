@@ -119,17 +119,15 @@
 
         <h1>Investment Plan</h1>
 
-        <!-- Plans are rendered dynamically from Supabase by invest.js -->
-        <div class="plans-grid" id="plansGrid">
-            <!-- Loading skeleton -->
-            <div class="plans-loading" id="plansLoading">
-                <div class="plan-card plan-basic" style="opacity:0.4; pointer-events:none;">
-                    <div class="plan-card_header"><h2>Loading…</h2><div class="plan-card_indicator"></div></div>
-                    <span class="plan-badge">—</span>
-                    <div class="plan-details"></div>
-                </div>
-            </div>
+        <!-- Skeleton shown while plans load from Supabase -->
+        <div class="plans-loading" id="plansLoading">
+            <div class="plan-skel skeleton"></div>
+            <div class="plan-skel skeleton"></div>
+            <div class="plan-skel skeleton"></div>
         </div>
+
+        <!-- Plans are rendered dynamically from Supabase by invest.js -->
+        <div class="plans-grid" id="plansGrid" style="display:none;"></div>
 
 
         <!-- ── PROFIT CALCULATOR ── -->

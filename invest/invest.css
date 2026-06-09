@@ -1,19 +1,40 @@
 /* invest.css — Invest page styles
    Follows the same variable system as style.css
-   Desktop first → tablet → mobile
+   Mobile first
 */
 
 body {
-    grid-template-columns: 17rem auto;
+    grid-template-columns: 1fr;
     overflow-x: hidden;
+}
+
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
 /* ========================= INVEST SECTION ========================= */
 .invest-section {
-    margin-top: 7rem;
-    margin-right: 2vw;
-    padding-bottom: 5rem;
+    margin-top: 6rem;
+    padding: 0 1rem 5rem;
+    overflow-x: hidden;
+}
+
+@media screen and (min-width: 600px) {
+    .invest-section {
+        margin-top: 7rem;
+        margin-right: 0;
+        padding: 0 1rem 5rem;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .invest-section {
+        margin-right: 2vw;
+        padding: 0 0 5rem;
+    }
 }
 
 .invest-section>h1 {
@@ -25,10 +46,22 @@ body {
 /* ========================= PLAN CARDS GRID ========================= */
 .plans-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-bottom: 3.5rem;
     align-items: start;
+}
+
+@media screen and (min-width: 600px) {
+    .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .plans-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .plan-card {
@@ -144,6 +177,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    max-width: 100%;
 }
 
 .calc-field {
@@ -319,12 +353,32 @@ body {
     background: var(--color-white);
     border-radius: var(--radius-3);
     width: 100%;
-    max-width: 44rem;
+    max-width: 100%;
+    margin: 0 1rem;
     padding: var(--card-padding);
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
     animation: slideUp 250ms ease;
+}
+
+@media screen and (min-width: 600px) {
+    .modal {
+        max-width: 44rem;
+        margin: 0;
+    }
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 600px) {
+    .modal-footer {
+        flex-direction: row;
+    }
 }
 
 @keyframes slideUp {
@@ -371,7 +425,7 @@ body {
     margin-top: -0.5rem;
 }
 
-/* ── COIN SELECTOR (NEW) ── */
+/* ── COIN SELECTOR ── */
 .modal-coin-section {
     background: var(--color-light);
     border-radius: var(--radius-2);
@@ -385,14 +439,12 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Row of 6 coin icons */
 .modal-coin-row {
     display: flex;
     justify-content: space-between;
     gap: 0.6rem;
 }
 
-/* Each coin button */
 .modal-coin {
     display: flex;
     flex-direction: column;
@@ -411,22 +463,28 @@ body {
     background: var(--color-white);
 }
 
-/* Active/selected coin gets a primary border */
 .modal-coin.selected {
     border-color: var(--color-primary);
     background: var(--color-white);
 }
 
-/* The coloured circle icon */
 .modal-coin-icon {
-    width: 3.2rem;
-    height: 3.2rem;
+    width: 2.6rem;
+    height: 2.6rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
+}
+
+@media screen and (min-width: 600px) {
+    .modal-coin-icon {
+        width: 3.2rem;
+        height: 3.2rem;
+        font-size: 1.5rem;
+    }
 }
 
 .modal-coin small {
@@ -439,7 +497,6 @@ body {
     color: var(--color-primary);
 }
 
-/* Hint text below coins */
 .modal-coin-hint {
     font-size: 1rem;
     color: var(--color-gray-light);
@@ -451,7 +508,6 @@ body {
     color: var(--color-success);
 }
 
-/* Amount input field */
 .modal-field label {
     display: block;
     font-size: 1.1rem;
@@ -471,7 +527,6 @@ body {
     transition: var(--transition);
 }
 
-/* Locked state — when no coin selected yet */
 .modal-input-wrapper.locked {
     opacity: 0.45;
     cursor: not-allowed;
@@ -515,7 +570,6 @@ body {
     min-height: 1.5rem;
 }
 
-/* Success state */
 .modal-success {
     display: none;
     flex-direction: column;
@@ -542,12 +596,6 @@ body {
 .modal-success p {
     color: var(--color-gray-light);
     font-size: 1.1rem;
-}
-
-/* Modal footer */
-.modal-footer {
-    display: flex;
-    gap: 1rem;
 }
 
 .modal-cancel-btn {
@@ -612,57 +660,31 @@ body {
 }
 
 
-/* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    body {
-        grid-template-columns: 1fr;
-    }
+/* ================================================================
+   ACTIVE INVESTMENTS SECTION
+   ================================================================ */
 
-    .invest-section {
-        margin-right: 1rem;
-        padding: 0 1rem 5rem;
-    }
+/* ========================= PLANS LOADING SKELETON ========================= */
+.plans-loading {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+}
 
-    .plans-grid {
+@media screen and (min-width: 600px) {
+    .plans-loading {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
-    .invest-section {
-        margin-top: 6rem;
-        margin-right: 0;
-        padding: 0 1rem 5rem;
-        overflow-x: hidden;
-    }
-
-    .plans-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .calculator-card {
-        max-width: 100%;
-    }
-
-    .modal {
-        margin: 0 1rem;
-        max-width: 100%;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-    }
-
-    /* Slightly smaller coin icons on mobile */
-    .modal-coin-icon {
-        width: 2.6rem;
-        height: 2.6rem;
-        font-size: 1.2rem;
+@media screen and (min-width: 1024px) {
+    .plans-loading {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
-/* ================================================================
-   ACTIVE INVESTMENTS SECTION
-   ================================================================ */
+.plan-skel {
+    height: 28rem;
+    border-radius: var(--radius-3);
+}
