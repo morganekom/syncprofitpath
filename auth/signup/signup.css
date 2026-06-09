@@ -47,7 +47,7 @@ body {
 /* ========================= AUTH PAGE LAYOUT ========================= */
 .auth-page {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     min-height: 100vh;
 }
 
@@ -55,13 +55,12 @@ body {
 /* ── LEFT PANEL ── */
 .auth-left {
     background: var(--color-dark);
-    padding: 4rem 4rem 4rem 5rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    position: static;
+    height: auto;
 }
 
 .auth-logo {
@@ -84,7 +83,7 @@ body {
 }
 
 .auth-features {
-    display: flex;
+    display: none; /* hidden on mobile, shown on desktop */
     flex-direction: column;
     gap: 2rem;
     flex: 1;
@@ -127,6 +126,7 @@ body {
 .auth-login-link {
     color: rgba(255, 255, 255, 0.5);
     font-size: 1.2rem;
+    display: none; /* hidden on mobile, shown on desktop */
 }
 
 .auth-login-link a {
@@ -693,6 +693,10 @@ body {
 
     .auth-features {
         display: flex;
+    }
+
+    .auth-login-link {
+        display: block;
     }
 
     .auth-right {
