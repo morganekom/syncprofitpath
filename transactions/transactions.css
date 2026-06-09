@@ -1,31 +1,57 @@
 /* transactions.css
-   Desktop first → tablet → mobile
+   Mobile first
    Matches variable system from style.css
 */
 
 body {
-    grid-template-columns: 17rem auto;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
 /* ========================= TRANSACTIONS SECTION ========================= */
 .transactions-section {
-    margin-top: 7rem;
-    margin-right: 2vw;
-    padding-bottom: 6rem;
+    margin-top: 6rem;
+    padding: 0 1rem 6rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+@media screen and (min-width: 600px) {
+    .transactions-section {
+        margin-top: 7rem;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .transactions-section {
+        margin-right: 2vw;
+        padding: 0 0 6rem;
+    }
 }
 
 
 /* ========================= HEADER ROW ========================= */
 .transactions-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 1rem;
+}
+
+@media screen and (min-width: 600px) {
+    .transactions-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
 }
 
 .transactions-header h1 {
@@ -40,12 +66,21 @@ body {
     background: var(--color-white);
     border-radius: var(--radius-2);
     padding: 0.4rem;
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media screen and (min-width: 600px) {
+    .filter-tabs {
+        width: auto;
+        overflow-x: visible;
+    }
 }
 
 .filter-tab {
-    padding: 0.7rem 1.4rem;
+    padding: 0.6rem 1rem;
     border-radius: var(--radius-1);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--color-gray-dark);
     background: transparent;
@@ -54,6 +89,13 @@ body {
     transition: var(--transition);
     font-family: "Poppins", sans-serif;
     white-space: nowrap;
+}
+
+@media screen and (min-width: 600px) {
+    .filter-tab {
+        padding: 0.7rem 1.4rem;
+        font-size: 1.1rem;
+    }
 }
 
 .filter-tab:hover {
@@ -195,7 +237,7 @@ body {
 .table-wrapper {
     background: var(--color-white);
     border-radius: var(--radius-3);
-    overflow-x: auto; /* horizontal scroll on small screens */
+    overflow-x: auto;
 }
 
 .transactionsTable {
@@ -236,14 +278,23 @@ body {
     background: var(--color-light);
 }
 
-/* Reference — monospace, slightly muted */
+/* Hide less important columns on mobile */
+.transactionsTable .hide-mobile {
+    display: none;
+}
+
+@media screen and (min-width: 600px) {
+    .transactionsTable .hide-mobile {
+        display: table-cell;
+    }
+}
+
 .td-reference {
     font-family: 'Courier New', monospace;
     font-size: 1rem;
     color: var(--color-gray-light);
 }
 
-/* Type badge */
 .type-badge {
     display: inline-flex;
     align-items: center;
@@ -270,7 +321,6 @@ body {
     color: var(--color-purple);
 }
 
-/* Status badge */
 .status-badge {
     display: inline-block;
     padding: 0.3rem 1rem;
@@ -295,12 +345,10 @@ body {
     color: var(--color-danger);
 }
 
-/* Amount — green for deposit, red for withdrawal */
 .amount-positive { color: var(--color-success); font-weight: 700; }
 .amount-negative { color: var(--color-danger);  font-weight: 700; }
 .amount-neutral  { color: var(--color-purple);  font-weight: 700; }
 
-/* Note — truncate if too long */
 .td-note {
     max-width: 16rem;
     overflow: hidden;
@@ -308,42 +356,4 @@ body {
     white-space: nowrap;
     color: var(--color-gray-light);
     font-size: 1.1rem;
-}
-
-
-/* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    body { grid-template-columns: 1fr; }
-
-    .transactions-section {
-        margin-right: 1rem;
-        padding: 0 1rem 6rem;
-    }
-}
-
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
-    .transactions-section { margin-top: 6rem; }
-
-    .transactions-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filter-tabs {
-        width: 100%;
-        overflow-x: auto;
-        padding: 0.4rem;
-    }
-
-    .filter-tab {
-        font-size: 1rem;
-        padding: 0.6rem 1rem;
-    }
-
-    /* Hide less important columns on mobile */
-    .transactionsTable .hide-mobile {
-        display: none;
-    }
 }
