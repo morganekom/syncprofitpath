@@ -137,7 +137,21 @@
 
             <!-- Profile photo -->
             <div class="settings-card">
-                <div class="profile-photo-section">
+
+                <!-- Skeleton — shown while photo loads from Supabase -->
+                <div class="profile-photo-section" id="profilePhotoSkeleton">
+                    <div class="profile-photo-wrap">
+                        <div class="skeleton" style="width:7rem;height:7rem;border-radius:50%;"></div>
+                    </div>
+                    <div class="profile-photo-info" style="flex:1;">
+                        <div class="skeleton" style="height:1.8rem;width:14rem;border-radius:var(--radius-1);margin-bottom:0.6rem;"></div>
+                        <div class="skeleton" style="height:1.2rem;width:18rem;border-radius:var(--radius-1);margin-bottom:0.8rem;"></div>
+                        <div class="skeleton" style="height:2rem;width:8rem;border-radius:var(--radius-1);"></div>
+                    </div>
+                </div>
+
+                <!-- Real content — hidden until data is ready -->
+                <div class="profile-photo-section" id="profilePhotoReal" style="display:none;">
                     <div class="profile-photo-wrap">
                         <img src="../assets/profile-1.jpg" alt="Profile" id="profilePhotoPreview">
                         <label class="photo-edit-btn" for="profilePhotoInput" title="Change photo">
@@ -154,6 +168,7 @@
                         </span>
                     </div>
                 </div>
+
             </div>
 
             <!-- Photo crop modal -->

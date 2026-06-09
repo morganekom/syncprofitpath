@@ -94,12 +94,22 @@ function loadAllSavedData() {
         if (navPhoto) { navPhoto.src = src; navPhoto.style.display = ''; }
     }
 
-    // Show cached photo instantly (avoids flash of dummy image)
+    // Helper: reveal real profile section, hide skeleton
+    function revealProfileSection() {
+        const skelEl = document.getElementById('profilePhotoSkeleton');
+        const realEl = document.getElementById('profilePhotoReal');
+        if (skelEl) skelEl.style.display = 'none';
+        if (realEl) realEl.style.display = '';
+    }
+
     const _photoKey   = _currentUser.id ? `profilePhoto_${_currentUser.id}` : null;
     const cachedPhoto = _photoKey ? localStorage.getItem(_photoKey) : null;
-    applyPhoto(cachedPhoto || null);
 
-    // Then fetch the authoritative value from Supabase
+    if (cachedPhoto) {
+        applyPhoto(cachedPhoto);
+        revealProfileSection();
+    }
+
     if (_currentUser.id) {
         db.from('users')
           .select('avatar_url')
@@ -108,10 +118,13 @@ function loadAllSavedData() {
           .then(({ data }) => {
               const dbPhoto = data && data.avatar_url ? data.avatar_url : null;
               applyPhoto(dbPhoto);
-              // Sync cache to match DB
               if (dbPhoto && _photoKey) localStorage.setItem(_photoKey, dbPhoto);
               else if (_photoKey)       localStorage.removeItem(_photoKey);
-          });
+              revealProfileSection();
+          })
+          .catch(() => revealProfileSection());
+    } else {
+        revealProfileSection();
     }
 
     // ── Profile ──

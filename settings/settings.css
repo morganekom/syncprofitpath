@@ -588,6 +588,16 @@ body {
         gap: 0.6rem;
     }
 }
+
+
+/* ================================================================
+   CROP MODAL
+   ================================================================ */
+
+.crop-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
     background: rgba(0,0,0,0.7);
     z-index: 200;
     align-items: center;
@@ -795,4 +805,17 @@ body {
         text-align: center;
         gap: 0.8rem;
     }
+}
+
+/* ========================= SKELETON LOADER ========================= */
+@keyframes shimmer {
+    0%   { background-position: -60rem 0; }
+    100% { background-position:  60rem 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--color-light) 25%, #e0dfe8 50%, var(--color-light) 75%);
+    background-size: 120rem 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-1);
 }
