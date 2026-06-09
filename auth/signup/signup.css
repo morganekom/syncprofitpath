@@ -653,50 +653,53 @@ body {
 
 
 /* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    .auth-page {
-        grid-template-columns: 1fr;
-    }
 
-    .auth-left {
-        position: static;
-        height: auto;
-        padding: 3rem;
-        min-height: unset;
-    }
-
-    .auth-features {
-        display: none;
-    }
-
+/* ========================= MEDIA QUERIES (tablet) ========================= */
+@media screen and (min-width: 600px) {
     .auth-right {
         padding: 3rem 2rem;
     }
-}
 
-
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
     .auth-left {
-        padding: 2rem 1.5rem;
-    }
-
-    .auth-right {
-        padding: 2rem 1.2rem;
+        padding: 3rem;
     }
 
     .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .step-dot span {
-        font-size: 0.9rem;
+        grid-template-columns: 1fr 1fr;
     }
 
     .signup-box {
         gap: 1.6rem;
     }
+
+    .step-dot span {
+        font-size: 1rem;
+    }
 }
+
+
+/* ========================= MEDIA QUERIES (desktop) ========================= */
+@media screen and (min-width: 1024px) {
+    .auth-page {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .auth-left {
+        padding: 4rem 4rem 4rem 5rem;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+    }
+
+    .auth-features {
+        display: flex;
+    }
+
+    .auth-right {
+        padding: 4rem 3rem;
+    }
+}
+
 /* Fix: restore native date picker UI (overrides global appearance:none reset) */
 input[type="date"].auth-input {
     -webkit-appearance: auto;
