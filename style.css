@@ -440,22 +440,26 @@ nav {
     padding: 1.5rem 2vw;
     cursor: pointer;
     border: none;
-    background: transparent;
+    background: var(--color-white);
     width: 100%;
     font-family: "Poppins", sans-serif;
     transition: var(--transition);
-    margin-top: auto;
+    /* Mobile: stick to bottom of overlay */
+    position: sticky;
+    bottom: 0;
+    margin-top: 0;
+    border-top: 1px solid var(--color-light);
+    z-index: 1;
 }
 
-/* On mobile the logout btn sticks to the bottom of the overlay */
-@media screen and (max-width: 1023px) {
+/* On desktop the logout btn sits in normal flow at the bottom of the sidebar */
+@media screen and (min-width: 1024px) {
     .sidebar_logout-btn {
-        position: sticky;
-        bottom: 0;
-        margin-top: 0;
-        background: var(--color-white);
-        border-top: 1px solid var(--color-light);
-        z-index: 1;
+        position: static;
+        margin-top: auto;
+        background: transparent;
+        border-top: none;
+        z-index: auto;
     }
 }
 
@@ -634,12 +638,12 @@ canvas {
 /* ========================= RIGHT PANEL (investments etc.) ========================= */
 .right {
     margin-top: 6rem;
-    margin-right: 2vw;
+    margin-right: 1rem;
 }
 
-@media screen and (max-width: 1023px) {
+@media screen and (min-width: 1024px) {
     .right {
-        margin-right: 1rem;
+        margin-right: 2vw;
     }
 }
 
