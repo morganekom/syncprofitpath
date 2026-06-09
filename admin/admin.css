@@ -5,8 +5,13 @@
 */
 
 /* ========================= BODY LAYOUT ========================= */
-body {
-    grid-template-columns: 17rem auto;
+/* Mobile/tablet: body is display:block from style.css, no sidebar column needed */
+
+/* Desktop: admin sidebar + content */
+@media screen and (min-width: 1024px) {
+    body {
+        grid-template-columns: 17rem auto;
+    }
 }
 
 
@@ -134,7 +139,7 @@ body {
 /* ========================= STAT CARDS ========================= */
 .admin-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
 }
 
@@ -217,7 +222,7 @@ body {
 /* ========================= BOTTOM GRID ========================= */
 .admin-grid {
     display: grid;
-    grid-template-columns: 1fr 36rem;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     align-items: start;
 }
@@ -683,48 +688,73 @@ body {
 }
 
 
+/* ========================= MOBILE BASE (default) ========================= */
+.admin-main {
+    margin-top: 6.5rem;
+    margin-left: 1.4rem;
+    margin-right: 1.4rem;
+    gap: 1.4rem;
+}
+
+.admin-header { align-items: flex-start; }
+
+.admin-stat-card { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+
+.admin-table th:nth-child(n+4),
+.admin-table td:nth-child(n+4) { display: none; }
+
+.sidebar_close-btn { display: inline-flex; position: absolute; top: 2rem; right: 1.5rem; }
+
+.admin-modal { padding: 1.6rem; }
+
+/* Logout always visible — sticky at bottom of admin sidebar */
+.sidebar_logout-btn {
+    position: sticky;
+    bottom: 0;
+    margin-top: 0;
+    background: var(--color-white);
+    border-top: 1px solid var(--color-light);
+    z-index: 1;
+}
+
+
 /* ========================= MEDIA QUERIES (tablet) ========================= */
-@media screen and (max-width: 1024px) {
-    body { grid-template-columns: 1fr; }
-
+@media screen and (min-width: 600px) {
     .admin-stats { grid-template-columns: 1fr 1fr; }
-
-    .admin-grid { grid-template-columns: 1fr; }
 
     .admin-main { margin-right: 1.4rem; margin-left: 1.4rem; }
 }
 
 
-/* ========================= MEDIA QUERIES (mobile) ========================= */
-@media screen and (max-width: 600px) {
+/* ========================= MEDIA QUERIES (desktop) ========================= */
+@media screen and (min-width: 1024px) {
+    .admin-stats { grid-template-columns: repeat(3, 1fr); }
+
+    .admin-grid { grid-template-columns: 1fr 36rem; }
+
     .admin-main {
-        margin-top: 6.5rem;
-        margin-left: 1.4rem;
-        margin-right: 1.4rem;
-        gap: 1.4rem;
+        margin-top: 7rem;
+        margin-right: 2.9vw;
+        margin-left: 0;
+        gap: 2rem;
     }
 
-    .admin-stats { grid-template-columns: 1fr; }
+    .admin-header { align-items: flex-end; }
 
-    .admin-header { align-items: flex-start; }
-
-    .admin-stat-card { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+    .admin-stat-card { flex-direction: row; align-items: center; gap: 1rem; }
 
     .admin-table th:nth-child(n+4),
-    .admin-table td:nth-child(n+4) { display: none; }
+    .admin-table td:nth-child(n+4) { display: table-cell; }
 
-    .sidebar_close-btn { display: inline-flex; position: absolute; top: 2rem; right: 1.5rem; }
+    .sidebar_close-btn { display: none; }
 
-    .admin-modal { padding: 1.6rem; }
+    .admin-modal { padding: var(--card-padding); }
 
-    /* Logout always visible — sticky at bottom of admin sidebar */
     .sidebar_logout-btn {
-        position: sticky;
-        bottom: 0;
-        margin-top: 0;
-        background: var(--color-white);
-        border-top: 1px solid var(--color-light);
-        z-index: 1;
+        position: static;
+        margin-top: auto;
+        background: transparent;
+        border-top: none;
     }
 }
 
