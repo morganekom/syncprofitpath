@@ -257,7 +257,7 @@ function buildUserItem(u) {
 
     return `
         <li>
-            <a href="./user/user.html?id=${u.id}" class="new-user-item">
+            <a href="./user/?id=${u.id}" class="new-user-item">
                 <div class="user-avatar">${initials}</div>
                 <div class="user-info">
                     <div class="user-name">${escapeHtml(name)}</div>
