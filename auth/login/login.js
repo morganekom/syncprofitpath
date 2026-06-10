@@ -153,8 +153,6 @@ async function submitLogin() {
         .update({ last_login: new Date().toISOString() })
         .eq('id', user.id);
 
-    saveSession(user);
-
     if (remember) {
         localStorage.setItem('rememberedEmail', email);
         const remembered = JSON.parse(localStorage.getItem('rememberedAccounts') || '[]');
@@ -179,6 +177,9 @@ async function submitLogin() {
         show2FAStep(user.email);
         return;
     }
+
+    // No 2FA — save session and redirect
+    saveSession(user);
 
     // ── ROLE-BASED REDIRECT ──
     // admin → admin dashboard
