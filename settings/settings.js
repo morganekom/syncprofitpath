@@ -627,7 +627,16 @@ function init2FAState() {
 
 async function start2FASetup() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    if (!currentUser.id) return;
+    if (!currentUser.id) {
+        alert('Session error — please refresh and try again.');
+        return;
+    }
+
+    // Check CDN libraries loaded
+    if (typeof OTPAuth === 'undefined') {
+        alert('Required library failed to load. Please check your internet connection and refresh the page.');
+        return;
+    }
 
     // Generate a random 20-byte base32 secret
     const array  = new Uint8Array(20);
@@ -639,8 +648,14 @@ async function start2FASetup() {
     const formatted = base32.match(/.{1,4}/g).join(' ');
     document.getElementById('twoFAKeyDisplay').textContent = formatted;
 
+    // Switch to setup state first so user sees something immediately
+    document.getElementById('twoFA-off').style.display   = 'none';
+    document.getElementById('twoFA-setup').style.display = 'block';
+    document.getElementById('twoFAConfirmCode').value    = '';
+    document.getElementById('twoFASetupError').textContent = '';
+
     // Build otpauth:// URI for QR code
-    const totp    = new OTPAuth.TOTP({
+    const totp = new OTPAuth.TOTP({
         issuer:    'SyncProfitPath',
         label:     currentUser.email || 'user',
         algorithm: 'SHA1',
@@ -651,20 +666,22 @@ async function start2FASetup() {
     const uri = totp.toString();
 
     // Render QR code onto canvas
-    const canvas = document.getElementById('twoFAQrCanvas');
-    await QRCode.toCanvas(canvas, uri, {
-        width:  220,
-        margin: 2,
-        color:  {
-            dark:  '#27282f',
-            light: '#ffffff',
+    try {
+        if (typeof QRCode !== 'undefined') {
+            const canvas = document.getElementById('twoFAQrCanvas');
+            await QRCode.toCanvas(canvas, uri, {
+                width:  220,
+                margin: 2,
+                color:  { dark: '#27282f', light: '#ffffff' }
+            });
+        } else {
+            // QRCode library failed — hide canvas, user can still use the key
+            document.getElementById('twoFAQrCanvas').style.display = 'none';
         }
-    });
-
-    document.getElementById('twoFA-off').style.display   = 'none';
-    document.getElementById('twoFA-setup').style.display = 'block';
-    document.getElementById('twoFAConfirmCode').value    = '';
-    document.getElementById('twoFASetupError').textContent = '';
+    } catch (err) {
+        console.error('QR render error:', err);
+        document.getElementById('twoFAQrCanvas').style.display = 'none';
+    }
 }
 
 function cancel2FASetup() {
