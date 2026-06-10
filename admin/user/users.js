@@ -10,7 +10,12 @@ let selectedUserIds = new Set();
 
 // ========================= INIT =========================
 document.addEventListener('DOMContentLoaded', () => {
-    loadUsers();
+    loadUsers().then(() => {
+        // If navigated here from admin dashboard with a specific user id, open their modal
+        const params = new URLSearchParams(window.location.search);
+        const targetId = params.get('id');
+        if (targetId) openUserModal(targetId);
+    });
 });
 
 
