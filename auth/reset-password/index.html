@@ -111,12 +111,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../supabase.js"></script>
     <script>
-    // Supabase will automatically pick up the token from the URL hash
-    // and establish a session when the page loads
+    // getSession() alone runs before Supabase has processed the #access_token
+    // hash in the URL, so it always returns null and shows "expired".
+    // We must wait for onAuthStateChange to fire PASSWORD_RECOVERY — same
+    // pattern used in confirm.js for signup verification.
     async function init() {
-        const { data: { session }, error } = await db.auth.getSession();
+        const session = await new Promise((resolve) => {
+            db.auth.getSession().then(({ data: { session } }) => {
+                if (session) { resolve(session); return; }
 
-        if (error || !session) {
+                const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
+                    if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+                        subscription.unsubscribe();
+                        resolve(session);
+                    }
+                });
+
+                // Safety timeout — if nothing fires in 8s, treat link as invalid
+                setTimeout(() => { subscription.unsubscribe(); resolve(null); }, 8000);
+            });
+        });
+
+        if (!session) {
             document.getElementById('invalidStep').style.display = 'block';
         } else {
             document.getElementById('resetStep').style.display = 'block';
