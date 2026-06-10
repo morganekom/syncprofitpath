@@ -128,7 +128,7 @@
                             <input type="checkbox" id="rememberMe">
                             <span>Remember me</span>
                         </label>
-                        <a href="#" class="forgot-link" onclick="showForgotMsg()">Forgot password?</a>
+                        <a href="../forgot-password/" class="forgot-link">Forgot password?</a>
                     </div>
 
                     <!-- Global error -->
@@ -143,17 +143,6 @@
 
 
                 </div><!-- end #manualForm -->
-
-                <!-- ── FORGOT PASSWORD MESSAGE ── -->
-                <div class="forgot-msg" id="forgotMsg" style="display:none;">
-                    <div class="forgot-icon"><i class="uil uil-envelope-lock"></i></div>
-                    <h3>Password Reset</h3>
-                    <p>Contact your administrator or support team to reset your password. This feature will be available
-                        once the backend is connected.</p>
-                    <button class="auth-btn-outline" onclick="hideForgotMsg()" style="margin-top:1rem;">
-                        <i class="uil uil-arrow-left"></i> Back to Sign In
-                    </button>
-                </div>
 
                 <!-- ── 2FA STEP ── shown after correct password if user has 2FA enabled -->
                 <div id="twoFAStep" style="display:none;">

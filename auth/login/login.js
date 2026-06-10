@@ -85,16 +85,6 @@ function togglePw(inputId, btn) {
     btn.querySelector('i').className = isHidden ? 'uil uil-eye-slash' : 'uil uil-eye';
 }
 
-function showForgotMsg() {
-    document.getElementById('manualForm').style.display = 'none';
-    document.getElementById('forgotMsg').style.display  = 'flex';
-}
-
-function hideForgotMsg() {
-    document.getElementById('forgotMsg').style.display  = 'none';
-    document.getElementById('manualForm').style.display = 'block';
-}
-
 function clearErrors() {
     document.getElementById('emailErr').textContent    = '';
     document.getElementById('passwordErr').textContent = '';
