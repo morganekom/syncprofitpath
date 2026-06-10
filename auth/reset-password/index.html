@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function () {
+            var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark-theme');
+                document.body.classList.add('dark-theme');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password — SyncProfitPath</title>
+    <link rel="icon" type="image/png" href="../../assets/favicon.png">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../signup/signup.css">
+    <link rel="stylesheet" href="../login/login.css">
+</head>
+<body>
+    <div class="auth-page">
+
+        <!-- LEFT PANEL -->
+        <div class="auth-left">
+            <div class="auth-brand">
+                <img src="../../assets/logo.png" alt="SyncProfitPath" class="auth-logo">
+                <p class="auth-tagline">Almost there.<br>Create your new password.</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-right">
+            <div class="login-box">
+
+                <!-- Invalid/expired link state -->
+                <div id="invalidStep" style="display:none;text-align:center;">
+                    <div class="forgot-icon" style="margin:0 auto 1.2rem;">
+                        <i class="uil uil-exclamation-triangle" style="font-size:2.4rem;color:#e74c3c;"></i>
+                    </div>
+                    <h3 style="margin-bottom:0.6rem;">Link expired or invalid</h3>
+                    <p style="color:var(--color-gray-dark);margin-bottom:1.6rem;">
+                        This reset link has expired or already been used. Please request a new one.
+                    </p>
+                    <a href="../forgot-password/" class="auth-btn"
+                        style="text-decoration:none;display:flex;align-items:center;justify-content:center;">
+                        Request New Link <i class="uil uil-envelope" style="margin-left:0.4rem;"></i>
+                    </a>
+                </div>
+
+                <!-- New password form -->
+                <div id="resetStep" style="display:none;">
+                    <div class="login-header">
+                        <h2>New Password</h2>
+                        <p>Choose a strong password for your account.</p>
+                    </div>
+
+                    <div class="form-group" style="margin-top:1.6rem;">
+                        <label>New Password</label>
+                        <div class="input-wrap">
+                            <i class="uil uil-lock"></i>
+                            <input type="password" id="newPassword" class="auth-input"
+                                placeholder="New password" autocomplete="new-password">
+                            <button class="pw-toggle" type="button" onclick="togglePw('newPassword', this)">
+                                <i class="uil uil-eye"></i>
+                            </button>
+                        </div>
+                        <p class="field-error" id="pwErr"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrap">
+                            <i class="uil uil-lock-access"></i>
+                            <input type="password" id="confirmPassword" class="auth-input"
+                                placeholder="Confirm new password" autocomplete="new-password">
+                            <button class="pw-toggle" type="button" onclick="togglePw('confirmPassword', this)">
+                                <i class="uil uil-eye"></i>
+                            </button>
+                        </div>
+                        <p class="field-error" id="confirmErr"></p>
+                    </div>
+
+                    <p class="form-error" id="globalErr"></p>
+
+                    <button class="auth-btn" id="resetBtn" onclick="submitReset()">
+                        Save New Password <i class="uil uil-check"></i>
+                    </button>
+                </div>
+
+                <!-- Success state -->
+                <div id="successStep" style="display:none;text-align:center;">
+                    <div class="forgot-icon" style="margin:0 auto 1.2rem;">
+                        <i class="uil uil-check-circle" style="font-size:2.4rem;color:var(--color-primary);"></i>
+                    </div>
+                    <h3 style="margin-bottom:0.6rem;">Password updated!</h3>
+                    <p style="color:var(--color-gray-dark);margin-bottom:1.6rem;">
+                        Your password has been changed. You can now sign in with your new password.
+                    </p>
+                    <a href="../login/" class="auth-btn"
+                        style="text-decoration:none;display:flex;align-items:center;justify-content:center;">
+                        Sign In <i class="uil uil-arrow-right" style="margin-left:0.4rem;"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../supabase.js"></script>
+    <script>
+    // Supabase will automatically pick up the token from the URL hash
+    // and establish a session when the page loads
+    async function init() {
+        const { data: { session }, error } = await db.auth.getSession();
+
+        if (error || !session) {
+            document.getElementById('invalidStep').style.display = 'block';
+        } else {
+            document.getElementById('resetStep').style.display = 'block';
+        }
+    }
+
+    init();
+
+    async function submitReset() {
+        const pw        = document.getElementById('newPassword').value;
+        const confirm   = document.getElementById('confirmPassword').value;
+        const pwErr     = document.getElementById('pwErr');
+        const confErr   = document.getElementById('confirmErr');
+        const globalErr = document.getElementById('globalErr');
+        const btn       = document.getElementById('resetBtn');
+
+        pwErr.textContent     = '';
+        confErr.textContent   = '';
+        globalErr.textContent = '';
+
+        let valid = true;
+
+        if (pw.length < 8) {
+            pwErr.textContent = 'Password must be at least 8 characters.';
+            document.getElementById('newPassword').closest('.input-wrap').classList.add('input-error');
+            valid = false;
+        }
+        if (pw !== confirm) {
+            confErr.textContent = 'Passwords do not match.';
+            document.getElementById('confirmPassword').closest('.input-wrap').classList.add('input-error');
+            valid = false;
+        }
+        if (!valid) return;
+
+        btn.innerHTML = 'Saving... <i class="uil uil-spinner spin"></i>';
+        btn.disabled  = true;
+
+        const { error } = await db.auth.updateUser({ password: pw });
+
+        if (error) {
+            globalErr.textContent = 'Failed to update password. The link may have expired.';
+            btn.innerHTML = 'Save New Password <i class="uil uil-check"></i>';
+            btn.disabled  = false;
+            return;
+        }
+
+        // Sign out so user logs in fresh with new password
+        await db.auth.signOut();
+
+        document.getElementById('resetStep').style.display   = 'none';
+        document.getElementById('successStep').style.display = 'block';
+    }
+
+    function togglePw(inputId, btn) {
+        const input    = document.getElementById(inputId);
+        const isHidden = input.type === 'password';
+        input.type     = isHidden ? 'text' : 'password';
+        btn.querySelector('i').className = isHidden ? 'uil uil-eye-slash' : 'uil uil-eye';
+    }
+
+    const spinStyle = document.createElement('style');
+    spinStyle.textContent = '.spin{animation:spin 0.9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(spinStyle);
+    </script>
+</body>
+</html>
