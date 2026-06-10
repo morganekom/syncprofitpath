@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="../signup/signup.css">
 
     <style>
-        /* ── Page background & text via existing theme variables ── */
         .cb-page {
             display: flex;
             align-items: center;
@@ -34,32 +33,22 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--color-dark);
-            transition: opacity 0.2s;
         }
         .cb-sub {
             margin: 0;
             font-size: 1.2rem;
             color: var(--color-gray-dark);
-            transition: opacity 0.2s;
         }
 
-        /* OS dark mode fallback (for users who never set a theme in the app) */
         @media (prefers-color-scheme: dark) {
-            :root:not(.dark-theme):not(.light-theme) .cb-page {
-                background: #0d242c;
-            }
-            :root:not(.dark-theme):not(.light-theme) .cb-title {
-                color: #ddd;
-            }
-            :root:not(.dark-theme):not(.light-theme) .cb-sub {
-                color: #adacb5;
-            }
+            :root:not(.dark-theme):not(.light-theme) .cb-page  { background: #0d242c; }
+            :root:not(.dark-theme):not(.light-theme) .cb-title { color: #ddd; }
+            :root:not(.dark-theme):not(.light-theme) .cb-sub   { color: #adacb5; }
         }
 
-        /* ── Animations ── */
         @keyframes checkPop {
-            0%   { opacity: 0; transform: scale(0.5); }
-            65%  { opacity: 1; transform: scale(1.08); }
+            0%   { opacity: 0; transform: scale(0.4); }
+            65%  { opacity: 1; transform: scale(1.1); }
             100% { opacity: 1; transform: scale(1); }
         }
         .check-reveal {
@@ -69,8 +58,13 @@
             from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-in {
-            animation: fadeUp 0.35s ease forwards;
+        .fade-in { animation: fadeUp 0.35s ease forwards; }
+
+        /* Dots slow-settle animation */
+        .dot-settle {
+            transition: cx 0.5s cubic-bezier(0.34,1.2,0.64,1),
+                        cy 0.5s cubic-bezier(0.34,1.2,0.64,1),
+                        opacity 0.4s ease;
         }
     </style>
 </head>
@@ -79,7 +73,6 @@
     <div class="cb-page">
         <div class="cb-wrap">
 
-            <!-- Animated logo -->
             <svg id="animSvg" viewBox="0 0 200 200" width="160" height="160">
 
                 <!-- 6 orbit dots -->
@@ -90,7 +83,7 @@
                 <circle class="dot" cx="32"  cy="138" r="16" fill="#098654"/>
                 <circle class="dot" cx="32"  cy="62"  r="16" fill="#098654"/>
 
-                <!-- Checkmark: nested SVG lets the browser handle scaling correctly -->
+                <!-- Checkmark: nested SVG with correct viewBox -->
                 <svg id="checkmark"
                      x="15" y="28" width="170" height="144"
                      viewBox="0 0 1080 739"
@@ -101,9 +94,8 @@
 
             </svg>
 
-            <!-- Text -->
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.6rem;">
-                <h2 id="signingText" class="cb-title">Signing you in…</h2>
+                <h2 id="signingText"    class="cb-title">Signing you in…</h2>
                 <p  id="signingSubtext" class="cb-sub">Setting up your account.</p>
             </div>
 
@@ -115,13 +107,20 @@
         const dots      = Array.from(document.querySelectorAll('.dot'));
         const cx = 100, cy = 100, r = 78, total = dots.length;
         const opacities = [1, 0.82, 0.6, 0.4, 0.24, 0.12];
-        let   angle = 0, raf, done = false;
+
+        // Final resting positions for each dot (evenly spaced around the circle)
+        // Index matches original dot order: top, top-right, bottom-right, bottom, bottom-left, top-left
+        const restAngles = [0, 60, 120, 180, 240, 300]; // degrees, 0 = top
+
+        let angle = 0, raf, done = false;
+
+        function toRad(d) { return d * Math.PI / 180; }
 
         function step() {
             if (done) return;
             angle = (angle + 1.4) % 360;
             dots.forEach((dot, i) => {
-                const a = (angle - i * (360 / total)) * Math.PI / 180;
+                const a = toRad(angle - i * (360 / total));
                 dot.setAttribute('cx', (cx + r * Math.sin(a)).toFixed(2));
                 dot.setAttribute('cy', (cy - r * Math.cos(a)).toFixed(2));
                 dot.style.opacity = opacities[i];
@@ -134,18 +133,23 @@
             done = true;
             cancelAnimationFrame(raf);
 
-            // Fade dots out
-            dots.forEach(dot => {
-                dot.style.transition = 'opacity 0.35s';
-                dot.style.opacity    = '0';
+            // Snap dots back to evenly-spaced rest positions, all fully visible
+            dots.forEach((dot, i) => {
+                dot.classList.add('dot-settle');
+                const a = toRad(restAngles[i]);
+                dot.setAttribute('cx', (cx + r * Math.sin(a)).toFixed(2));
+                dot.setAttribute('cy', (cy - r * Math.cos(a)).toFixed(2));
+                dot.style.opacity = '1';
+                // Restore original alternating colors
+                dot.style.fill = i % 2 === 0 ? '#098654' : '#00e27b';
             });
 
-            // Pop checkmark in
+            // Pop checkmark in after dots settle
             setTimeout(() => {
                 const mark = document.getElementById('checkmark');
                 mark.style.opacity = '1';
                 mark.classList.add('check-reveal');
-            }, 300);
+            }, 400);
 
             // Swap text
             setTimeout(() => {
@@ -161,7 +165,7 @@
                     h2.classList.add('fade-in');
                     p.classList.add('fade-in');
                 }, 200);
-            }, 350);
+            }, 450);
         };
     })();
     </script>
