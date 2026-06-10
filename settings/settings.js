@@ -173,9 +173,6 @@ function loadAllSavedData() {
         document.getElementById('cryptoSavedBadge').style.display = 'inline-flex';
     }
 
-    // ── 2FA ──
-    const twoFA = localStorage.getItem('twoFAEnabled') === 'true';
-    document.getElementById('twoFAToggle').checked = twoFA;
 }
 
 
