@@ -572,35 +572,31 @@ async function savePassword() {
     if (newPw.length < 8)     { errorEl.textContent = 'New password must be at least 8 characters.'; return; }
     if (newPw !== confirm)    { errorEl.textContent = 'Passwords do not match.'; return; }
 
-    // Verify current password against DB
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
     btn.textContent = 'Saving...';
     btn.disabled    = true;
 
-    const { data: userCheck, error: checkError } = await db
-        .from('users')
-        .select('id')
-        .eq('id', currentUser.id)
-        .eq('password', current)
-        .maybeSingle();
+    // Step 1: Verify the current password is correct via Supabase Auth
+    const { error: verifyError } = await db.auth.signInWithPassword({
+        email:    currentUser.email,
+        password: current,
+    });
 
-    if (checkError || !userCheck) {
+    if (verifyError) {
         btn.textContent = 'Update Password';
         btn.disabled    = false;
         errorEl.textContent = 'Current password is incorrect.';
         return;
     }
 
-    const { error } = await db
-        .from('users')
-        .update({ password: newPw })
-        .eq('id', currentUser.id);
+    // Step 2: Update the password in Supabase Auth
+    const { error: updateError } = await db.auth.updateUser({ password: newPw });
 
     btn.textContent = 'Update Password';
     btn.disabled    = false;
 
-    if (error) {
+    if (updateError) {
         errorEl.textContent = 'Failed to update password. Please try again.';
         return;
     }
