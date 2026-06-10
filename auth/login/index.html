@@ -157,6 +157,36 @@
                     </button>
                 </div>
 
+                <!-- ── 2FA STEP ── shown after correct password if user has 2FA enabled -->
+                <div id="twoFAStep" style="display:none;">
+                    <div class="twofa-login-header">
+                        <div class="twofa-login-icon"><i class="uil uil-shield-check"></i></div>
+                        <h3>Two-Factor Authentication</h3>
+                        <p>Open your authenticator app and enter the 6-digit code for SyncProfitPath.</p>
+                    </div>
+                    <div class="form-group" style="margin-top:1.6rem;">
+                        <label>Authentication Code</label>
+                        <div class="input-wrap">
+                            <i class="uil uil-key-skeleton-alt"></i>
+                            <input type="text" id="totpCode" class="auth-input"
+                                placeholder="000000" maxlength="6"
+                                inputmode="numeric" pattern="[0-9]*"
+                                autocomplete="one-time-code">
+                        </div>
+                        <p class="field-error" id="totpError"></p>
+                    </div>
+                    <button class="auth-btn" id="totpBtn" onclick="submitTOTP()">
+                        Verify <i class="uil uil-arrow-right"></i>
+                    </button>
+                    <div class="twofa-support-row">
+                        <p>Can't access your authenticator?</p>
+                        <a class="twofa-support-link" id="twoFASupportLink" href="#">Help me reach support</a>
+                    </div>
+                    <button class="twofa-back-btn" onclick="backToLogin()">
+                        <i class="uil uil-arrow-left"></i> Back
+                    </button>
+                </div>
+
             </div><!-- end .login-box -->
         </div><!-- end .auth-right -->
     </div><!-- end .auth-page -->
@@ -164,6 +194,7 @@
     <!-- Supabase CDN — must load before supabase.js and login.js -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@9.3.6/dist/otpauth.umd.min.js"></script>
     <script src="./login.js"></script>
 </body>
 

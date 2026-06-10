@@ -267,3 +267,84 @@
     object-fit: contain;
     display: inline-block;
 }
+
+/* ================================================================
+   2FA LOGIN STEP
+   ================================================================ */
+
+.twofa-login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.8rem;
+    padding-bottom: 0.4rem;
+}
+
+.twofa-login-icon {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.twofa-login-icon i {
+    font-size: 2.8rem;
+    color: var(--color-primary);
+}
+
+.twofa-login-header h3 {
+    font-size: 1.8rem;
+    color: var(--color-dark);
+}
+
+.twofa-login-header p {
+    color: var(--color-gray-light);
+    font-size: 1.15rem;
+    max-width: 28rem;
+    line-height: 1.6;
+}
+
+.twofa-support-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.4rem;
+    text-align: center;
+}
+
+.twofa-support-row p {
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+}
+
+.twofa-support-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: var(--transition);
+}
+
+.twofa-support-link:hover { text-decoration: underline; }
+
+.twofa-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    margin-top: 0.8rem;
+    width: 100%;
+    padding: 0.4rem 0;
+    transition: var(--transition);
+}
+.twofa-back-btn:hover { color: var(--color-dark); }

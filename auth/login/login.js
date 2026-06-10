@@ -179,6 +179,17 @@ async function submitLogin() {
 
     btn.innerHTML = 'Welcome back! Redirecting...';
 
+    // ── 2FA CHECK ──
+    // If user has TOTP enabled, show the code step instead of redirecting
+    if (user.totp_enabled && user.totp_secret) {
+        // Stash user temporarily — only complete session after code verified
+        sessionStorage.setItem('pendingUser', JSON.stringify(user));
+        btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+        btn.disabled  = false;
+        show2FAStep(user.email);
+        return;
+    }
+
     // ── ROLE-BASED REDIRECT ──
     // admin → admin dashboard
     // user  → main dashboard
@@ -250,3 +261,85 @@ function saveSession(user) {
 const spinStyle = document.createElement('style');
 spinStyle.textContent = '.spin{animation:spin 0.9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(spinStyle);
+
+
+// ================================================================
+// 2FA LOGIN STEP
+// ================================================================
+
+function show2FAStep(email) {
+    document.getElementById('manualForm').style.display  = 'none';
+    document.getElementById('twoFAStep').style.display   = 'block';
+    document.getElementById('totpCode').value            = '';
+    document.getElementById('totpError').textContent     = '';
+    document.getElementById('totpCode').focus();
+
+    // Pre-fill support email with context
+    const subject = encodeURIComponent('2FA Access Issue — SyncProfitPath');
+    const body    = encodeURIComponent(
+        `Hi Support,\n\nI\'m unable to access my authenticator app and need help signing in.\n\nAccount email: ${email}\n\nPlease help me regain access.\n\nThank you.`
+    );
+    const link = document.getElementById('twoFASupportLink');
+    if (link) link.href = `mailto:support@syncprofitpath.com?subject=${subject}&body=${body}`;
+
+    // Allow Enter key on code input
+    document.getElementById('totpCode').addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitTOTP();
+    });
+}
+
+async function submitTOTP() {
+    const code    = document.getElementById('totpCode').value.trim().replace(/\s/g, '');
+    const errorEl = document.getElementById('totpError');
+    const btn     = document.getElementById('totpBtn');
+    errorEl.textContent = '';
+
+    if (!/^\d{6}$/.test(code)) {
+        errorEl.textContent = 'Please enter the 6-digit code from your authenticator app.';
+        return;
+    }
+
+    const user = JSON.parse(sessionStorage.getItem('pendingUser') || 'null');
+    if (!user || !user.totp_secret) {
+        errorEl.textContent = 'Session expired. Please sign in again.';
+        backToLogin();
+        return;
+    }
+
+    btn.innerHTML = 'Verifying... <i class="uil uil-spinner spin"></i>';
+    btn.disabled  = true;
+
+    const totp  = new OTPAuth.TOTP({
+        algorithm: 'SHA1',
+        digits:    6,
+        period:    30,
+        secret:    OTPAuth.Secret.fromBase32(user.totp_secret),
+    });
+    const delta = totp.validate({ token: code, window: 1 });
+
+    if (delta === null) {
+        errorEl.textContent = 'Incorrect code. Check your app and try again — codes refresh every 30 seconds.';
+        btn.innerHTML = 'Verify <i class="uil uil-arrow-right"></i>';
+        btn.disabled  = false;
+        return;
+    }
+
+    // Code correct — complete login
+    sessionStorage.removeItem('pendingUser');
+
+    await db.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
+    saveSession(user);
+
+    btn.innerHTML = 'Verified! Redirecting...';
+    setTimeout(() => {
+        window.location.href = user.role === 'admin' ? '../../admin/' : '../../dashboard/';
+    }, 600);
+}
+
+function backToLogin() {
+    sessionStorage.removeItem('pendingUser');
+    document.getElementById('twoFAStep').style.display  = 'none';
+    document.getElementById('manualForm').style.display = 'block';
+    document.getElementById('totpCode').value           = '';
+    document.getElementById('totpError').textContent    = '';
+}
