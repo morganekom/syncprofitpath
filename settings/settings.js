@@ -67,6 +67,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadNavPhoto();
     updateKycStatus();
     initAppearanceTab();
+    init2FAState();
     // Capture original values after data loads (slight delay for async profile load)
     setTimeout(captureOriginalProfile, 600);
 });
@@ -606,18 +607,170 @@ async function savePassword() {
 }
 
 
+
 // ================================================================
-// 2FA TOGGLE — saves to localStorage only (no Supabase column for this yet)
+// 2FA — TOTP enrollment and verification
+// Uses OTPAuth (TOTP RFC 6238) + QRCode.js, both loaded via CDN
+// Secret stored in Supabase users table column: totp_secret
+// Enabled flag stored in column: totp_enabled (boolean)
 // ================================================================
 
-function toggle2FA(checkbox) {
-    const msg = document.getElementById('twoFAMsg');
-    localStorage.setItem('twoFAEnabled', checkbox.checked);
-    msg.textContent = checkbox.checked
-        ? '✓ Two-factor authentication enabled.'
-        : 'Two-factor authentication disabled.';
-    setTimeout(() => msg.textContent = '', 3000);
+let _pendingTotpSecret = null;   // holds secret during setup, cleared after
+
+function init2FAState() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const enabled = currentUser.totp_enabled === true || currentUser.totp_enabled === 'true';
+    document.getElementById('twoFA-off').style.display   = enabled ? 'none'  : 'block';
+    document.getElementById('twoFA-on').style.display    = enabled ? 'block' : 'none';
+    document.getElementById('twoFA-setup').style.display = 'none';
 }
+
+async function start2FASetup() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.id) return;
+
+    // Generate a random 20-byte base32 secret
+    const array  = new Uint8Array(20);
+    crypto.getRandomValues(array);
+    const base32 = uint8ToBase32(array);
+    _pendingTotpSecret = base32;
+
+    // Display formatted key (groups of 4 for readability)
+    const formatted = base32.match(/.{1,4}/g).join(' ');
+    document.getElementById('twoFAKeyDisplay').textContent = formatted;
+
+    // Build otpauth:// URI for QR code
+    const totp    = new OTPAuth.TOTP({
+        issuer:    'SyncProfitPath',
+        label:     currentUser.email || 'user',
+        algorithm: 'SHA1',
+        digits:    6,
+        period:    30,
+        secret:    OTPAuth.Secret.fromBase32(base32),
+    });
+    const uri = totp.toString();
+
+    // Render QR code onto canvas
+    const canvas = document.getElementById('twoFAQrCanvas');
+    await QRCode.toCanvas(canvas, uri, {
+        width:  220,
+        margin: 2,
+        color:  {
+            dark:  '#27282f',
+            light: '#ffffff',
+        }
+    });
+
+    document.getElementById('twoFA-off').style.display   = 'none';
+    document.getElementById('twoFA-setup').style.display = 'block';
+    document.getElementById('twoFAConfirmCode').value    = '';
+    document.getElementById('twoFASetupError').textContent = '';
+}
+
+function cancel2FASetup() {
+    _pendingTotpSecret = null;
+    document.getElementById('twoFA-setup').style.display = 'none';
+    document.getElementById('twoFA-off').style.display   = 'block';
+}
+
+async function verify2FASetup() {
+    const code    = document.getElementById('twoFAConfirmCode').value.trim().replace(/\s/g, '');
+    const errorEl = document.getElementById('twoFASetupError');
+    errorEl.textContent = '';
+
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        errorEl.textContent = 'Please enter the 6-digit code from your app.';
+        return;
+    }
+
+    if (!_pendingTotpSecret) {
+        errorEl.textContent = 'Setup session expired. Please start again.';
+        cancel2FASetup();
+        return;
+    }
+
+    const totp = new OTPAuth.TOTP({
+        algorithm: 'SHA1',
+        digits:    6,
+        period:    30,
+        secret:    OTPAuth.Secret.fromBase32(_pendingTotpSecret),
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+
+    if (delta === null) {
+        errorEl.textContent = 'Code is incorrect or has expired. Check your app and try again.';
+        return;
+    }
+
+    // Code verified — save secret and enabled flag to Supabase
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const { error } = await db
+        .from('users')
+        .update({ totp_secret: _pendingTotpSecret, totp_enabled: true })
+        .eq('id', currentUser.id);
+
+    if (error) {
+        errorEl.textContent = 'Failed to save. Please try again.';
+        return;
+    }
+
+    // Update local session
+    currentUser.totp_secret  = _pendingTotpSecret;
+    currentUser.totp_enabled = true;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    _pendingTotpSecret = null;
+
+    document.getElementById('twoFA-setup').style.display = 'none';
+    document.getElementById('twoFA-on').style.display    = 'block';
+}
+
+async function disable2FA() {
+    if (!confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) return;
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const { error } = await db
+        .from('users')
+        .update({ totp_secret: null, totp_enabled: false })
+        .eq('id', currentUser.id);
+
+    if (error) { alert('Failed to disable 2FA. Please try again.'); return; }
+
+    currentUser.totp_secret  = null;
+    currentUser.totp_enabled = false;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    document.getElementById('twoFA-on').style.display  = 'none';
+    document.getElementById('twoFA-off').style.display = 'block';
+}
+
+function copySetupKey() {
+    const key = (_pendingTotpSecret || '').match(/.{1,4}/g)?.join(' ') || '';
+    if (!key) return;
+    navigator.clipboard.writeText(key).then(() => {
+        const msg = document.getElementById('twoFACopyMsg');
+        msg.textContent = '✓ Copied to clipboard';
+        setTimeout(() => msg.textContent = '', 2500);
+    });
+}
+
+// ── Base32 encoder (RFC 4648, no padding) ──
+function uint8ToBase32(bytes) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let bits = 0, value = 0, output = '';
+    for (let i = 0; i < bytes.length; i++) {
+        value = (value << 8) | bytes[i];
+        bits += 8;
+        while (bits >= 5) {
+            output += alphabet[(value >>> (bits - 5)) & 31];
+            bits -= 5;
+        }
+    }
+    if (bits > 0) output += alphabet[(value << (5 - bits)) & 31];
+    return output;
+}
+
+
 
 
 // ================================================================

@@ -281,18 +281,69 @@
             </div>
 
             <!-- 2FA -->
-            <div class="settings-card">
-                <div class="toggle-row">
-                    <div>
-                        <h3 class="card-title">Two-Factor Authentication</h3>
-                        <p class="card-subtitle">Add an extra layer of security to your account</p>
+            <div class="settings-card" id="twoFACard">
+
+                <!-- STATE 0: disabled -->
+                <div id="twoFA-off">
+                    <div class="toggle-row">
+                        <div>
+                            <h3 class="card-title">Two-Factor Authentication</h3>
+                            <p class="card-subtitle">Add an extra layer of security. You'll need your authenticator app each time you sign in.</p>
+                        </div>
+                        <button class="twofa-enable-btn" onclick="start2FASetup()">
+                            <i class="uil uil-lock-alt"></i> Enable 2FA
+                        </button>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="twoFAToggle" onchange="toggle2FA(this)">
-                        <span class="toggle-slider"></span>
-                    </label>
                 </div>
-                <p class="form-success" id="twoFAMsg"></p>
+
+                <!-- STATE 1: setup — QR + key -->
+                <div id="twoFA-setup" style="display:none;">
+                    <h3 class="card-title">Set Up Authenticator</h3>
+                    <ol class="twofa-steps">
+                        <li>Install an authenticator app — <strong>Google Authenticator</strong>, <strong>Authy</strong>, or your phone's built-in one all work.</li>
+                        <li>Open the app, tap <strong>Add account</strong>, then scan the QR code below.</li>
+                        <li>Can't scan? Tap <strong>Enter a setup key</strong> in your app and type the key shown below.</li>
+                        <li>Once added, enter the <strong>6-digit code</strong> your app shows to confirm it's working.</li>
+                    </ol>
+                    <div class="twofa-qr-wrap">
+                        <canvas id="twoFAQrCanvas"></canvas>
+                    </div>
+                    <div class="twofa-key-wrap">
+                        <p class="twofa-key-label">Setup key (manual entry)</p>
+                        <div class="twofa-key-row">
+                            <code id="twoFAKeyDisplay" class="twofa-key-code"></code>
+                            <button class="twofa-copy-btn" onclick="copySetupKey()" title="Copy key">
+                                <i class="uil uil-copy"></i>
+                            </button>
+                        </div>
+                        <p class="twofa-copy-msg" id="twoFACopyMsg"></p>
+                    </div>
+                    <div class="twofa-confirm-wrap">
+                        <label class="twofa-confirm-label">Enter the 6-digit code from your app to confirm</label>
+                        <div class="twofa-code-row">
+                            <input type="text" id="twoFAConfirmCode" class="twofa-code-input"
+                                maxlength="6" inputmode="numeric" pattern="[0-9]*"
+                                placeholder="000000" autocomplete="one-time-code">
+                            <button class="twofa-verify-btn" onclick="verify2FASetup()">Confirm &amp; Activate</button>
+                        </div>
+                        <p class="form-error" id="twoFASetupError"></p>
+                    </div>
+                    <button class="twofa-cancel-btn" onclick="cancel2FASetup()">Cancel</button>
+                </div>
+
+                <!-- STATE 2: enabled -->
+                <div id="twoFA-on" style="display:none;">
+                    <div class="toggle-row">
+                        <div>
+                            <h3 class="card-title">Two-Factor Authentication</h3>
+                            <p class="card-subtitle twofa-active-label"><i class="uil uil-shield-check"></i> Active — your account is protected.</p>
+                        </div>
+                        <button class="twofa-disable-btn" onclick="disable2FA()">
+                            <i class="uil uil-unlock-alt"></i> Disable
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -506,6 +557,8 @@
     <script src="../chat-widget.js"></script>
     <script src="../notify.js"></script>
     <script src="../notify-inapp.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@9.3.6/dist/otpauth.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="./settings.js"></script>
 </body>
 
