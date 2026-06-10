@@ -265,6 +265,19 @@ body {
     border-color: var(--color-danger);
 }
 
+/* Email is locked — users cannot change it after signup */
+.settings-input--locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+    user-select: none;
+    border-color: transparent !important;
+}
+
+.settings-input--locked:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
 /* Select styling */
 .settings-select {
     cursor: pointer;

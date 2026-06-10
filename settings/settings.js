@@ -313,13 +313,12 @@ function checkProfileDirty() {
     const isDirty =
         document.getElementById('firstName').value      !== _originalProfile.firstName ||
         document.getElementById('lastName').value       !== _originalProfile.lastName  ||
-        document.getElementById('profileEmail').value   !== _originalProfile.email     ||
         document.getElementById('profilePhone').value   !== _originalProfile.phone     ||
         document.getElementById('profileCountry').value !== _originalProfile.country;
     btn.disabled = !isDirty;
 }
 
-['firstName','lastName','profileEmail','profilePhone','profileCountry'].forEach(id => {
+['firstName','lastName','profilePhone','profileCountry'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', checkProfileDirty);
 });
