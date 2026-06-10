@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function () {
+            var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark-theme');
+                document.body.classList.add('dark-theme');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password — SyncProfitPath</title>
+    <link rel="icon" type="image/png" href="../../assets/favicon.png">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../signup/signup.css">
+    <link rel="stylesheet" href="../login/login.css">
+</head>
+<body>
+    <div class="auth-page">
+
+        <!-- LEFT PANEL -->
+        <div class="auth-left">
+            <div class="auth-brand">
+                <img src="../../assets/logo.png" alt="SyncProfitPath" class="auth-logo">
+                <p class="auth-tagline">Reset your password.<br>Get back to your portfolio.</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-right">
+            <div class="login-box">
+
+                <!-- Step 1: Enter email -->
+                <div id="emailStep">
+                    <div class="login-header">
+                        <h2>Forgot Password</h2>
+                        <p>Enter your account email and we'll send you a reset link.</p>
+                    </div>
+
+                    <div class="form-group" style="margin-top:1.6rem;">
+                        <label>Email Address</label>
+                        <div class="input-wrap">
+                            <i class="uil uil-envelope"></i>
+                            <input type="email" id="resetEmail" class="auth-input"
+                                placeholder="your@email.com" autocomplete="email">
+                        </div>
+                        <p class="field-error" id="emailErr"></p>
+                    </div>
+
+                    <p class="form-error" id="globalErr"></p>
+
+                    <button class="auth-btn" id="sendBtn" onclick="sendReset()">
+                        Send Reset Link <i class="uil uil-envelope"></i>
+                    </button>
+
+                    <a href="../login/" class="auth-btn-outline"
+                        style="text-decoration:none;text-align:center;display:flex;align-items:center;
+                               justify-content:center;margin-top:0.8rem;">
+                        <i class="uil uil-arrow-left" style="margin-right:0.4rem;"></i> Back to Sign In
+                    </a>
+                </div>
+
+                <!-- Step 2: Email sent confirmation -->
+                <div id="sentStep" style="display:none;text-align:center;">
+                    <div class="forgot-icon" style="margin:0 auto 1.2rem;">
+                        <i class="uil uil-envelope-check" style="font-size:2.4rem;color:var(--color-primary);"></i>
+                    </div>
+                    <h3 style="margin-bottom:0.6rem;">Check your inbox</h3>
+                    <p style="color:var(--color-gray-dark);margin-bottom:1.6rem;">
+                        We sent a password reset link to <strong id="sentEmail"></strong>.
+                        It may take a minute to arrive — check your spam folder too.
+                    </p>
+                    <a href="../login/" class="auth-btn"
+                        style="text-decoration:none;display:flex;align-items:center;justify-content:center;">
+                        Back to Sign In <i class="uil uil-arrow-right" style="margin-left:0.4rem;"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../supabase.js"></script>
+    <script>
+    async function sendReset() {
+        const emailInput = document.getElementById('resetEmail');
+        const emailErr   = document.getElementById('emailErr');
+        const globalErr  = document.getElementById('globalErr');
+        const btn        = document.getElementById('sendBtn');
+        const email      = emailInput.value.trim().toLowerCase();
+
+        emailErr.textContent  = '';
+        globalErr.textContent = '';
+
+        if (!email || !email.includes('@')) {
+            emailErr.textContent = 'Please enter a valid email address.';
+            emailInput.closest('.input-wrap').classList.add('input-error');
+            return;
+        }
+
+        btn.innerHTML = 'Sending... <i class="uil uil-spinner spin"></i>';
+        btn.disabled  = true;
+
+        const { error } = await db.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://syncprofitpath.com/auth/reset-password/'
+        });
+
+        if (error) {
+            globalErr.textContent = 'Something went wrong. Please try again.';
+            btn.innerHTML = 'Send Reset Link <i class="uil uil-envelope"></i>';
+            btn.disabled  = false;
+            return;
+        }
+
+        // Show confirmation regardless — avoids leaking whether email exists
+        document.getElementById('emailStep').style.display = 'none';
+        document.getElementById('sentStep').style.display  = 'block';
+        document.getElementById('sentEmail').textContent   = email;
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendReset();
+    });
+
+    const spinStyle = document.createElement('style');
+    spinStyle.textContent = '.spin{animation:spin 0.9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(spinStyle);
+    </script>
+</body>
+</html>
