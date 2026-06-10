@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <script>
         (function () {
@@ -12,107 +11,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signing In</title>
     <link rel="icon" type="image/png" href="../../assets/favicon.png">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../signup/signup.css">
-</head>
-
-<body>
-    <div class="auth-page" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--color-light);">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2.4rem;">
-
-            <!-- ── Animated Logo ── -->
-            <div style="width:160px;height:160px;position:relative;">
-                <svg id="animSvg" viewBox="0 0 200 200" width="160" height="160" style="overflow:visible;">
-
-                    <!-- 6 orbit dots -->
-                    <circle class="dot" id="d0" cx="100" cy="22"  r="16" fill="#098654"/>
-                    <circle class="dot" id="d1" cx="168" cy="62"  r="16" fill="#00e27b"/>
-                    <circle class="dot" id="d2" cx="168" cy="138" r="16" fill="#00e27b"/>
-                    <circle class="dot" id="d3" cx="100" cy="178" r="16" fill="#00e27b"/>
-                    <circle class="dot" id="d4" cx="32"  cy="138" r="16" fill="#098654"/>
-                    <circle class="dot" id="d5" cx="32"  cy="62"  r="16" fill="#098654"/>
-
-                    <!-- Checkmark — nested SVG with its own viewBox handles scaling perfectly -->
-                    <svg id="checkmark" x="18" y="30" width="164" height="140"
-                         viewBox="0 0 1080 739"
-                         style="opacity:0;transform-origin:100px 100px;overflow:visible;">
-                        <path fill="#00e27b" d="m1080 285.59l-391.82 370.73c-119.74 113.31-308.19 108.1-421.49-11.65l-163.56-172.86c22.68 9.41 45.73 13.95 68.64 14.58 6.34 0.18 12.69 0.11 19.29-0.44 5.37-0.34 10.51-0.69 15.9-1.51 7.35-1.02 14.7-2.28 22.06-4.03 3.93-0.87 7.86-1.73 11.8-3.09 1.96-0.43 4.18-1.1 6.4-1.77q3.31-1.01 6.64-2.01c4.18-1.35 8.12-2.71 12.07-4.31 6.16-2.26 12.32-4.53 18.26-7.3 5.92-2.52 11.85-5.28 17.55-8.29 5.93-2.77 11.62-5.78 17.32-9.04 5.7-3.01 11.4-6.27 16.86-9.78 10.92-6.78 21.61-13.8 31.81-21.08 5.22-3.51 10.21-7.28 15.19-11.04 19.43-14.59 37.17-29.72 52.2-43.7 3.01-2.84 5.76-5.45 8.52-8.06 8.27-7.82 15.53-14.93 22.06-21.59l1.76-1.9 0.76-0.95 26.08-25.38 103.29-100.59 2.76-2.61 209.42-197.92z"/>
-                        <path fill="#098654" d="m506.91 288.94l-26.51 26.88-0.77 1.01-1.79 2.01-22.43 22.86-8.66 8.55c-15.29 14.82-33.37 30.88-53.22 46.43-5.09 4.01-10.18 8.02-15.52 11.78-10.43 7.77-21.37 15.28-32.55 22.54-5.6 3.76-11.44 7.26-17.28 10.51-5.85 3.5-11.69 6.74-17.79 9.74-5.84 3.24-11.93 6.24-18.02 8.98-6.1 2.99-12.45 5.48-18.79 7.96-4.06 1.74-8.12 3.23-12.43 4.72q-3.43 1.11-6.85 2.23c-2.28 0.74-4.57 1.48-6.59 1.98-4.06 1.48-8.12 2.46-12.18 3.45-7.6 1.97-15.2 3.43-22.8 4.65-5.58 0.96-10.89 1.43-16.46 1.9-6.84 0.71-13.42 0.92-20 0.87-23.78-0.17-47.79-4.39-71.52-13.67l-104.75-106.27 296.64-292.42z"/>
-                    </svg>
-
-                </svg>
-            </div>
-
-            <!-- ── Text ── -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.6rem;">
-                <h2 id="signingText" style="margin:0;font-size:1.8rem;font-weight:700;color:var(--color-dark);">Signing you in…</h2>
-                <p id="signingSubtext" style="margin:0;color:var(--color-gray-dark);font-size:1.2rem;">Setting up your account.</p>
-            </div>
-
-        </div>
-    </div>
 
     <style>
+        /* ── Page background & text via existing theme variables ── */
+        .cb-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--color-light);
+        }
+        .cb-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.4rem;
+        }
+        .cb-title {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            transition: opacity 0.2s;
+        }
+        .cb-sub {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--color-gray-dark);
+            transition: opacity 0.2s;
+        }
+
+        /* OS dark mode fallback (for users who never set a theme in the app) */
+        @media (prefers-color-scheme: dark) {
+            :root:not(.dark-theme):not(.light-theme) .cb-page {
+                background: #0d242c;
+            }
+            :root:not(.dark-theme):not(.light-theme) .cb-title {
+                color: #ddd;
+            }
+            :root:not(.dark-theme):not(.light-theme) .cb-sub {
+                color: #adacb5;
+            }
+        }
+
+        /* ── Animations ── */
         @keyframes checkPop {
-            0%   { opacity: 0; transform: translate(82px, 70px) scale(0.4) translate(-82px, -70px); }
-            60%  { opacity: 1; transform: translate(82px, 70px) scale(1.1)  translate(-82px, -70px); }
-            100% { opacity: 1; transform: translate(82px, 70px) scale(1)    translate(-82px, -70px); }
+            0%   { opacity: 0; transform: scale(0.5); }
+            65%  { opacity: 1; transform: scale(1.08); }
+            100% { opacity: 1; transform: scale(1); }
         }
         .check-reveal {
-            animation: checkPop 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+            animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-in { animation: fadeUp 0.4s ease forwards; }
+        .fade-in {
+            animation: fadeUp 0.35s ease forwards;
+        }
     </style>
+</head>
+
+<body>
+    <div class="cb-page">
+        <div class="cb-wrap">
+
+            <!-- Animated logo -->
+            <svg id="animSvg" viewBox="0 0 200 200" width="160" height="160">
+
+                <!-- 6 orbit dots -->
+                <circle class="dot" cx="100" cy="22"  r="16" fill="#098654"/>
+                <circle class="dot" cx="168" cy="62"  r="16" fill="#00e27b"/>
+                <circle class="dot" cx="168" cy="138" r="16" fill="#00e27b"/>
+                <circle class="dot" cx="100" cy="178" r="16" fill="#00e27b"/>
+                <circle class="dot" cx="32"  cy="138" r="16" fill="#098654"/>
+                <circle class="dot" cx="32"  cy="62"  r="16" fill="#098654"/>
+
+                <!-- Checkmark: nested SVG lets the browser handle scaling correctly -->
+                <svg id="checkmark"
+                     x="15" y="28" width="170" height="144"
+                     viewBox="0 0 1080 739"
+                     style="opacity:0; transform-box:fill-box; transform-origin:center;">
+                    <path fill="#00e27b" d="m1080 285.59l-391.82 370.73c-119.74 113.31-308.19 108.1-421.49-11.65l-163.56-172.86c22.68 9.41 45.73 13.95 68.64 14.58 6.34 0.18 12.69 0.11 19.29-0.44 5.37-0.34 10.51-0.69 15.9-1.51 7.35-1.02 14.7-2.28 22.06-4.03 3.93-0.87 7.86-1.73 11.8-3.09 1.96-0.43 4.18-1.1 6.4-1.77q3.31-1.01 6.64-2.01c4.18-1.35 8.12-2.71 12.07-4.31 6.16-2.26 12.32-4.53 18.26-7.3 5.92-2.52 11.85-5.28 17.55-8.29 5.93-2.77 11.62-5.78 17.32-9.04 5.7-3.01 11.4-6.27 16.86-9.78 10.92-6.78 21.61-13.8 31.81-21.08 5.22-3.51 10.21-7.28 15.19-11.04 19.43-14.59 37.17-29.72 52.2-43.7 3.01-2.84 5.76-5.45 8.52-8.06 8.27-7.82 15.53-14.93 22.06-21.59l1.76-1.9 0.76-0.95 26.08-25.38 103.29-100.59 2.76-2.61 209.42-197.92z"/>
+                    <path fill="#098654" d="m506.91 288.94l-26.51 26.88-0.77 1.01-1.79 2.01-22.43 22.86-8.66 8.55c-15.29 14.82-33.37 30.88-53.22 46.43-5.09 4.01-10.18 8.02-15.52 11.78-10.43 7.77-21.37 15.28-32.55 22.54-5.6 3.76-11.44 7.26-17.28 10.51-5.85 3.5-11.69 6.74-17.79 9.74-5.84 3.24-11.93 6.24-18.02 8.98-6.1 2.99-12.45 5.48-18.79 7.96-4.06 1.74-8.12 3.23-12.43 4.72q-3.43 1.11-6.85 2.23c-2.28 0.74-4.57 1.48-6.59 1.98-4.06 1.48-8.12 2.46-12.18 3.45-7.6 1.97-15.2 3.43-22.8 4.65-5.58 0.96-10.89 1.43-16.46 1.9-6.84 0.71-13.42 0.92-20 0.87-23.78-0.17-47.79-4.39-71.52-13.67l-104.75-106.27 296.64-292.42z"/>
+                </svg>
+
+            </svg>
+
+            <!-- Text -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.6rem;">
+                <h2 id="signingText" class="cb-title">Signing you in…</h2>
+                <p  id="signingSubtext" class="cb-sub">Setting up your account.</p>
+            </div>
+
+        </div>
+    </div>
 
     <script>
     (function () {
-        const dots     = Array.from(document.querySelectorAll('.dot'));
-        const cx = 100, cy = 100, r = 78;
-        const total    = dots.length;
+        const dots      = Array.from(document.querySelectorAll('.dot'));
+        const cx = 100, cy = 100, r = 78, total = dots.length;
         const opacities = [1, 0.82, 0.6, 0.4, 0.24, 0.12];
-        let   angle    = 0;
-        let   raf;
-        let   done     = false;
-
-        function toRad(d) { return d * Math.PI / 180; }
+        let   angle = 0, raf, done = false;
 
         function step() {
             if (done) return;
             angle = (angle + 1.4) % 360;
-
             dots.forEach((dot, i) => {
-                const a = toRad(angle - i * (360 / total));
+                const a = (angle - i * (360 / total)) * Math.PI / 180;
                 dot.setAttribute('cx', (cx + r * Math.sin(a)).toFixed(2));
                 dot.setAttribute('cy', (cy - r * Math.cos(a)).toFixed(2));
                 dot.style.opacity = opacities[i];
             });
-
             raf = requestAnimationFrame(step);
         }
-
         step();
 
         window.signInComplete = function () {
             done = true;
             cancelAnimationFrame(raf);
 
-            // Fade out dots
+            // Fade dots out
             dots.forEach(dot => {
-                dot.style.transition = 'opacity 0.4s';
+                dot.style.transition = 'opacity 0.35s';
                 dot.style.opacity    = '0';
             });
 
-            // Reveal checkmark
+            // Pop checkmark in
             setTimeout(() => {
                 const mark = document.getElementById('checkmark');
-                mark.classList.add('check-reveal');
                 mark.style.opacity = '1';
-            }, 350);
+                mark.classList.add('check-reveal');
+            }, 300);
 
             // Swap text
             setTimeout(() => {
@@ -123,12 +156,12 @@
                 setTimeout(() => {
                     h2.textContent = 'Signed in!';
                     p.textContent  = 'Redirecting you now…';
-                    h2.classList.add('fade-in');
-                    p.classList.add('fade-in');
                     h2.style.opacity = '';
                     p.style.opacity  = '';
+                    h2.classList.add('fade-in');
+                    p.classList.add('fade-in');
                 }, 200);
-            }, 400);
+            }, 350);
         };
     })();
     </script>
