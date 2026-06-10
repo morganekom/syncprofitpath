@@ -121,20 +121,67 @@ async function submitLogin() {
     btn.innerHTML = 'Signing in... <i class="uil uil-spinner"></i>';
     btn.disabled  = true;
 
-    const { data: user, error } = await db
-        .from('users')
-        .select('*')
-        .eq('email', email.toLowerCase())
-        .eq('password', password)
-        .maybeSingle();
+    // ── Step 1: Try Supabase Auth first (migrated + all new users) ──
+    const { data: authData, error: authError } = await db.auth.signInWithPassword({
+        email:    email.toLowerCase(),
+        password: password,
+    });
 
-    if (error || !user) {
-        document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
-        document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
-        document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
-        btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
-        btn.disabled  = false;
-        return;
+    // ── Step 2: Resolve the user profile ──
+    let user = null;
+
+    if (!authError && authData.user) {
+        // Auth succeeded — fetch full profile by auth UID
+        const { data: profile, error: profileError } = await db
+            .from('users')
+            .select('*')
+            .eq('id', authData.user.id)
+            .maybeSingle();
+
+        if (profileError || !profile) {
+            document.getElementById('loginError').textContent = 'Account not found. Please contact support.';
+            btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+            btn.disabled  = false;
+            return;
+        }
+        user = profile;
+
+    } else {
+        // ── Fallback: check legacy users.password column ──
+        // Catches email users who existed before the Auth migration.
+        // If their plaintext password matches, log them in and silently
+        // migrate them to Supabase Auth so this never triggers again.
+        const { data: legacyUser } = await db
+            .from('users')
+            .select('*')
+            .eq('email', email.toLowerCase())
+            .eq('password', password)
+            .maybeSingle();
+
+        if (!legacyUser) {
+            // Neither Auth nor legacy password matched
+            document.getElementById('loginError').textContent = 'Incorrect email or password. Please try again.';
+            document.getElementById('loginEmail').closest('.input-wrap').classList.add('input-error');
+            document.getElementById('loginPassword').closest('.input-wrap').classList.add('input-error');
+            btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+            btn.disabled  = false;
+            return;
+        }
+
+        // Legacy match — fire-and-forget migration to Supabase Auth.
+        // Uses the migrate-password Edge Function (service role server-side).
+        // If it fails, user just goes through fallback again next login.
+        fetch('https://syqdwottzrhpclnvzdmz.supabase.co/functions/v1/migrate-password', {
+            method:  'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'apikey':        SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ userId: legacyUser.id, password }),
+        }).catch(e => console.warn('Silent migration failed — will retry on next login.', e.message));
+
+        user = legacyUser;
     }
 
     // Update last login timestamp
@@ -172,8 +219,6 @@ async function submitLogin() {
     saveSession(user);
 
     // ── ROLE-BASED REDIRECT ──
-    // admin → admin dashboard
-    // user  → main dashboard
     setTimeout(() => {
         if (user.role === 'admin') {
             window.location.href = '../../admin/';
