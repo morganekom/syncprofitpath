@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Migration — Admin Only</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f13;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 2rem 1.2rem;
+        }
+        .card {
+            background: #1a1a22;
+            border: 1px solid #2a2a35;
+            border-radius: 16px;
+            padding: 2rem 1.4rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.3rem;
+            color: #00e27b;
+            margin-bottom: 0.4rem;
+        }
+        .subtitle {
+            font-size: 0.88rem;
+            color: #666;
+            margin-bottom: 1.6rem;
+            line-height: 1.5;
+        }
+        label {
+            display: block;
+            font-size: 0.82rem;
+            color: #888;
+            margin-bottom: 0.4rem;
+        }
+        input {
+            width: 100%;
+            background: #0f0f13;
+            border: 1px solid #2a2a35;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            margin-bottom: 1.2rem;
+            outline: none;
+        }
+        input:focus { border-color: #00e27b; }
+        button {
+            width: 100%;
+            background: #00e27b;
+            color: #0f0f13;
+            border: none;
+            border-radius: 10px;
+            padding: 0.95rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #log {
+            margin-top: 1.6rem;
+            background: #0f0f13;
+            border: 1px solid #2a2a35;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 0.82rem;
+            line-height: 1.8;
+            min-height: 60px;
+            display: none;
+            word-break: break-all;
+        }
+        .line-ok      { color: #00e27b; }
+        .line-skip    { color: #888; }
+        .line-fail    { color: #e74c3c; }
+        .line-info    { color: #f0c040; }
+        .line-done    { color: #00e27b; font-weight: 700; font-size: 1rem; }
+        .warning {
+            background: #2a1a1a;
+            border: 1px solid #e74c3c44;
+            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            font-size: 0.82rem;
+            color: #e74c3c;
+            margin-bottom: 1.4rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Password Migration</h1>
+        <p class="subtitle">Migrates all email-signup users from plaintext passwords to Supabase Auth. Run once, then delete this file.</p>
+
+        <div class="warning">
+            ⚠️ Delete this file from your project immediately after running. Never leave it deployed.
+        </div>
+
+        <label>Service Role Key</label>
+        <input type="password" id="serviceKey" placeholder="sb_secret_..." autocomplete="off" />
+
+        <button id="runBtn" onclick="runMigration()">Run Migration</button>
+
+        <div id="log"></div>
+    </div>
+
+    <script>
+    const SUPABASE_URL = 'https://syqdwottzrhpclnvzdmz.supabase.co';
+
+    function log(msg, type = 'info') {
+        const box = document.getElementById('log');
+        box.style.display = 'block';
+        const line = document.createElement('div');
+        line.className = 'line-' + type;
+        line.textContent = msg;
+        box.appendChild(line);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function runMigration() {
+        const serviceKey = document.getElementById('serviceKey').value.trim();
+        const btn        = document.getElementById('runBtn');
+        const box        = document.getElementById('log');
+
+        if (!serviceKey) {
+            alert('Please paste your service role key first.');
+            return;
+        }
+
+        box.innerHTML = '';
+        box.style.display = 'block';
+        btn.disabled  = true;
+        btn.textContent = 'Running...';
+
+        log('Fetching users with plaintext passwords...', 'info');
+
+        // ── Step 1: Fetch all users where password column is not null ──
+        let users = [];
+        try {
+            const res = await fetch(
+                `${SUPABASE_URL}/rest/v1/users?select=id,email,password&password=not.is.null`,
+                {
+                    headers: {
+                        'apikey':        serviceKey,
+                        'Authorization': `Bearer ${serviceKey}`,
+                    }
+                }
+            );
+
+            if (!res.ok) {
+                const err = await res.text();
+                log('Failed to fetch users: ' + err, 'fail');
+                log('Check your service role key and try again.', 'fail');
+                btn.disabled    = false;
+                btn.textContent = 'Run Migration';
+                return;
+            }
+
+            users = await res.json();
+        } catch (e) {
+            log('Network error: ' + e.message, 'fail');
+            btn.disabled    = false;
+            btn.textContent = 'Run Migration';
+            return;
+        }
+
+        if (!users.length) {
+            log('No users found with plaintext passwords. Already migrated or nothing to do.', 'done');
+            btn.disabled    = false;
+            btn.textContent = 'Run Migration';
+            return;
+        }
+
+        log(`Found ${users.length} user(s) to migrate.`, 'info');
+        log('─────────────────────────────', 'skip');
+
+        let migrated = 0;
+        let skipped  = 0;
+        let failed   = [];
+
+        // ── Step 2: Migrate each user ──
+        for (const user of users) {
+            if (!user.password) {
+                log(`Skipped (no password): ${user.email}`, 'skip');
+                skipped++;
+                continue;
+            }
+
+            // Set password in Supabase Auth
+            const authRes = await fetch(
+                `${SUPABASE_URL}/auth/v1/admin/users/${user.id}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey':          serviceKey,
+                        'Authorization':   `Bearer ${serviceKey}`,
+                        'Content-Type':    'application/json',
+                    },
+                    body: JSON.stringify({ password: user.password }),
+                }
+            );
+
+            if (!authRes.ok) {
+                const err = await authRes.text();
+                log(`✗ Failed: ${user.email} — ${err}`, 'fail');
+                failed.push(user.email);
+                continue;
+            }
+
+            // Null out the plaintext column
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey':        serviceKey,
+                        'Authorization': `Bearer ${serviceKey}`,
+                        'Content-Type':  'application/json',
+                        'Prefer':        'return=minimal',
+                    },
+                    body: JSON.stringify({ password: null }),
+                }
+            );
+
+            log(`✓ Migrated: ${user.email}`, 'ok');
+            migrated++;
+        }
+
+        // ── Step 3: Summary ──
+        log('─────────────────────────────', 'skip');
+        log(`Done — migrated: ${migrated} · skipped: ${skipped} · failed: ${failed.length}`, 'done');
+
+        if (failed.length) {
+            log('Failed emails:', 'fail');
+            failed.forEach(e => log('  ' + e, 'fail'));
+        } else {
+            log('All passwords migrated and plaintext removed. ✓', 'ok');
+            log('You can now delete this file from your project.', 'info');
+        }
+
+        btn.textContent = 'Done';
+    }
+    </script>
+</body>
+</html>
