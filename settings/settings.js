@@ -113,15 +113,25 @@ function loadAllSavedData() {
 
     if (_currentUser.id) {
         db.from('users')
-          .select('avatar_url')
+          .select('avatar_url, totp_enabled, totp_secret')
           .eq('id', _currentUser.id)
           .maybeSingle()
           .then(({ data }) => {
-              const dbPhoto = data && data.avatar_url ? data.avatar_url : null;
+              if (!data) { revealProfileSection(); return; }
+
+              // Photo
+              const dbPhoto = data.avatar_url || null;
               applyPhoto(dbPhoto);
               if (dbPhoto && _photoKey) localStorage.setItem(_photoKey, dbPhoto);
               else if (_photoKey)       localStorage.removeItem(_photoKey);
               revealProfileSection();
+
+              // 2FA — sync latest values from DB into currentUser then re-render state
+              const fresh = JSON.parse(localStorage.getItem('currentUser') || '{}');
+              fresh.totp_enabled = data.totp_enabled || false;
+              fresh.totp_secret  = data.totp_secret  || null;
+              localStorage.setItem('currentUser', JSON.stringify(fresh));
+              init2FAState();
           })
           .catch(() => revealProfileSection());
     } else {

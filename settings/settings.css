@@ -100,7 +100,13 @@ body {
 .card-subtitle {
     color: var(--color-gray-light);
     font-size: 1.1rem;
-    margin-top: -0.6rem;
+    margin-top: 0.3rem;
+}
+
+/* 2FA toggle row needs a gap between title and subtitle */
+#twoFACard .card-subtitle {
+    margin-top: 0.5rem;
+    line-height: 1.5;
 }
 
 .card-title-row {
@@ -881,6 +887,8 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-top: 0.5rem;
+    line-height: 1.5;
 }
 
 .twofa-steps {
