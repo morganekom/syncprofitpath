@@ -33,7 +33,8 @@ async function handleGoogleCallback() {
                 .eq('id', existingUser.id);
 
             saveSession(existingUser);
-            redirectAfterLogin(existingUser.role);
+            window.signInComplete && window.signInComplete();
+            setTimeout(() => redirectAfterLogin(existingUser.role), 1200);
             return;
         }
 
@@ -77,7 +78,8 @@ async function handleGoogleCallback() {
         saveSession(newUser);
 
         // New Google users go to dashboard directly — email already verified by Google
-        redirectAfterLogin(newUser.role);
+        window.signInComplete && window.signInComplete();
+        setTimeout(() => redirectAfterLogin(newUser.role), 1200);
 
     } catch (err) {
         console.error('Callback error:', err.message);

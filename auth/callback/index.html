@@ -19,21 +19,154 @@
 
 <body>
     <div class="auth-page" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
-        <div class="signup-box" style="max-width:48rem;width:100%;margin:2rem;">
-            <div class="signup-success" id="callbackState">
-                <div class="success-ring">
-                    <i class="uil uil-spinner spin"></i>
-                </div>
-                <h2>Signing you in…</h2>
-                <p style="color:var(--color-gray-light);font-size:1.2rem;">Setting up your account.</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2.4rem;">
+
+            <!-- ── Animated Logo ── -->
+            <div id="logoAnim" style="width:160px;height:160px;position:relative;">
+                <svg id="animSvg" viewBox="0 0 200 200" width="160" height="160" style="overflow:visible;">
+
+                    <!-- 6 orbit dots — evenly spaced, but positioned to match the logo layout -->
+                    <!-- dark green: top, bottom-left, mid-left -->
+                    <!-- bright green: bottom, top-right, mid-right -->
+
+                    <circle class="dot" id="d0" cx="100" cy="22"  r="16" fill="#098654"/>
+                    <circle class="dot" id="d1" cx="168" cy="62"  r="16" fill="#00e27b"/>
+                    <circle class="dot" id="d2" cx="168" cy="138" r="16" fill="#00e27b"/>
+                    <circle class="dot" id="d3" cx="100" cy="178" r="16" fill="#00e27b"/>
+                    <circle class="dot" id="d4" cx="32"  cy="138" r="16" fill="#098654"/>
+                    <circle class="dot" id="d5" cx="32"  cy="62"  r="16" fill="#098654"/>
+
+                    <!-- Checkmark (hidden initially) -->
+                    <g id="checkmark" style="opacity:0;transform-origin:100px 100px;">
+                        <!-- dark left part of the checkmark -->
+                        <path fill="#098654" d="
+                            M 72 100
+                            L 86 88
+                            L 115 120
+                            L 100 133
+                            Z
+                        "/>
+                        <!-- bright right sweep -->
+                        <path fill="#00e27b" d="
+                            M 86 88
+                            L 148 72
+                            L 134 120
+                            L 115 120
+                            Z
+                        "/>
+                    </g>
+                </svg>
             </div>
+
+            <!-- ── Text ── -->
+            <div id="callbackState" style="display:flex;flex-direction:column;align-items:center;gap:0.6rem;">
+                <h2 id="signingText" style="margin:0;font-size:1.8rem;font-weight:700;color:var(--color-text, #111);">Signing you in…</h2>
+                <p id="signingSubtext" style="margin:0;color:var(--color-gray-light,#888);font-size:1.2rem;">Setting up your account.</p>
+            </div>
+
         </div>
     </div>
 
     <style>
-        .spin { animation: spin 0.9s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ── Dot orbit animation ── */
+        :root {
+            --orbit-r: 78px;
+        }
+
+        /* Each dot's base angle is set via JS; CSS handles the smooth spin */
+        .dot {
+            transform-origin: 100px 100px;
+            transition: opacity 0.3s;
+        }
+
+        /* Checkmark reveal */
+        @keyframes checkPop {
+            0%   { opacity: 0; transform: scale(0.4); }
+            60%  { opacity: 1; transform: scale(1.12); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .check-reveal {
+            animation: checkPop 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+
+        /* Text fade swap */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeUp 0.4s ease forwards; }
     </style>
+
+    <script>
+    (function () {
+        const svg    = document.getElementById('animSvg');
+        const dots   = Array.from(document.querySelectorAll('.dot'));
+        const cx     = 100, cy = 100, r = 78;
+        const total  = dots.length;
+        let   angle  = 0;          // degrees, leading dot position
+        let   raf;
+        let   done   = false;
+
+        // Brightness levels for the tail (index 0 = leading dot, 5 = farthest behind)
+        const opacities = [1, 0.85, 0.65, 0.45, 0.28, 0.15];
+
+        function toRad(d) { return d * Math.PI / 180; }
+
+        function step() {
+            if (done) return;
+            angle = (angle + 1.4) % 360;           // speed: degrees per frame
+
+            dots.forEach((dot, i) => {
+                // Each dot is spaced 60° apart; leading dot is at `angle`
+                const a = toRad(angle - i * (360 / total));
+                const x = cx + r * Math.sin(a);
+                const y = cy - r * Math.cos(a);
+                dot.setAttribute('cx', x.toFixed(2));
+                dot.setAttribute('cy', y.toFixed(2));
+                dot.style.opacity = opacities[i];
+            });
+
+            raf = requestAnimationFrame(step);
+        }
+
+        // Start spinning immediately
+        step();
+
+        // Exposed globally so callback.js can call it on success
+        window.signInComplete = function () {
+            done = true;
+            cancelAnimationFrame(raf);
+
+            // Snap all dots to their "logo" positions and fade out
+            const logoAngles = [0, 60, 120, 180, 240, 300];
+            dots.forEach((dot, i) => {
+                const a = toRad(logoAngles[i]);
+                dot.setAttribute('cx', (cx + r * Math.sin(a)).toFixed(2));
+                dot.setAttribute('cy', (cy - r * Math.cos(a)).toFixed(2));
+                dot.style.transition = 'opacity 0.5s';
+                dot.style.opacity    = '0.15';
+            });
+
+            // Show checkmark after dots fade
+            setTimeout(() => {
+                const mark = document.getElementById('checkmark');
+                mark.classList.add('check-reveal');
+                mark.style.opacity = '1';
+            }, 400);
+
+            // Swap text
+            setTimeout(() => {
+                const h2 = document.getElementById('signingText');
+                const p  = document.getElementById('signingSubtext');
+                h2.textContent = 'Signed in!';
+                p.textContent  = 'Redirecting you now…';
+                h2.classList.add('fade-in');
+                p.classList.add('fade-in');
+            }, 500);
+        };
+    })();
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../supabase.js"></script>
