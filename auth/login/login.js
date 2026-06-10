@@ -4,23 +4,13 @@
 
 
 // ================================================================
-// THEME TOGGLE
+// THEME — follows OS setting on auth pages, no manual toggle
 // ================================================================
 
-const themeBtn  = document.getElementById('themeBtn');
-const themeIcon = document.getElementById('themeIcon');
-
-const savedTheme = localStorage.getItem('currrentTheme');
-if (savedTheme) {
-    document.body.classList.add(savedTheme);
-    themeIcon.className = savedTheme === 'dark-theme' ? 'uil uil-sun' : 'uil uil-moon';
-}
-
-themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    const isDark = document.body.classList.contains('dark-theme');
-    themeIcon.className = isDark ? 'uil uil-sun' : 'uil uil-moon';
-    localStorage.setItem('currrentTheme', isDark ? 'dark-theme' : '');
+const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+systemDark.addEventListener('change', e => {
+    document.documentElement.classList.toggle('dark-theme', e.matches);
+    document.body.classList.toggle('dark-theme', e.matches);
 });
 
 
