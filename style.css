@@ -283,6 +283,13 @@ nav {
     flex-shrink: 0;
 }
 
+.nav_profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 @media screen and (min-width: 1024px) {
     .nav_profile-photo {
         width: 3.2rem;
