@@ -112,6 +112,102 @@ function formatLandNum(num) {
 }
 
 document.addEventListener('DOMContentLoaded', loadLandingPlans);
+document.addEventListener('DOMContentLoaded', loadLandingFaqs);
+document.addEventListener('DOMContentLoaded', loadLandingFooter);
+
+
+// ── LOAD FOOTER CONTENT FROM SUPABASE ──
+// Updates tagline, social links, support links, copyright and disclaimer text.
+// Static HTML values remain as fallback if the row is missing or a field is empty.
+async function loadLandingFooter() {
+    try {
+        const { data, error } = await db
+            .from('landing_footer')
+            .select('*')
+            .eq('id', 1)
+            .single();
+
+        if (error || !data) return;
+
+        setLandText('footerTagline',    data.brand_tagline);
+        setLandHtml('footerCopyright',  data.copyright_text);
+        setLandText('footerDisclaimer', data.disclaimer_text);
+
+        setLandHref('footerTwitter',   data.social_twitter_url);
+        setLandHref('footerTelegram',  data.social_telegram_url);
+        setLandHref('footerWhatsapp',  data.social_whatsapp_url);
+        setLandHref('footerInstagram', data.social_instagram_url);
+        setLandHref('footerContact',   data.contact_url);
+        setLandHref('footerPrivacy',   data.privacy_policy_url);
+        setLandHref('footerTerms',     data.terms_url);
+
+    } catch (err) {
+        console.warn('Landing footer fetch failed:', err.message);
+    }
+}
+
+function setLandText(id, value) {
+    if (value == null || value === '') return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function setLandHtml(id, value) {
+    if (value == null || value === '') return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = value; // copyright_text from DB should already include © character, not &copy;
+}
+
+function setLandHref(id, value) {
+    if (!value) return;
+    const el = document.getElementById(id);
+    if (el) {
+        el.href = value;
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+    }
+}
+
+
+// ── LOAD FAQ FROM SUPABASE ──
+// Fetches active FAQ items and renders the accordion in the FAQ section.
+async function loadLandingFaqs() {
+    const container = document.getElementById('landFaqs');
+    if (!container) return;
+
+    try {
+        const { data, error } = await db
+            .from('landing_faqs')
+            .select('question, answer')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true });
+
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = data.map(faq => `
+            <div class="land-faq" onclick="toggleFaq(this)">
+                <div class="land-faq__q">
+                    <span>${escapeLandHtml(faq.question)}</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+                <div class="land-faq__a">${escapeLandHtml(faq.answer)}</div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.warn('Landing FAQ fetch failed:', err.message);
+        container.innerHTML = '';
+    }
+}
+
+function escapeLandHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+}
 
 // ── IF ALREADY LOGGED IN → redirect to dashboard ──
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
