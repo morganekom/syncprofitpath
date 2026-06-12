@@ -17,6 +17,12 @@ let activePlan      = null;
 let pendingDeleteId = null;
 let siteSettings    = null;
 
+let allFaqs            = [];
+let activeFaq          = null;
+let pendingDeleteFaqId = null;
+
+let landingFooter = null;
+
 
 // ================================================================
 // INIT
@@ -44,7 +50,7 @@ async function loadSettings() {
     if (refreshBtn) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
 
     try {
-        await Promise.all([loadSiteSettings(), loadPlans()]);
+        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings()]);
         contentEl.style.display = 'block';
     } catch (err) {
         console.error('loadSettings error:', err.message);
@@ -122,7 +128,7 @@ function populateDepositLockedView(s) {
 // Btn starts as color-light / "Saved", turns primary / "Save" on input
 // ================================================================
 
-const DIRTY_SECTIONS = ['withdrawal', 'referral', 'email'];
+const DIRTY_SECTIONS = ['withdrawal', 'referral', 'email', 'footer'];
 
 function bindDirtyListeners() {
     // Withdrawal inputs
@@ -136,6 +142,14 @@ function bindDirtyListeners() {
     // Email inputs
     ['emailFromName', 'emailSupport'].forEach(id => {
         document.getElementById(id)?.addEventListener('input', () => markDirty('email'));
+    });
+    // Footer inputs
+    [
+        'footerTaglineInput', 'footerTwitterInput', 'footerTelegramInput', 'footerWhatsappInput',
+        'footerInstagramInput', 'footerContactInput', 'footerPrivacyInput', 'footerTermsInput',
+        'footerCopyrightInput', 'footerDisclaimerInput'
+    ].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => markDirty('footer'));
     });
 }
 
@@ -201,19 +215,40 @@ async function saveSection(section) {
                 registrations_open: document.getElementById('registrationsOpen').checked,
             };
             break;
+
+        case 'footer':
+            payload = {
+                brand_tagline:        document.getElementById('footerTaglineInput').value.trim()    || null,
+                social_twitter_url:   document.getElementById('footerTwitterInput').value.trim()    || null,
+                social_telegram_url:  document.getElementById('footerTelegramInput').value.trim()   || null,
+                social_whatsapp_url:  document.getElementById('footerWhatsappInput').value.trim()   || null,
+                social_instagram_url: document.getElementById('footerInstagramInput').value.trim()  || null,
+                contact_url:          document.getElementById('footerContactInput').value.trim()    || null,
+                privacy_policy_url:   document.getElementById('footerPrivacyInput').value.trim()    || null,
+                terms_url:            document.getElementById('footerTermsInput').value.trim()      || null,
+                copyright_text:       document.getElementById('footerCopyrightInput').value.trim()  || null,
+                disclaimer_text:      document.getElementById('footerDisclaimerInput').value.trim() || null,
+            };
+            break;
     }
 
     payload.updated_at = new Date().toISOString();
 
     try {
+        const table = section === 'footer' ? 'landing_footer' : 'site_settings';
+
         const { error } = await db
-            .from('site_settings')
+            .from(table)
             .update(payload)
             .eq('id', 1);
 
         if (error) throw error;
 
-        siteSettings = { ...siteSettings, ...payload };
+        if (section === 'footer') {
+            landingFooter = { ...landingFooter, ...payload };
+        } else {
+            siteSettings = { ...siteSettings, ...payload };
+        }
 
         // Dirty-state sections: reset to "Saved"
         if (DIRTY_SECTIONS.includes(section)) {
@@ -708,4 +743,316 @@ async function saveOrder() {
 
     saveBtn.disabled  = false;
     saveBtn.innerHTML = '<i class="uil uil-check"></i> Save Order';
+}
+
+
+// ================================================================
+// LANDING PAGE FAQ
+// ================================================================
+
+async function loadFaqs() {
+    const loadingEl = document.getElementById('faqsLoading');
+    const emptyEl   = document.getElementById('faqsEmpty');
+    const listEl    = document.getElementById('faqsList');
+
+    loadingEl.style.display = 'flex';
+    emptyEl.style.display   = 'none';
+    listEl.style.display    = 'none';
+
+    const { data, error } = await db
+        .from('landing_faqs')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+    loadingEl.style.display = 'none';
+
+    if (error) {
+        console.error('Load FAQs error:', error.message);
+        emptyEl.style.display = 'flex';
+        document.querySelector('#faqsEmpty p').textContent = 'Failed to load FAQs. Please refresh.';
+        return;
+    }
+
+    allFaqs = data || [];
+    renderFaqsList();
+}
+
+function renderFaqsList() {
+    const emptyEl = document.getElementById('faqsEmpty');
+    const listEl  = document.getElementById('faqsList');
+    const hint    = document.getElementById('faqsOrderHint');
+
+    if (allFaqs.length === 0) {
+        emptyEl.style.display = 'flex';
+        listEl.style.display  = 'none';
+        hint.style.display    = 'none';
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+    listEl.style.display  = 'flex';
+    listEl.innerHTML      = allFaqs.map(f => buildFaqCard(f)).join('');
+    initFaqDragSort();
+}
+
+function buildFaqCard(f) {
+    const question  = escapeHtml(f.question || 'Untitled question');
+    const answer    = escapeHtml(f.answer || '');
+    const isActive  = f.is_active !== false;
+    const cardClass = isActive ? '' : 'faq-inactive';
+    const statusClass = isActive ? 'active'   : 'inactive';
+    const statusLabel = isActive ? 'Visible'  : 'Hidden';
+
+    return `
+        <div class="faq-admin-card ${cardClass}" data-id="${escapeHtml(String(f.id))}" draggable="true">
+            <i class="uil uil-draggabledots faq-admin-drag"></i>
+            <div class="faq-admin-body">
+                <div class="faq-admin-question">${question}</div>
+                <div class="faq-admin-answer">${answer}</div>
+                <span class="faq-admin-status ${statusClass}">
+                    <i class="uil ${isActive ? 'uil-check' : 'uil-minus'}"></i> ${statusLabel}
+                </span>
+            </div>
+            <div class="faq-admin-actions">
+                <button onclick="openEditFaqModal('${escapeHtml(String(f.id))}')" aria-label="Edit FAQ">
+                    <i class="uil uil-edit"></i>
+                </button>
+                <button class="faq-admin-delete" onclick="requestDeleteFaq('${escapeHtml(String(f.id))}')" aria-label="Delete FAQ">
+                    <i class="uil uil-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+
+// ── ADD / EDIT MODAL ──
+
+function openAddFaqModal() {
+    activeFaq = null;
+    document.getElementById('faqModalTitle').textContent = 'Add FAQ';
+    document.getElementById('fmId').value       = '';
+    document.getElementById('fmQuestion').value = '';
+    document.getElementById('fmAnswer').value   = '';
+    document.getElementById('fmActive').checked = true;
+    document.getElementById('fmError').textContent = '';
+
+    document.getElementById('faqModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function openEditFaqModal(id) {
+    activeFaq = allFaqs.find(f => String(f.id) === String(id));
+    if (!activeFaq) return;
+
+    document.getElementById('faqModalTitle').textContent = 'Edit FAQ';
+    document.getElementById('fmId').value       = activeFaq.id;
+    document.getElementById('fmQuestion').value = activeFaq.question || '';
+    document.getElementById('fmAnswer').value   = activeFaq.answer || '';
+    document.getElementById('fmActive').checked = activeFaq.is_active !== false;
+    document.getElementById('fmError').textContent = '';
+
+    document.getElementById('faqModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFaqModal(event) {
+    if (event && event.target !== document.getElementById('faqModal')) return;
+    document.getElementById('faqModal').classList.remove('open');
+    document.body.style.overflow = '';
+    activeFaq = null;
+}
+
+async function saveFaq() {
+    const errorEl  = document.getElementById('fmError');
+    const saveBtn  = document.getElementById('fmSaveBtn');
+    errorEl.textContent = '';
+
+    const question = document.getElementById('fmQuestion').value.trim();
+    const answer   = document.getElementById('fmAnswer').value.trim();
+    const isActive = document.getElementById('fmActive').checked;
+
+    if (!question || !answer) {
+        errorEl.textContent = 'Both question and answer are required.';
+        return;
+    }
+
+    saveBtn.disabled  = true;
+    saveBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
+
+    const payload = {
+        question,
+        answer,
+        is_active:  isActive,
+        updated_at: new Date().toISOString(),
+    };
+
+    try {
+        let error;
+        if (activeFaq) {
+            ({ error } = await db.from('landing_faqs').update(payload).eq('id', activeFaq.id));
+        } else {
+            payload.sort_order = allFaqs.length > 0
+                ? Math.max(...allFaqs.map(f => f.sort_order || 0)) + 1
+                : 1;
+            ({ error } = await db.from('landing_faqs').insert(payload));
+        }
+
+        if (error) throw error;
+
+        document.getElementById('faqModal').classList.remove('open');
+        document.body.style.overflow = '';
+        activeFaq = null;
+        await loadFaqs();
+
+    } catch (err) {
+        console.error('saveFaq error:', err.message);
+        errorEl.textContent = err.message || 'Save failed. Please try again.';
+    }
+
+    saveBtn.disabled  = false;
+    saveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Save';
+}
+
+
+// ── DELETE ──
+
+function requestDeleteFaq(id) {
+    const faq = allFaqs.find(f => String(f.id) === String(id));
+    if (!faq) return;
+
+    pendingDeleteFaqId = id;
+    document.getElementById('fdcQuestion').textContent = faq.question || 'this FAQ';
+    document.getElementById('faqDeleteConfirmModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFaqDeleteConfirm(event) {
+    if (event && event.target !== document.getElementById('faqDeleteConfirmModal')) return;
+    document.getElementById('faqDeleteConfirmModal').classList.remove('open');
+    document.body.style.overflow = '';
+    pendingDeleteFaqId = null;
+}
+
+async function confirmDeleteFaq() {
+    if (!pendingDeleteFaqId) return;
+    const confirmBtn = document.getElementById('fdcConfirmBtn');
+    confirmBtn.disabled  = true;
+    confirmBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Deleting…';
+
+    try {
+        const { error } = await db.from('landing_faqs').delete().eq('id', pendingDeleteFaqId);
+        if (error) throw error;
+
+        document.getElementById('faqDeleteConfirmModal').classList.remove('open');
+        document.body.style.overflow = '';
+        pendingDeleteFaqId = null;
+        await loadFaqs();
+
+    } catch (err) {
+        console.error('confirmDeleteFaq error:', err.message);
+        alert('Failed to delete: ' + err.message);
+    }
+
+    confirmBtn.disabled  = false;
+    confirmBtn.innerHTML = '<i class="uil uil-trash-alt"></i> Yes, Delete';
+}
+
+
+// ── DRAG REORDER ──
+
+function initFaqDragSort() {
+    const list = document.getElementById('faqsList');
+    const hint = document.getElementById('faqsOrderHint');
+    let dragSrc = null;
+
+    list.querySelectorAll('.faq-admin-card').forEach(card => {
+        card.addEventListener('dragstart', function (e) {
+            dragSrc = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function () {
+            this.classList.remove('dragging');
+            list.querySelectorAll('.faq-admin-card').forEach(c => c.classList.remove('drag-over'));
+        });
+        card.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (this !== dragSrc) {
+                list.querySelectorAll('.faq-admin-card').forEach(c => c.classList.remove('drag-over'));
+                this.classList.add('drag-over');
+            }
+        });
+        card.addEventListener('drop', function (e) {
+            e.preventDefault();
+            if (dragSrc && this !== dragSrc) {
+                const allCards = [...list.querySelectorAll('.faq-admin-card')];
+                const srcIdx   = allCards.indexOf(dragSrc);
+                const tgtIdx   = allCards.indexOf(this);
+                if (srcIdx < tgtIdx) list.insertBefore(dragSrc, this.nextSibling);
+                else                  list.insertBefore(dragSrc, this);
+                hint.style.display = 'flex';
+            }
+        });
+    });
+}
+
+async function saveFaqOrder() {
+    const hint    = document.getElementById('faqsOrderHint');
+    const saveBtn = hint.querySelector('.save-order-btn');
+    saveBtn.disabled  = true;
+    saveBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
+
+    try {
+        const cards   = [...document.querySelectorAll('#faqsList .faq-admin-card')];
+        const updates = cards.map((card, index) => ({ id: card.dataset.id, sort_order: index + 1 }));
+        for (const u of updates) {
+            const { error } = await db.from('landing_faqs').update({ sort_order: u.sort_order }).eq('id', u.id);
+            if (error) throw error;
+        }
+        hint.style.display = 'none';
+        await loadFaqs();
+    } catch (err) {
+        console.error('Save FAQ order error:', err.message);
+        alert('Failed to save order: ' + err.message);
+    }
+
+    saveBtn.disabled  = false;
+    saveBtn.innerHTML = '<i class="uil uil-check"></i> Save Order';
+}
+
+
+// ================================================================
+// LANDING PAGE FOOTER — LOAD & POPULATE
+// ================================================================
+
+async function loadFooterSettings() {
+    const { data, error } = await db
+        .from('landing_footer')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+    if (error) {
+        console.error('Load footer settings error:', error.message);
+        return;
+    }
+
+    landingFooter = data;
+    populateFooterSettings(data);
+}
+
+function populateFooterSettings(f) {
+    document.getElementById('footerTaglineInput').value    = f.brand_tagline        ?? '';
+    document.getElementById('footerTwitterInput').value    = f.social_twitter_url   ?? '';
+    document.getElementById('footerTelegramInput').value   = f.social_telegram_url  ?? '';
+    document.getElementById('footerWhatsappInput').value   = f.social_whatsapp_url  ?? '';
+    document.getElementById('footerInstagramInput').value  = f.social_instagram_url ?? '';
+    document.getElementById('footerContactInput').value    = f.contact_url          ?? '';
+    document.getElementById('footerPrivacyInput').value    = f.privacy_policy_url   ?? '';
+    document.getElementById('footerTermsInput').value      = f.terms_url            ?? '';
+    document.getElementById('footerCopyrightInput').value  = f.copyright_text       ?? '';
+    document.getElementById('footerDisclaimerInput').value = f.disclaimer_text      ?? '';
+    resetDirty('footer');
 }

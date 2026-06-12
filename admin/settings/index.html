@@ -389,7 +389,108 @@
                 </label>
             </div>
 
+
+            <!-- ══════════════════════════════════════
+                 LANDING PAGE — FAQ
+            ══════════════════════════════════════ -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div class="settings-section-icon">
+                        <i class="uil uil-question-circle"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-section-title">Landing Page FAQ</h2>
+                        <p class="settings-section-desc">Manage the questions shown in the FAQ section of the landing page.</p>
+                    </div>
+                    <button class="settings-action-btn" onclick="openAddFaqModal()">
+                        <i class="uil uil-plus"></i> Add FAQ
+                    </button>
+                </div>
+
+                <div id="faqsLoading" class="admin-loading" style="padding: 2rem 0;">
+                    <i class="uil uil-spinner-alt spin"></i> Loading FAQs…
+                </div>
+                <div id="faqsEmpty" class="admin-empty" style="display:none;">
+                    <i class="uil uil-question-circle"></i>
+                    <p>No FAQs found. Add your first question.</p>
+                </div>
+                <div class="faqs-list" id="faqsList" style="display:none;"></div>
+                <div class="plans-order-hint" id="faqsOrderHint" style="display:none;">
+                    <i class="uil uil-info-circle"></i>
+                    Drag to reorder.
+                    <button class="save-order-btn" onclick="saveFaqOrder()">
+                        <i class="uil uil-check"></i> Save Order
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════════════════════
+                 LANDING PAGE — FOOTER
+            ══════════════════════════════════════ -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div class="settings-section-icon">
+                        <i class="uil uil-window-section"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-section-title">Landing Page Footer</h2>
+                        <p class="settings-section-desc">Brand tagline, social links, support links, and bottom legal text.</p>
+                    </div>
+                </div>
+                <div class="settings-form-grid">
+                    <div class="settings-field" style="grid-column: 1 / -1;">
+                        <label class="settings-label">Brand Tagline</label>
+                        <input type="text" id="footerTaglineInput" class="settings-input" placeholder="Smart crypto investment plans with daily returns…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Twitter URL</label>
+                        <input type="url" id="footerTwitterInput" class="settings-input" placeholder="https://twitter.com/…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Telegram URL</label>
+                        <input type="url" id="footerTelegramInput" class="settings-input" placeholder="https://t.me/…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">WhatsApp URL</label>
+                        <input type="url" id="footerWhatsappInput" class="settings-input" placeholder="https://wa.me/…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Instagram URL</label>
+                        <input type="url" id="footerInstagramInput" class="settings-input" placeholder="https://instagram.com/…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Contact Us URL</label>
+                        <input type="url" id="footerContactInput" class="settings-input" placeholder="mailto:support@… or page URL">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Privacy Policy URL</label>
+                        <input type="url" id="footerPrivacyInput" class="settings-input" placeholder="https://…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Terms of Service URL</label>
+                        <input type="url" id="footerTermsInput" class="settings-input" placeholder="https://…">
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Copyright Text</label>
+                        <input type="text" id="footerCopyrightInput" class="settings-input" placeholder="© 2026 SyncProfitPath. All rights reserved.">
+                    </div>
+                    <div class="settings-field" style="grid-column: 1 / -1;">
+                        <label class="settings-label">Disclaimer Text</label>
+                        <input type="text" id="footerDisclaimerInput" class="settings-input" placeholder="Investment involves risk…">
+                    </div>
+                </div>
+                <div class="settings-save-row">
+                    <p class="settings-feedback" id="footerFeedback"></p>
+                    <button class="settings-save-btn settings-save-btn--idle" id="footerSaveBtn" onclick="saveSection('footer')">
+                        <i class="uil uil-check-circle"></i> Saved
+                    </button>
+                </div>
+            </div>
+
         </div><!-- /settingsContent -->
+
+
     </main>
 
 
@@ -657,6 +758,82 @@
             <div class="modal-actions">
                 <button class="action-btn" onclick="closeDeleteConfirm()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
                 <button class="action-btn reject" onclick="confirmDeletePlan()">
+                    <i class="uil uil-trash-alt"></i> Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════
+         FAQ EDIT / ADD MODAL
+    ══════════════════════════════════════════ -->
+    <div class="admin-modal-overlay" id="faqModal" onclick="closeFaqModal(event)">
+        <div class="admin-modal plans-modal plans-modal--narrow">
+            <div class="admin-modal-header">
+                <h3 id="faqModalTitle">Edit FAQ</h3>
+                <button class="admin-modal-close" onclick="closeFaqModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+            <input type="hidden" id="fmId">
+
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="fmQuestion">Question</label>
+                    <input type="text" id="fmQuestion" class="plans-modal-input" placeholder="e.g. Is my money safe on SyncProfitPath?">
+                </div>
+            </div>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="fmAnswer">Answer</label>
+                    <textarea id="fmAnswer" class="plans-modal-input" rows="4" placeholder="Answer shown when the question is expanded…"></textarea>
+                </div>
+            </div>
+
+            <label class="settings-toggle-label" style="margin-top: 0.4rem;">
+                <div class="settings-toggle-wrap">
+                    <input type="checkbox" id="fmActive" class="settings-toggle-input" checked>
+                    <span class="settings-toggle-track">
+                        <span class="settings-toggle-thumb"></span>
+                    </span>
+                </div>
+                <span class="settings-toggle-text">Visible on landing page</span>
+            </label>
+
+            <p class="plans-modal-error" id="fmError"></p>
+
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeFaqModal()" style="background:var(--color-light);color:var(--color-dark);">
+                    Cancel
+                </button>
+                <button class="action-btn approve" id="fmSaveBtn" onclick="saveFaq()">
+                    <i class="uil uil-check-circle"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FAQ DELETE CONFIRM MODAL -->
+    <div class="admin-modal-overlay" id="faqDeleteConfirmModal" onclick="closeFaqDeleteConfirm(event)">
+        <div class="admin-modal plans-modal plans-modal--narrow">
+            <div class="admin-modal-header">
+                <h3>Delete FAQ</h3>
+                <button class="admin-modal-close" onclick="closeFaqDeleteConfirm()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+            <div class="plans-delete-body">
+                <div class="plans-delete-icon">
+                    <i class="uil uil-exclamation-triangle"></i>
+                </div>
+                <p>You are about to permanently delete <strong id="fdcQuestion">this FAQ</strong>.</p>
+                <p class="plans-delete-warn">This cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeFaqDeleteConfirm()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
+                <button class="action-btn reject" id="fdcConfirmBtn" onclick="confirmDeleteFaq()">
                     <i class="uil uil-trash-alt"></i> Yes, Delete
                 </button>
             </div>
