@@ -442,56 +442,8 @@
                 <span class="land-eyebrow">FAQ</span>
                 <h2>Common Questions</h2>
             </div>
-            <div class="land-faqs">
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>Is my money safe on SyncProfitPath?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">Yes. All user funds are secured with 256-bit SSL encryption. We use cold wallet storage for the majority of assets and enforce strict security protocols to protect your investments at all times.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>What is the minimum deposit?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">The minimum deposit is $100, which qualifies you for the Basic Plan. You can deposit using Bitcoin, Ethereum, USDT, USDC, Solana, or Litecoin.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>When are profits credited?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">Profits are calculated and credited to your account balance every 24 hours. You can track your earnings in real time on your dashboard.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>Can I withdraw at any time?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">Yes. There are no lock-in periods. You can submit a withdrawal request at any time and it will be processed by our team. Minimum withdrawal is $10.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>How does the referral program work?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">Every user gets a unique referral code. When someone signs up using your code and makes a deposit, you earn a referral bonus. You can track all your referrals and earnings in the Refer & Earn section of your dashboard.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>Do I need to verify my identity?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">KYC (Know Your Customer) verification is required to unlock full account features including withdrawals. You'll need to submit a government-issued ID and proof of address. Verification typically takes 24–48 hours.</div>
-                </div>
-                <div class="land-faq" onclick="toggleFaq(this)">
-                    <div class="land-faq__q">
-                        <span>How do I upgrade my plan?</span>
-                        <i class="uil uil-angle-down"></i>
-                    </div>
-                    <div class="land-faq__a">Simply make an additional deposit that falls within a higher plan's range. The system automatically applies the corresponding plan rate to your investment.</div>
-                </div>
+            <div class="land-faqs" id="landFaqs">
+                <div class="land-faq-loading" id="landFaqsLoading">Loading…</div>
             </div>
         </div>
     </section>
@@ -521,12 +473,12 @@
         <div class="land-container land-footer__inner">
             <div class="land-footer__brand">
                 <img src="./assets/logo.png" alt="SyncProfitPath" class="land-footer__logo">
-                <p>Smart crypto investment plans with daily returns. Secure, transparent, and always accessible.</p>
+                <p id="footerTagline">Smart crypto investment plans with daily returns. Secure, transparent, and always accessible.</p>
                 <div class="land-footer__socials">
-                    <a href="#" aria-label="Twitter"><i class="uil uil-twitter"></i></a>
-                    <a href="#" aria-label="Telegram"><i class="uil uil-telegram"></i></a>
-                    <a href="#" aria-label="WhatsApp"><i class="uil uil-whatsapp"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="uil uil-instagram"></i></a>
+                    <a href="#" id="footerTwitter" aria-label="Twitter"><i class="uil uil-twitter"></i></a>
+                    <a href="#" id="footerTelegram" aria-label="Telegram"><i class="uil uil-telegram"></i></a>
+                    <a href="#" id="footerWhatsapp" aria-label="WhatsApp"><i class="uil uil-whatsapp"></i></a>
+                    <a href="#" id="footerInstagram" aria-label="Instagram"><i class="uil uil-instagram"></i></a>
                 </div>
             </div>
             <div class="land-footer__col">
@@ -546,15 +498,15 @@
             <div class="land-footer__col">
                 <h5>Support</h5>
                 <a href="#faq">FAQ</a>
-                <a href="#">Contact Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <a href="#" id="footerContact">Contact Us</a>
+                <a href="#" id="footerPrivacy">Privacy Policy</a>
+                <a href="#" id="footerTerms">Terms of Service</a>
             </div>
         </div>
         <div class="land-footer__bottom">
             <div class="land-container">
-                <p>&copy; 2026 SyncProfitPath. All rights reserved.</p>
-                <p>Investment involves risk. Past performance is not indicative of future results.</p>
+                <p id="footerCopyright">&copy; 2026 SyncProfitPath. All rights reserved.</p>
+                <p id="footerDisclaimer">Investment involves risk. Past performance is not indicative of future results.</p>
             </div>
         </div>
     </footer>
