@@ -1119,8 +1119,10 @@ canvas {
 
 .nav_menu-btn--desktop:hover { background: var(--color-primary); }
 
+/* Desktop sidebar is always visible (sticky, in-flow) — the desktop
+   hamburger has nothing to toggle, so hide it at desktop widths. */
 @media screen and (min-width: 1024px) {
-    .nav_menu-btn--desktop { display: inline-flex; }
+    .nav_menu-btn--desktop { display: none !important; }
 }
 
 /* Hide original nav_menu-btn if still present */
