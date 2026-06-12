@@ -58,6 +58,15 @@ async function loadLandingPlans() {
 
         const cards = document.querySelectorAll('.land-plan');
 
+        // Hero card mini plan list (Basic / Standard / Premium rates)
+        const heroRateEls = document.querySelectorAll('.hero-plan-item strong');
+        data.forEach((plan, i) => {
+            const dailyRate = plan.daily_rate != null ? plan.daily_rate : 0;
+            if (heroRateEls[i]) {
+                heroRateEls[i].textContent = '+' + dailyRate + '%/day';
+            }
+        });
+
         data.forEach((plan, i) => {
             const card = cards[i];
             if (!card) return;
