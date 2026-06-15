@@ -2036,3 +2036,59 @@
     background: var(--color-primary);
     color: var(--color-dark);
 }
+
+
+/* ================================================================
+   KYC DOCUMENT PREVIEW GRID
+   ================================================================ */
+
+.kyc-docs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem;
+    margin: 1.2rem 0;
+}
+
+.kyc-doc-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.kyc-doc-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.kyc-doc-preview {
+    display: block;
+    border: 2px solid var(--color-light);
+    border-radius: var(--radius-2);
+    overflow: hidden;
+    transition: var(--transition);
+    background: var(--color-light);
+}
+
+.kyc-doc-preview:hover {
+    border-color: var(--color-primary);
+}
+
+.kyc-doc-preview img {
+    width: 100%;
+    height: 16rem;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: var(--transition);
+}
+
+.kyc-doc-preview:hover img {
+    opacity: 0.9;
+}
+
+@media (max-width: 540px) {
+    .kyc-docs-grid { grid-template-columns: 1fr; }
+}
