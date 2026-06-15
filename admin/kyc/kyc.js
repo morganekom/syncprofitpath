@@ -218,11 +218,18 @@ function openKycModal(id) {
     } else {
         noDocs.style.display   = 'none';
 
-        // Populate document images
-        const idType = u.kyc_id_type || 'Government ID';
-        setKycDoc('mkIdDoc', 'mkIdDocLink', 'mkIdDocLabel', u.kyc_id_url, idType);
-        setKycDoc('mkAddrDoc', 'mkAddrDocLink', 'mkAddrDocLabel', u.kyc_addr_url, 'Proof of Address');
-        docsWrap.style.display = 'grid';
+        // Show docs section only if URLs exist (users who submitted before
+        // the file-upload update will have no URLs — show a fallback notice)
+        if (u.kyc_id_url || u.kyc_addr_url) {
+            const idType = u.kyc_id_type || 'Government ID';
+            setKycDoc('mkIdDoc', 'mkIdDocLink', 'mkIdDocLabel', u.kyc_id_url, idType);
+            setKycDoc('mkAddrDoc', 'mkAddrDocLink', 'mkAddrDocLabel', u.kyc_addr_url, 'Proof of Address');
+            docsWrap.style.display = 'grid';
+        } else {
+            docsWrap.style.display = 'none';
+            noDocs.style.display   = 'flex';
+            noDocs.textContent     = 'No document images on file. User may have submitted before file upload was enabled.';
+        }
 
         noteWrap.style.display = isPending ? 'flex' : 'none';
         actions.style.display  = isPending ? 'flex' : 'none';
