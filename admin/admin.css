@@ -930,6 +930,7 @@
 @media screen and (max-width: 600px) {
     .filter-bar { flex-direction: column; align-items: stretch; }
     .search-wrap { min-width: unset; width: 100%; }
+    .filter-tab { padding: 0.6rem 1rem; font-size: 1rem; }
 
     /* Keep: user, amount, status, actions */
     .admin-table th:nth-child(2),
