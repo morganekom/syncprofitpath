@@ -823,34 +823,67 @@ async function submitKyc() {
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-    const { error } = await db
-        .from('users')
-        .update({ kyc_status: 'pending' })
-        .eq('id', currentUser.id);
+    btn.textContent = 'Uploading...';
 
-    btn.classList.remove('loading');
+    const uid = currentUser.id;
+    const ts  = Date.now();
 
-    if (error) {
-        btn.textContent = 'Submit Documents';
-        btn.disabled    = false;
-        errorEl.textContent = 'Submission failed. Please try again.';
-        return;
-    }
+    try {
+        // Upload government ID
+        const idExt  = idFile.name.split('.').pop();
+        const idPath = `${uid}/id_${ts}.${idExt}`;
+        const { error: idErr } = await db.storage
+            .from('kyc-documents')
+            .upload(idPath, idFile, { upsert: true });
+        if (idErr) throw new Error('ID upload failed: ' + idErr.message);
 
-    // Sync localStorage
-    localStorage.setItem('kycStatus', 'pending');
-        // Send KYC pending notification
+        // Upload proof of address
+        const addrExt  = addrFile.name.split('.').pop();
+        const addrPath = `${uid}/addr_${ts}.${addrExt}`;
+        const { error: addrErr } = await db.storage
+            .from('kyc-documents')
+            .upload(addrPath, addrFile, { upsert: true });
+        if (addrErr) throw new Error('Address upload failed: ' + addrErr.message);
+
+        // Get public URLs
+        const { data: idUrlData }   = db.storage.from('kyc-documents').getPublicUrl(idPath);
+        const { data: addrUrlData } = db.storage.from('kyc-documents').getPublicUrl(addrPath);
+
+        // Save status + URLs + id type to users table
+        const { error: dbErr } = await db
+            .from('users')
+            .update({
+                kyc_status:   'pending',
+                kyc_id_url:   idUrlData.publicUrl,
+                kyc_addr_url: addrUrlData.publicUrl,
+                kyc_id_type:  idType,
+            })
+            .eq('id', uid);
+        if (dbErr) throw new Error('Save failed: ' + dbErr.message);
+
+        btn.classList.remove('loading');
+
+        // Sync localStorage
+        localStorage.setItem('kycStatus', 'pending');
         const kycUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         sendNotification({
             type:  'kyc_pending',
             email: kycUser.email || '',
             name:  kycUser.full_name || kycUser.first_name || 'there',
         });
-    const updatedUser = { ...currentUser, kyc_status: 'pending' };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        const updatedUser = { ...currentUser, kyc_status: 'pending' };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
-    successEl.textContent = '✓ Documents submitted. We will review within 24–48 hours.';
-    updateKycStatus();
+        successEl.textContent = '✓ Documents submitted. We will review within 24–48 hours.';
+        updateKycStatus();
+
+    } catch (err) {
+        console.error('KYC submit error:', err.message);
+        btn.textContent = 'Submit Documents';
+        btn.disabled    = false;
+        btn.classList.remove('loading');
+        errorEl.textContent = err.message || 'Submission failed. Please try again.';
+    }
 }
 
 
