@@ -40,7 +40,7 @@ async function loadKyc() {
     try {
         const { data, error } = await db
             .from('users')
-            .select('id, full_name, first_name, last_name, email, phone, country, dob, balance, kyc_status, created_at')
+            .select('id, full_name, first_name, last_name, email, phone, country, dob, balance, kyc_status, kyc_id_url, kyc_addr_url, kyc_id_type, created_at')
             .neq('role', 'admin')
             .order('created_at', { ascending: false });
 
@@ -205,17 +205,25 @@ function openKycModal(id) {
     document.getElementById('mkBadge').textContent = capitalise(status);
 
     // Documents section
-    // We store kyc_status but not file URLs yet — show note if unsubmitted
-    const noDocs  = document.getElementById('mkNoDocs');
+    const noDocs   = document.getElementById('mkNoDocs');
+    const docsWrap = document.getElementById('mkDocsWrap');
     const noteWrap = document.getElementById('mkNoteWrap');
     const actions  = document.getElementById('mkActions');
 
     if (status === 'unsubmitted') {
         noDocs.style.display   = 'flex';
+        docsWrap.style.display = 'none';
         noteWrap.style.display = 'none';
         actions.style.display  = 'none';
     } else {
         noDocs.style.display   = 'none';
+
+        // Populate document images
+        const idType = u.kyc_id_type || 'Government ID';
+        setKycDoc('mkIdDoc', 'mkIdDocLink', 'mkIdDocLabel', u.kyc_id_url, idType);
+        setKycDoc('mkAddrDoc', 'mkAddrDocLink', 'mkAddrDocLabel', u.kyc_addr_url, 'Proof of Address');
+        docsWrap.style.display = 'grid';
+
         noteWrap.style.display = isPending ? 'flex' : 'none';
         actions.style.display  = isPending ? 'flex' : 'none';
     }
@@ -305,5 +313,26 @@ async function handleKycAction(newStatus) {
         verifyBtn.innerHTML = '<i class="uil uil-shield-check"></i> Verify';
         rejectBtn.innerHTML = '<i class="uil uil-times-circle"></i> Reject';
         alert('Something went wrong: ' + err.message);
+    }
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+
+function setKycDoc(imgId, linkId, labelId, url, label) {
+    const img  = document.getElementById(imgId);
+    const link = document.getElementById(linkId);
+    const lbl  = document.getElementById(labelId);
+
+    if (lbl) lbl.textContent = label;
+
+    if (url) {
+        img.src            = url;
+        link.href          = url;
+        link.style.display = 'block';
+    } else {
+        img.src            = '';
+        link.style.display = 'none';
     }
 }
