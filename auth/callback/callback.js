@@ -18,11 +18,23 @@ async function handleGoogleCallback() {
 
         const authUser = session.user;
 
+        // ── PROVIDER GUARD ──
+        // This callback page is ONLY for Google OAuth users.
+        // If an email/password user somehow lands here (e.g. after a
+        // password reset), redirect them to login immediately so we
+        // never accidentally create a ghost profile for them.
+        const provider = authUser.app_metadata?.provider || '';
+        if (provider !== 'google') {
+            await db.auth.signOut();
+            window.location.href = '../login/';
+            return;
+        }
+
         // ── CHECK IF PROFILE EXISTS IN USERS TABLE ──
         const { data: existingUser } = await db
             .from('users')
             .select('*')
-            .eq('email', authUser.email)
+            .eq('id', authUser.id)       // match by Auth UID, not email
             .maybeSingle();
 
         if (existingUser) {
