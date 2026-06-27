@@ -73,13 +73,13 @@
 
 /* ========================= MAIN LAYOUT ========================= */
 .admin-main {
-    margin-top: 7rem;
-    margin-right: 2.9vw;
-    padding-bottom: 6rem;
+    margin-top: 6.5rem;
+    padding: 0 1.4rem 6rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.4rem;
     min-width: 0;
+    box-sizing: border-box;
 }
 
 
@@ -689,13 +689,6 @@
 
 
 /* ========================= MOBILE BASE (default) ========================= */
-.admin-main {
-    margin-top: 6.5rem;
-    margin-left: 1.4rem;
-    margin-right: 1.4rem;
-    gap: 1.4rem;
-}
-
 .admin-header { align-items: flex-start; }
 
 .admin-stat-card { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
@@ -721,8 +714,6 @@
 /* ========================= MEDIA QUERIES (tablet) ========================= */
 @media screen and (min-width: 600px) {
     .admin-stats { grid-template-columns: 1fr 1fr; }
-
-    .admin-main { margin-right: 1.4rem; margin-left: 1.4rem; }
 }
 
 
@@ -734,8 +725,7 @@
 
     .admin-main {
         margin-top: 7rem;
-        margin-right: 2.9vw;
-        margin-left: 0;
+        padding: 0 2.9vw 6rem 0;
         gap: 2rem;
     }
 
