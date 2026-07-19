@@ -48,10 +48,11 @@ async function handleConfirmation() {
 
         // ── STEP 2: Check if profile already exists ──
         // (handles edge case where user clicks the link twice)
+        // Match by Auth UID — not email — to avoid ID mismatches
         const { data: existingUser } = await db
             .from('users')
             .select('*')
-            .eq('email', authUser.email)
+            .eq('id', authUser.id)
             .maybeSingle();
 
         if (existingUser) {
@@ -75,6 +76,7 @@ async function handleConfirmation() {
         const { data: newUser, error: insertError } = await db
             .from('users')
             .insert([{
+                id:               authUser.id,
                 first_name:       firstName,
                 last_name:        lastName,
                 full_name:        fullName,
