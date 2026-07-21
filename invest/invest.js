@@ -163,15 +163,6 @@ function renderPlans() {
                         ${escapeHtml(name)} <span>Daily ${dailyRate}%</span>
                     </div>`;
         }).join('');
-
-    } catch (err) {
-        console.error('Failed to load investment plans:', err.message);
-        const skelEl = document.getElementById('plansLoading');
-        const grid   = document.getElementById('plansGrid');
-        if (skelEl) skelEl.style.display = 'none';
-        grid.style.display = '';
-        grid.innerHTML = '<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>';
-    }
 }
 
 
@@ -474,7 +465,3 @@ function formatNum(num) {
 }
 
 // ================================================================
-
-// ── Run on page load ──
-document.addEventListener('DOMContentLoaded', () => {
-});
