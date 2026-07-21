@@ -781,3 +781,383 @@
     font-family: inherit;
     line-height: 1.5;
 }
+
+
+/* ========================= SETTINGS TABS ========================= */
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 0.6rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.settings-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: var(--radius-2);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    white-space: nowrap;
+    flex: 1;
+    justify-content: center;
+}
+
+@media screen and (min-width: 600px) {
+    .settings-tab {
+        flex: unset;
+        justify-content: flex-start;
+    }
+}
+
+.settings-tab i {
+    font-size: 1.5rem;
+    color: inherit;
+}
+
+.settings-tab span {
+    display: none;
+}
+
+@media screen and (min-width: 480px) {
+    .settings-tab span {
+        display: inline;
+    }
+}
+
+.settings-tab:hover {
+    background: var(--color-light);
+    color: var(--color-dark);
+}
+
+.settings-tab.active {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+
+/* ========================= TAB PANELS ========================= */
+.settings-tab-panel {
+    display: none;
+}
+
+.settings-tab-panel.active {
+    display: block;
+}
+
+
+/* ========================= TESTIMONIALS LIST (in settings) ========================= */
+.tm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.tm-list-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--color-light);
+    transition: var(--transition);
+}
+
+.tm-list-item:last-child {
+    border-bottom: none;
+}
+
+.tm-list-avatar {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.tm-list-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.tm-list-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tm-list-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.2rem;
+    flex-wrap: wrap;
+}
+
+.tm-list-stars {
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.tm-list-stars .on  { color: var(--color-warning); }
+.tm-list-stars .off { color: var(--color-light); }
+
+.tm-list-plan {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+.tm-list-quote {
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+    margin-top: 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tm-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.tm-vis-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: var(--radius-1);
+    transition: var(--transition);
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+}
+
+.tm-vis-btn.visible   { color: var(--color-primary); }
+.tm-vis-btn.hidden-ic { color: var(--color-gray-light); }
+.tm-vis-btn:hover     { background: var(--color-light); }
+
+.tm-edit-btn {
+    background: var(--color-light);
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-1);
+    transition: var(--transition);
+    font-size: 1.3rem;
+    color: var(--color-gray-dark);
+    display: flex;
+    align-items: center;
+}
+
+.tm-edit-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.tm-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-1);
+    transition: var(--transition);
+    font-size: 1.3rem;
+    color: var(--color-gray-light);
+    display: flex;
+    align-items: center;
+}
+
+.tm-delete-btn:hover {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+
+/* ========================= TESTIMONIAL MODALS ========================= */
+.tm-modal {
+    max-width: 52rem;
+}
+
+.tm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.tm-field label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.tm-field--row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tm-required { color: var(--color-danger); }
+
+.tm-hint {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-gray-light);
+}
+
+.tm-input {
+    background: var(--color-light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-2);
+    padding: 1.1rem 1.3rem;
+    font-size: 1.2rem;
+    color: var(--color-dark);
+    font-family: "Poppins", sans-serif;
+    transition: var(--transition);
+    outline: none;
+    width: 100%;
+}
+
+.tm-input:focus { border-color: var(--color-primary); }
+.tm-input.error { border-color: var(--color-danger); }
+
+.tm-textarea {
+    min-height: 10rem;
+    resize: vertical;
+    line-height: 1.7;
+}
+
+.tm-star-picker {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.tm-star-picker button {
+    font-size: 2.2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-light);
+    transition: color 0.15s ease, transform 0.1s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.tm-star-picker button:hover,
+.tm-star-picker button.active {
+    color: var(--color-warning);
+    transform: scale(1.15);
+}
+
+.tm-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.tm-initials-input {
+    max-width: 8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    text-align: center;
+}
+
+.tm-avatar-preview {
+    width: 4.8rem;
+    height: 4.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    background: #00e27b;
+    color: #27282f;
+    transition: background 0.2s, color 0.2s;
+}
+
+.tm-color-swatches {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.tm-swatch {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    outline: none;
+}
+
+.tm-swatch:hover   { transform: scale(1.1); }
+.tm-swatch.active  { border-color: var(--color-dark); box-shadow: 0 0 0 2px var(--color-white); }
+
+.tm-toggle {
+    position: relative;
+    display: inline-block;
+    width: 4.4rem;
+    height: 2.4rem;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.tm-toggle input { opacity: 0; width: 0; height: 0; }
+
+.tm-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--color-light);
+    border-radius: 99px;
+    transition: background 0.2s;
+}
+
+.tm-toggle-track::before {
+    content: '';
+    position: absolute;
+    width: 1.8rem;
+    height: 1.8rem;
+    left: 0.3rem;
+    top: 0.3rem;
+    border-radius: 50%;
+    background: var(--color-gray-light);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.tm-toggle input:checked + .tm-toggle-track { background: rgba(0,226,123,0.2); }
+.tm-toggle input:checked + .tm-toggle-track::before {
+    transform: translateX(2rem);
+    background: var(--color-primary);
+}
+
+.tm-error {
+    font-size: 1.1rem;
+    color: var(--color-danger);
+    min-height: 1.4rem;
+}
+
+.tm-modal-footer {
+    margin-top: 0.4rem;
+}

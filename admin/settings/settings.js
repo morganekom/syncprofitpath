@@ -50,7 +50,7 @@ async function loadSettings() {
     if (refreshBtn) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
 
     try {
-        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings()]);
+        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings(), loadTestimonials()]);
         contentEl.style.display = 'block';
     } catch (err) {
         console.error('loadSettings error:', err.message);
@@ -1055,4 +1055,383 @@ function populateFooterSettings(f) {
     document.getElementById('footerCopyrightInput').value  = f.copyright_text       ?? '';
     document.getElementById('footerDisclaimerInput').value = f.disclaimer_text      ?? '';
     resetDirty('footer');
+}
+
+
+// ================================================================
+// SETTINGS TABS
+// ================================================================
+
+function switchTab(tabId, btn) {
+    // Deactivate all panels and buttons
+    document.querySelectorAll('.settings-tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
+
+    // Activate selected
+    document.getElementById('tab-' + tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+
+// ================================================================
+// TESTIMONIALS — state
+// ================================================================
+
+let allTestimonials    = [];
+let tmSelectedRating   = 5;
+let tmSelectedBg       = '#00e27b';
+let tmSelectedColor    = '#27282f';
+
+// Init testimonials UI once the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    loadTestimonials();
+    initTmStarPicker();
+    initTmColorSwatches();
+    document.getElementById('tmInitials')?.addEventListener('input', updateTmAvatarPreview);
+});
+
+
+// ================================================================
+// LOAD TESTIMONIALS
+// ================================================================
+
+async function loadTestimonials() {
+    const loadingEl = document.getElementById('tmLoading');
+    const emptyEl   = document.getElementById('tmEmpty');
+    const listEl    = document.getElementById('tmList');
+
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (emptyEl)   emptyEl.style.display   = 'none';
+    if (listEl)    listEl.style.display    = 'none';
+
+    try {
+        const { data, error } = await db
+            .from('testimonials')
+            .select('*')
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+
+        allTestimonials = data || [];
+        renderTmList();
+
+    } catch (err) {
+        console.error('loadTestimonials error:', err.message);
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (emptyEl)   emptyEl.style.display   = 'flex';
+    }
+}
+
+function renderTmList() {
+    const loadingEl = document.getElementById('tmLoading');
+    const emptyEl   = document.getElementById('tmEmpty');
+    const listEl    = document.getElementById('tmList');
+
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    if (allTestimonials.length === 0) {
+        if (emptyEl) emptyEl.style.display = 'flex';
+        if (listEl)  listEl.style.display  = 'none';
+        return;
+    }
+
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (listEl) {
+        listEl.style.display = 'flex';
+        listEl.innerHTML = allTestimonials.map(t => buildTmListItem(t)).join('');
+    }
+}
+
+function buildTmListItem(t) {
+    const bg       = t.avatar_bg    || '#00e27b';
+    const color    = t.avatar_color || '#27282f';
+    const initials = escapeHtml(t.avatar_initials || '?');
+    const starsOn  = '★'.repeat(Math.min(5, Math.max(1, t.rating || 5)));
+    const starsOff = '★'.repeat(5 - (t.rating || 5));
+    const isVisible = t.is_visible !== false;
+    const visClass  = isVisible ? 'visible' : 'hidden-ic';
+    const visIcon   = isVisible ? 'uil-eye' : 'uil-eye-slash';
+    const visTitle  = isVisible ? 'Hide from landing page' : 'Show on landing page';
+
+    return `
+        <div class="tm-list-item" id="tmItem-${t.id}">
+            <div class="tm-list-avatar" style="background:${bg};color:${color}">${initials}</div>
+            <div class="tm-list-body">
+                <div class="tm-list-name">${escapeHtml(t.name)}</div>
+                <div class="tm-list-meta">
+                    <span class="tm-list-stars">
+                        <span class="on">${starsOn}</span><span class="off">${starsOff}</span>
+                    </span>
+                    ${t.plan_label ? `<span class="tm-list-plan">${escapeHtml(t.plan_label)}</span>` : ''}
+                </div>
+                <div class="tm-list-quote">${escapeHtml(t.quote)}</div>
+            </div>
+            <div class="tm-list-actions">
+                <button class="tm-vis-btn ${visClass}" title="${visTitle}"
+                    onclick="toggleTmVisibility(${t.id}, ${!isVisible})">
+                    <i class="uil ${visIcon}"></i>
+                </button>
+                <button class="tm-edit-btn" title="Edit" onclick="openEditTestimonialModal(${t.id})">
+                    <i class="uil uil-edit"></i>
+                </button>
+                <button class="tm-delete-btn" title="Delete"
+                    onclick="openTmDeleteModal(${t.id}, '${escapeHtml(t.name)}')">
+                    <i class="uil uil-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+
+// ================================================================
+// STAR PICKER
+// ================================================================
+
+function initTmStarPicker() {
+    const picker = document.getElementById('tmStarPicker');
+    if (!picker) return;
+    picker.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click',      () => setTmRating(parseInt(btn.dataset.v)));
+        btn.addEventListener('mouseenter', () => highlightTmStars(parseInt(btn.dataset.v)));
+        btn.addEventListener('mouseleave', () => highlightTmStars(tmSelectedRating));
+    });
+    highlightTmStars(5);
+}
+
+function setTmRating(v) {
+    tmSelectedRating = v;
+    document.getElementById('tmRating').value = v;
+    highlightTmStars(v);
+}
+
+function highlightTmStars(v) {
+    document.getElementById('tmStarPicker')?.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.v) <= v);
+    });
+}
+
+
+// ================================================================
+// COLOUR SWATCHES
+// ================================================================
+
+function initTmColorSwatches() {
+    document.getElementById('tmColorSwatches')?.querySelectorAll('.tm-swatch').forEach(s => {
+        s.addEventListener('click', () => {
+            document.querySelectorAll('#tmColorSwatches .tm-swatch').forEach(x => x.classList.remove('active'));
+            s.classList.add('active');
+            tmSelectedBg    = s.dataset.bg;
+            tmSelectedColor = s.dataset.color;
+            document.getElementById('tmAvatarBg').value    = tmSelectedBg;
+            document.getElementById('tmAvatarColor').value = tmSelectedColor;
+            updateTmAvatarPreview();
+        });
+    });
+}
+
+function updateTmAvatarPreview() {
+    const initials = (document.getElementById('tmInitials')?.value || '').toUpperCase() || '?';
+    const preview  = document.getElementById('tmAvatarPreview');
+    if (!preview) return;
+    preview.textContent      = initials;
+    preview.style.background = tmSelectedBg;
+    preview.style.color      = tmSelectedColor;
+}
+
+
+// ================================================================
+// ADD / EDIT MODALS
+// ================================================================
+
+function openAddTestimonialModal() {
+    resetTmModal();
+    document.getElementById('tmModalTitle').textContent = 'Add Testimonial';
+    document.getElementById('tmEditId').value = '';
+    document.getElementById('tmModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function openEditTestimonialModal(id) {
+    const t = allTestimonials.find(x => x.id === id);
+    if (!t) return;
+
+    resetTmModal();
+    document.getElementById('tmModalTitle').textContent = 'Edit Testimonial';
+    document.getElementById('tmEditId').value           = t.id;
+    document.getElementById('tmName').value             = t.name         || '';
+    document.getElementById('tmPlanLabel').value        = t.plan_label   || '';
+    document.getElementById('tmQuote').value            = t.quote        || '';
+    document.getElementById('tmInitials').value         = t.avatar_initials || '';
+    document.getElementById('tmSortOrder').value        = t.sort_order   || 10;
+    document.getElementById('tmVisible').checked        = t.is_visible !== false;
+
+    setTmRating(t.rating || 5);
+
+    tmSelectedBg    = t.avatar_bg    || '#00e27b';
+    tmSelectedColor = t.avatar_color || '#27282f';
+    document.getElementById('tmAvatarBg').value    = tmSelectedBg;
+    document.getElementById('tmAvatarColor').value = tmSelectedColor;
+    document.querySelectorAll('#tmColorSwatches .tm-swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.bg === tmSelectedBg);
+    });
+    updateTmAvatarPreview();
+
+    document.getElementById('tmModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTmModal(e) {
+    if (e && e.target !== document.getElementById('tmModal')) return;
+    document.getElementById('tmModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function resetTmModal() {
+    document.getElementById('tmName').value        = '';
+    document.getElementById('tmPlanLabel').value   = '';
+    document.getElementById('tmQuote').value       = '';
+    document.getElementById('tmInitials').value    = '';
+    document.getElementById('tmSortOrder').value   = '10';
+    document.getElementById('tmVisible').checked   = true;
+    document.getElementById('tmError').textContent = '';
+
+    tmSelectedRating = 5;
+    document.getElementById('tmRating').value = '5';
+    highlightTmStars(5);
+
+    tmSelectedBg    = '#00e27b';
+    tmSelectedColor = '#27282f';
+    document.getElementById('tmAvatarBg').value    = '#00e27b';
+    document.getElementById('tmAvatarColor').value = '#27282f';
+    document.querySelectorAll('#tmColorSwatches .tm-swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.bg === '#00e27b');
+    });
+    updateTmAvatarPreview();
+}
+
+
+// ================================================================
+// SAVE TESTIMONIAL
+// ================================================================
+
+async function saveTestimonial() {
+    const saveBtn = document.getElementById('tmSaveBtn');
+    const errorEl = document.getElementById('tmError');
+    errorEl.textContent = '';
+
+    const id        = document.getElementById('tmEditId').value;
+    const name      = document.getElementById('tmName').value.trim();
+    const planLabel = document.getElementById('tmPlanLabel').value.trim();
+    const quote     = document.getElementById('tmQuote').value.trim();
+    const initials  = document.getElementById('tmInitials').value.trim().toUpperCase();
+    const rating    = parseInt(document.getElementById('tmRating').value) || 5;
+    const avatarBg  = document.getElementById('tmAvatarBg').value;
+    const avatarClr = document.getElementById('tmAvatarColor').value;
+    const visible   = document.getElementById('tmVisible').checked;
+    const sortOrder = parseInt(document.getElementById('tmSortOrder').value) || 10;
+
+    if (!name)     { errorEl.textContent = 'Name is required.';             return; }
+    if (!quote)    { errorEl.textContent = 'Quote is required.';            return; }
+    if (!initials) { errorEl.textContent = 'Avatar initials are required.'; return; }
+
+    const payload = {
+        name,
+        plan_label:      planLabel || null,
+        quote,
+        rating,
+        avatar_initials: initials,
+        avatar_bg:       avatarBg,
+        avatar_color:    avatarClr,
+        is_visible:      visible,
+        sort_order:      sortOrder,
+    };
+
+    saveBtn.disabled  = true;
+    saveBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
+
+    try {
+        let error;
+        if (id) {
+            ({ error } = await db.from('testimonials').update(payload).eq('id', id));
+        } else {
+            ({ error } = await db.from('testimonials').insert(payload));
+        }
+        if (error) throw error;
+
+        closeTmModal();
+        await loadTestimonials();
+
+    } catch (err) {
+        console.error('saveTestimonial error:', err.message);
+        errorEl.textContent = 'Failed to save. Please try again.';
+    }
+
+    saveBtn.disabled  = false;
+    saveBtn.innerHTML = '<i class="uil uil-check"></i> Save';
+}
+
+
+// ================================================================
+// TOGGLE VISIBILITY (inline)
+// ================================================================
+
+async function toggleTmVisibility(id, newVisible) {
+    try {
+        const { error } = await db
+            .from('testimonials')
+            .update({ is_visible: newVisible })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        const t = allTestimonials.find(x => x.id === id);
+        if (t) t.is_visible = newVisible;
+        renderTmList();
+
+    } catch (err) {
+        console.error('toggleTmVisibility error:', err.message);
+    }
+}
+
+
+// ================================================================
+// DELETE
+// ================================================================
+
+function openTmDeleteModal(id, name) {
+    document.getElementById('tmDeleteId').value          = id;
+    document.getElementById('tmDeleteName').textContent  = name;
+    document.getElementById('tmDeleteModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTmDeleteModal(e) {
+    if (e && e.target !== document.getElementById('tmDeleteModal')) return;
+    document.getElementById('tmDeleteModal').classList.remove('open');
+    document.body.style.overflow = '';
+    const btn = document.getElementById('tmDeleteBtn');
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="uil uil-trash-alt"></i> Delete';
+}
+
+async function confirmDeleteTestimonial() {
+    const btn = document.getElementById('tmDeleteBtn');
+    const id  = document.getElementById('tmDeleteId').value;
+
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Deleting…';
+
+    try {
+        const { error } = await db.from('testimonials').delete().eq('id', id);
+        if (error) throw error;
+
+        closeTmDeleteModal();
+        await loadTestimonials();
+
+    } catch (err) {
+        console.error('confirmDeleteTestimonial error:', err.message);
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="uil uil-trash-alt"></i> Delete';
+    }
 }

@@ -130,366 +130,414 @@
             </div>
         </header>
 
+        <!-- ── TAB NAV ── -->
+        <div class="settings-tabs">
+            <button class="settings-tab active" data-tab="platform" onclick="switchTab('platform', this)">
+                <i class="uil uil-layer-group"></i>
+                <span>Platform</span>
+            </button>
+            <button class="settings-tab" data-tab="landing" onclick="switchTab('landing', this)">
+                <i class="uil uil-window-section"></i>
+                <span>Landing Page</span>
+            </button>
+            <button class="settings-tab" data-tab="general" onclick="switchTab('general', this)">
+                <i class="uil uil-cog"></i>
+                <span>General</span>
+            </button>
+        </div>
+
         <div id="settingsLoading" class="admin-loading">
             <i class="uil uil-spinner-alt spin"></i> Loading settings…
         </div>
 
         <div id="settingsContent" style="display:none;">
 
-            <!-- ══════════════════════════════════════
-                 INVESTMENT PLANS
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
+
+            <!-- ════════════════════════════════════════════════════
+                 TAB: PLATFORM
+                 Investment Plans, Withdrawal Limits, Deposit, KYC, Referral
+            ════════════════════════════════════════════════════ -->
+            <div class="settings-tab-panel active" id="tab-platform">
+
+                <!-- INVESTMENT PLANS -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-layer-group"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Investment Plans</h2>
+                            <p class="settings-section-desc">Add, edit, and reorder investment plans shown on the invest page.</p>
+                        </div>
+                        <button class="settings-action-btn" onclick="openAddModal()">
+                            <i class="uil uil-plus"></i> Add Plan
+                        </button>
+                    </div>
+
+                    <div id="plansLoading" class="admin-loading" style="padding: 2rem 0;">
+                        <i class="uil uil-spinner-alt spin"></i> Loading plans…
+                    </div>
+                    <div id="plansEmpty" class="admin-empty" style="display:none;">
                         <i class="uil uil-layer-group"></i>
+                        <p>No investment plans found. Add your first plan.</p>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">Investment Plans</h2>
-                        <p class="settings-section-desc">Add, edit, and reorder investment plans shown on the invest page.</p>
+                    <div class="plans-grid" id="plansGrid" style="display:none;"></div>
+                    <div class="plans-order-hint" id="plansOrderHint" style="display:none;">
+                        <i class="uil uil-info-circle"></i>
+                        Drag cards to reorder.
+                        <button class="save-order-btn" onclick="saveOrder()">
+                            <i class="uil uil-check"></i> Save Order
+                        </button>
                     </div>
-                    <button class="settings-action-btn" onclick="openAddModal()">
-                        <i class="uil uil-plus"></i> Add Plan
-                    </button>
                 </div>
 
-                <div id="plansLoading" class="admin-loading" style="padding: 2rem 0;">
-                    <i class="uil uil-spinner-alt spin"></i> Loading plans…
-                </div>
-                <div id="plansEmpty" class="admin-empty" style="display:none;">
-                    <i class="uil uil-layer-group"></i>
-                    <p>No investment plans found. Add your first plan.</p>
-                </div>
-                <div class="plans-grid" id="plansGrid" style="display:none;"></div>
-                <div class="plans-order-hint" id="plansOrderHint" style="display:none;">
-                    <i class="uil uil-info-circle"></i>
-                    Drag cards to reorder.
-                    <button class="save-order-btn" onclick="saveOrder()">
-                        <i class="uil uil-check"></i> Save Order
-                    </button>
-                </div>
-            </div>
 
-
-            <!-- ══════════════════════════════════════
-                 WITHDRAWAL LIMITS
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-arrow-circle-up"></i>
-                    </div>
-                    <div>
-                        <h2 class="settings-section-title">Withdrawal Limits</h2>
-                        <p class="settings-section-desc">Set the minimum and maximum amounts users can withdraw.</p>
-                    </div>
-                </div>
-                <div class="settings-form-grid">
-                    <div class="settings-field">
-                        <label class="settings-label">Minimum Withdrawal ($)</label>
-                        <div class="settings-input-wrap">
-                            <span class="settings-prefix">$</span>
-                            <input type="number" id="withdrawalMin" class="settings-input settings-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
+                <!-- WITHDRAWAL LIMITS -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-arrow-circle-up"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Withdrawal Limits</h2>
+                            <p class="settings-section-desc">Set the minimum and maximum amounts users can withdraw.</p>
                         </div>
                     </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Maximum Withdrawal ($)</label>
-                        <div class="settings-input-wrap">
-                            <span class="settings-prefix">$</span>
-                            <input type="number" id="withdrawalMax" class="settings-input settings-input--prefixed" placeholder="e.g. 50000" min="0" step="0.01">
+                    <div class="settings-form-grid">
+                        <div class="settings-field">
+                            <label class="settings-label">Minimum Withdrawal ($)</label>
+                            <div class="settings-input-wrap">
+                                <span class="settings-prefix">$</span>
+                                <input type="number" id="withdrawalMin" class="settings-input settings-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Maximum Withdrawal ($)</label>
+                            <div class="settings-input-wrap">
+                                <span class="settings-prefix">$</span>
+                                <input type="number" id="withdrawalMax" class="settings-input settings-input--prefixed" placeholder="e.g. 50000" min="0" step="0.01">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="withdrawalFeedback"></p>
-                    <button class="settings-save-btn settings-save-btn--idle" id="withdrawalSaveBtn" onclick="saveSection('withdrawal')">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </button>
-                </div>
-            </div>
-
-
-            <!-- ══════════════════════════════════════
-                 DEPOSIT
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-arrow-circle-down"></i>
-                    </div>
-                    <div>
-                        <h2 class="settings-section-title">Deposit</h2>
-                        <p class="settings-section-desc">Wallet addresses and minimum deposit amount. Click Edit to make changes.</p>
-                    </div>
-                    <button class="plan-edit-btn settings-edit-btn" onclick="openDepositEditModal()">
-                        <i class="uil uil-edit"></i> Edit
-                    </button>
-                </div>
-
-                <!-- Locked read-only view -->
-                <div class="deposit-locked-grid">
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Min Deposit</span>
-                        <span class="deposit-locked-value" id="lockedDepositMin">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Bitcoin (BTC)</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletBtc">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Ethereum (ETH)</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletEth">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Tether (USDT)</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdt">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">USDC</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdc">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Solana (SOL)</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletSol">—</span>
-                    </div>
-                    <div class="deposit-locked-row">
-                        <span class="deposit-locked-label">Litecoin (LTC)</span>
-                        <span class="deposit-locked-value deposit-locked-address" id="lockedWalletLtc">—</span>
+                    <div class="settings-save-row">
+                        <p class="settings-feedback" id="withdrawalFeedback"></p>
+                        <button class="settings-save-btn settings-save-btn--idle" id="withdrawalSaveBtn" onclick="saveSection('withdrawal')">
+                            <i class="uil uil-check-circle"></i> Saved
+                        </button>
                     </div>
                 </div>
-            </div>
 
 
-            <!-- ══════════════════════════════════════
-                 KYC  — toggle only, auto-saves
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-shield-check"></i>
+                <!-- DEPOSIT -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-arrow-circle-down"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Deposit</h2>
+                            <p class="settings-section-desc">Wallet addresses and minimum deposit amount. Click Edit to make changes.</p>
+                        </div>
+                        <button class="plan-edit-btn settings-edit-btn" onclick="openDepositEditModal()">
+                            <i class="uil uil-edit"></i> Edit
+                        </button>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">KYC</h2>
-                        <p class="settings-section-desc">Toggle to require identity verification before users can withdraw. Saves automatically.</p>
-                    </div>
-                </div>
-                <label class="settings-toggle-label">
-                    <div class="settings-toggle-wrap">
-                        <input type="checkbox" id="kycRequired" class="settings-toggle-input">
-                        <span class="settings-toggle-track">
-                            <span class="settings-toggle-thumb"></span>
-                        </span>
-                    </div>
-                    <span class="settings-toggle-text">KYC is <strong id="kycRequiredLabel">Required</strong> before withdrawal</span>
-                </label>
-            </div>
 
-
-            <!-- ══════════════════════════════════════
-                 REFERRAL
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-share-alt"></i>
-                    </div>
-                    <div>
-                        <h2 class="settings-section-title">Referral</h2>
-                        <p class="settings-section-desc">Set the bonus amount credited when a referred user makes their first deposit.</p>
-                    </div>
-                </div>
-                <div class="settings-form-grid">
-                    <div class="settings-field">
-                        <label class="settings-label">Referral Bonus ($)</label>
-                        <div class="settings-input-wrap">
-                            <span class="settings-prefix">$</span>
-                            <input type="number" id="referralBonus" class="settings-input settings-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
+                    <div class="deposit-locked-grid">
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Min Deposit</span>
+                            <span class="deposit-locked-value" id="lockedDepositMin">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Bitcoin (BTC)</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletBtc">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Ethereum (ETH)</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletEth">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Tether (USDT)</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdt">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">USDC</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletUsdc">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Solana (SOL)</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletSol">—</span>
+                        </div>
+                        <div class="deposit-locked-row">
+                            <span class="deposit-locked-label">Litecoin (LTC)</span>
+                            <span class="deposit-locked-value deposit-locked-address" id="lockedWalletLtc">—</span>
                         </div>
                     </div>
                 </div>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="referralFeedback"></p>
-                    <button class="settings-save-btn settings-save-btn--idle" id="referralSaveBtn" onclick="saveSection('referral')">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </button>
-                </div>
-            </div>
 
 
-            <!-- ══════════════════════════════════════
-                 EMAIL & NOTIFICATIONS
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-envelope"></i>
+                <!-- KYC -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-shield-check"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">KYC</h2>
+                            <p class="settings-section-desc">Toggle to require identity verification before users can withdraw. Saves automatically.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">Email & Notifications</h2>
-                        <p class="settings-section-desc">Sender name and support address shown in all outgoing emails.</p>
-                    </div>
+                    <label class="settings-toggle-label">
+                        <div class="settings-toggle-wrap">
+                            <input type="checkbox" id="kycRequired" class="settings-toggle-input">
+                            <span class="settings-toggle-track">
+                                <span class="settings-toggle-thumb"></span>
+                            </span>
+                        </div>
+                        <span class="settings-toggle-text">KYC is <strong id="kycRequiredLabel">Required</strong> before withdrawal</span>
+                    </label>
                 </div>
-                <div class="settings-form-grid">
-                    <div class="settings-field">
-                        <label class="settings-label">From Name</label>
-                        <input type="text" id="emailFromName" class="settings-input" placeholder="e.g. SyncProfitPath">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Support Email</label>
-                        <input type="email" id="emailSupport" class="settings-input" placeholder="e.g. support@syncprofitpath.com">
-                    </div>
-                </div>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="emailFeedback"></p>
-                    <button class="settings-save-btn settings-save-btn--idle" id="emailSaveBtn" onclick="saveSection('email')">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </button>
-                </div>
-            </div>
 
 
-            <!-- ══════════════════════════════════════
-                 SITE & GENERAL — toggles only, auto-save
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-globe"></i>
+                <!-- REFERRAL -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-share-alt"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Referral</h2>
+                            <p class="settings-section-desc">Set the bonus amount credited when a referred user makes their first deposit.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">Site & General</h2>
-                        <p class="settings-section-desc">Control site availability and new user registrations. Both save automatically on toggle.</p>
+                    <div class="settings-form-grid">
+                        <div class="settings-field">
+                            <label class="settings-label">Referral Bonus ($)</label>
+                            <div class="settings-input-wrap">
+                                <span class="settings-prefix">$</span>
+                                <input type="number" id="referralBonus" class="settings-input settings-input--prefixed" placeholder="e.g. 10" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-save-row">
+                        <p class="settings-feedback" id="referralFeedback"></p>
+                        <button class="settings-save-btn settings-save-btn--idle" id="referralSaveBtn" onclick="saveSection('referral')">
+                            <i class="uil uil-check-circle"></i> Saved
+                        </button>
                     </div>
                 </div>
 
-                <label class="settings-toggle-label">
-                    <div class="settings-toggle-wrap">
-                        <input type="checkbox" id="maintenanceMode" class="settings-toggle-input">
-                        <span class="settings-toggle-track">
-                            <span class="settings-toggle-thumb"></span>
-                        </span>
+            </div><!-- /tab-platform -->
+
+
+            <!-- ════════════════════════════════════════════════════
+                 TAB: LANDING PAGE
+                 FAQ, Footer, Testimonials
+            ════════════════════════════════════════════════════ -->
+            <div class="settings-tab-panel" id="tab-landing">
+
+                <!-- FAQ -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-question-circle"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">FAQ</h2>
+                            <p class="settings-section-desc">Manage the questions shown in the FAQ section of the landing page.</p>
+                        </div>
+                        <button class="settings-action-btn" onclick="openAddFaqModal()">
+                            <i class="uil uil-plus"></i> Add FAQ
+                        </button>
                     </div>
-                    <span class="settings-toggle-text">
-                        Maintenance Mode is <strong id="maintenanceModeLabel">Off</strong>
-                        <span class="settings-toggle-hint">— users see a "We'll be back" message</span>
-                    </span>
-                </label>
 
-                <label class="settings-toggle-label" style="margin-top: 1.4rem;">
-                    <div class="settings-toggle-wrap">
-                        <input type="checkbox" id="registrationsOpen" class="settings-toggle-input">
-                        <span class="settings-toggle-track">
-                            <span class="settings-toggle-thumb"></span>
-                        </span>
+                    <div id="faqsLoading" class="admin-loading" style="padding: 2rem 0;">
+                        <i class="uil uil-spinner-alt spin"></i> Loading FAQs…
                     </div>
-                    <span class="settings-toggle-text">
-                        New Registrations are <strong id="registrationsOpenLabel">Open</strong>
-                        <span class="settings-toggle-hint">— turn off to stop new signups</span>
-                    </span>
-                </label>
-            </div>
-
-
-            <!-- ══════════════════════════════════════
-                 LANDING PAGE — FAQ
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
+                    <div id="faqsEmpty" class="admin-empty" style="display:none;">
                         <i class="uil uil-question-circle"></i>
+                        <p>No FAQs found. Add your first question.</p>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">Landing Page FAQ</h2>
-                        <p class="settings-section-desc">Manage the questions shown in the FAQ section of the landing page.</p>
+                    <div class="faqs-list" id="faqsList" style="display:none;"></div>
+                    <div class="plans-order-hint" id="faqsOrderHint" style="display:none;">
+                        <i class="uil uil-info-circle"></i>
+                        Drag to reorder.
+                        <button class="save-order-btn" onclick="saveFaqOrder()">
+                            <i class="uil uil-check"></i> Save Order
+                        </button>
                     </div>
-                    <button class="settings-action-btn" onclick="openAddFaqModal()">
-                        <i class="uil uil-plus"></i> Add FAQ
-                    </button>
                 </div>
 
-                <div id="faqsLoading" class="admin-loading" style="padding: 2rem 0;">
-                    <i class="uil uil-spinner-alt spin"></i> Loading FAQs…
+
+                <!-- FOOTER -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-window-section"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Footer</h2>
+                            <p class="settings-section-desc">Brand tagline, social links, support links, and bottom legal text.</p>
+                        </div>
+                    </div>
+                    <div class="settings-form-grid">
+                        <div class="settings-field" style="grid-column: 1 / -1;">
+                            <label class="settings-label">Brand Tagline</label>
+                            <input type="text" id="footerTaglineInput" class="settings-input" placeholder="Smart crypto investment plans with daily returns…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Twitter URL</label>
+                            <input type="url" id="footerTwitterInput" class="settings-input" placeholder="https://twitter.com/…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Telegram URL</label>
+                            <input type="url" id="footerTelegramInput" class="settings-input" placeholder="https://t.me/…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">WhatsApp URL</label>
+                            <input type="url" id="footerWhatsappInput" class="settings-input" placeholder="https://wa.me/…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Instagram URL</label>
+                            <input type="url" id="footerInstagramInput" class="settings-input" placeholder="https://instagram.com/…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Contact Us URL</label>
+                            <input type="url" id="footerContactInput" class="settings-input" placeholder="mailto:support@… or page URL">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Privacy Policy URL</label>
+                            <input type="url" id="footerPrivacyInput" class="settings-input" placeholder="https://…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Terms of Service URL</label>
+                            <input type="url" id="footerTermsInput" class="settings-input" placeholder="https://…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Copyright Text</label>
+                            <input type="text" id="footerCopyrightInput" class="settings-input" placeholder="© 2026 SyncProfitPath. All rights reserved.">
+                        </div>
+                        <div class="settings-field" style="grid-column: 1 / -1;">
+                            <label class="settings-label">Disclaimer Text</label>
+                            <input type="text" id="footerDisclaimerInput" class="settings-input" placeholder="Investment involves risk…">
+                        </div>
+                    </div>
+                    <div class="settings-save-row">
+                        <p class="settings-feedback" id="footerFeedback"></p>
+                        <button class="settings-save-btn settings-save-btn--idle" id="footerSaveBtn" onclick="saveSection('footer')">
+                            <i class="uil uil-check-circle"></i> Saved
+                        </button>
+                    </div>
                 </div>
-                <div id="faqsEmpty" class="admin-empty" style="display:none;">
-                    <i class="uil uil-question-circle"></i>
-                    <p>No FAQs found. Add your first question.</p>
-                </div>
-                <div class="faqs-list" id="faqsList" style="display:none;"></div>
-                <div class="plans-order-hint" id="faqsOrderHint" style="display:none;">
-                    <i class="uil uil-info-circle"></i>
-                    Drag to reorder.
-                    <button class="save-order-btn" onclick="saveFaqOrder()">
-                        <i class="uil uil-check"></i> Save Order
-                    </button>
-                </div>
-            </div>
 
 
-            <!-- ══════════════════════════════════════
-                 LANDING PAGE — FOOTER
-            ══════════════════════════════════════ -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <div class="settings-section-icon">
-                        <i class="uil uil-window-section"></i>
+                <!-- TESTIMONIALS -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-star"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Testimonials</h2>
+                            <p class="settings-section-desc">Manage the reviews shown on the landing page. Toggle visibility or add new ones.</p>
+                        </div>
+                        <button class="settings-action-btn" onclick="openAddTestimonialModal()">
+                            <i class="uil uil-plus"></i> Add
+                        </button>
                     </div>
-                    <div>
-                        <h2 class="settings-section-title">Landing Page Footer</h2>
-                        <p class="settings-section-desc">Brand tagline, social links, support links, and bottom legal text.</p>
+
+                    <div id="tmLoading" class="admin-loading" style="padding: 2rem 0;">
+                        <i class="uil uil-spinner-alt spin"></i> Loading testimonials…
+                    </div>
+                    <div id="tmEmpty" class="admin-empty" style="display:none;">
+                        <i class="uil uil-comment-alt-lines"></i>
+                        <p>No testimonials yet. Add your first one.</p>
+                    </div>
+                    <div class="tm-list" id="tmList" style="display:none;"></div>
+                </div>
+
+            </div><!-- /tab-landing -->
+
+
+            <!-- ════════════════════════════════════════════════════
+                 TAB: GENERAL
+                 Email & Notifications, Site & General
+            ════════════════════════════════════════════════════ -->
+            <div class="settings-tab-panel" id="tab-general">
+
+                <!-- EMAIL & NOTIFICATIONS -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-envelope"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Email & Notifications</h2>
+                            <p class="settings-section-desc">Sender name and support address shown in all outgoing emails.</p>
+                        </div>
+                    </div>
+                    <div class="settings-form-grid">
+                        <div class="settings-field">
+                            <label class="settings-label">From Name</label>
+                            <input type="text" id="emailFromName" class="settings-input" placeholder="e.g. SyncProfitPath">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Support Email</label>
+                            <input type="email" id="emailSupport" class="settings-input" placeholder="e.g. support@syncprofitpath.com">
+                        </div>
+                    </div>
+                    <div class="settings-save-row">
+                        <p class="settings-feedback" id="emailFeedback"></p>
+                        <button class="settings-save-btn settings-save-btn--idle" id="emailSaveBtn" onclick="saveSection('email')">
+                            <i class="uil uil-check-circle"></i> Saved
+                        </button>
                     </div>
                 </div>
-                <div class="settings-form-grid">
-                    <div class="settings-field" style="grid-column: 1 / -1;">
-                        <label class="settings-label">Brand Tagline</label>
-                        <input type="text" id="footerTaglineInput" class="settings-input" placeholder="Smart crypto investment plans with daily returns…">
+
+
+                <!-- SITE & GENERAL -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-globe"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Site & General</h2>
+                            <p class="settings-section-desc">Control site availability and new user registrations. Both save automatically on toggle.</p>
+                        </div>
                     </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Twitter URL</label>
-                        <input type="url" id="footerTwitterInput" class="settings-input" placeholder="https://twitter.com/…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Telegram URL</label>
-                        <input type="url" id="footerTelegramInput" class="settings-input" placeholder="https://t.me/…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">WhatsApp URL</label>
-                        <input type="url" id="footerWhatsappInput" class="settings-input" placeholder="https://wa.me/…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Instagram URL</label>
-                        <input type="url" id="footerInstagramInput" class="settings-input" placeholder="https://instagram.com/…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Contact Us URL</label>
-                        <input type="url" id="footerContactInput" class="settings-input" placeholder="mailto:support@… or page URL">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Privacy Policy URL</label>
-                        <input type="url" id="footerPrivacyInput" class="settings-input" placeholder="https://…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Terms of Service URL</label>
-                        <input type="url" id="footerTermsInput" class="settings-input" placeholder="https://…">
-                    </div>
-                    <div class="settings-field">
-                        <label class="settings-label">Copyright Text</label>
-                        <input type="text" id="footerCopyrightInput" class="settings-input" placeholder="© 2026 SyncProfitPath. All rights reserved.">
-                    </div>
-                    <div class="settings-field" style="grid-column: 1 / -1;">
-                        <label class="settings-label">Disclaimer Text</label>
-                        <input type="text" id="footerDisclaimerInput" class="settings-input" placeholder="Investment involves risk…">
-                    </div>
+
+                    <label class="settings-toggle-label">
+                        <div class="settings-toggle-wrap">
+                            <input type="checkbox" id="maintenanceMode" class="settings-toggle-input">
+                            <span class="settings-toggle-track">
+                                <span class="settings-toggle-thumb"></span>
+                            </span>
+                        </div>
+                        <span class="settings-toggle-text">
+                            Maintenance Mode is <strong id="maintenanceModeLabel">Off</strong>
+                            <span class="settings-toggle-hint">— users see a "We'll be back" message</span>
+                        </span>
+                    </label>
+
+                    <label class="settings-toggle-label" style="margin-top: 1.4rem;">
+                        <div class="settings-toggle-wrap">
+                            <input type="checkbox" id="registrationsOpen" class="settings-toggle-input">
+                            <span class="settings-toggle-track">
+                                <span class="settings-toggle-thumb"></span>
+                            </span>
+                        </div>
+                        <span class="settings-toggle-text">
+                            New Registrations are <strong id="registrationsOpenLabel">Open</strong>
+                            <span class="settings-toggle-hint">— turn off to stop new signups</span>
+                        </span>
+                    </label>
                 </div>
-                <div class="settings-save-row">
-                    <p class="settings-feedback" id="footerFeedback"></p>
-                    <button class="settings-save-btn settings-save-btn--idle" id="footerSaveBtn" onclick="saveSection('footer')">
-                        <i class="uil uil-check-circle"></i> Saved
-                    </button>
-                </div>
-            </div>
+
+            </div><!-- /tab-general -->
+
 
         </div><!-- /settingsContent -->
-
 
     </main>
 
@@ -840,6 +888,108 @@
         </div>
     </div>
 
+
+    <!-- ==================== TESTIMONIAL ADD/EDIT MODAL ==================== -->
+    <div class="admin-modal-overlay" id="tmModal" onclick="closeTmModal(event)">
+        <div class="admin-modal tm-modal">
+            <div class="admin-modal-header">
+                <h3 id="tmModalTitle">Add Testimonial</h3>
+                <button class="admin-modal-close" onclick="closeTmModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="tmEditId">
+
+            <div class="tm-field">
+                <label>Name <span class="tm-required">*</span></label>
+                <input type="text" id="tmName" class="tm-input" placeholder="e.g. James A.">
+            </div>
+            <div class="tm-field">
+                <label>Plan / Role label</label>
+                <input type="text" id="tmPlanLabel" class="tm-input" placeholder="e.g. Premium Plan Investor">
+            </div>
+            <div class="tm-field">
+                <label>Quote <span class="tm-required">*</span></label>
+                <textarea id="tmQuote" class="tm-input tm-textarea" placeholder="Write the testimonial text…"></textarea>
+            </div>
+            <div class="tm-field">
+                <label>Star Rating</label>
+                <div class="tm-star-picker" id="tmStarPicker">
+                    <button type="button" data-v="1">★</button>
+                    <button type="button" data-v="2">★</button>
+                    <button type="button" data-v="3">★</button>
+                    <button type="button" data-v="4">★</button>
+                    <button type="button" data-v="5">★</button>
+                </div>
+                <input type="hidden" id="tmRating" value="5">
+            </div>
+            <div class="tm-field">
+                <label>Avatar Initials <span class="tm-required">*</span></label>
+                <div class="tm-avatar-row">
+                    <input type="text" id="tmInitials" class="tm-input tm-initials-input" maxlength="2" placeholder="JA">
+                    <div class="tm-avatar-preview" id="tmAvatarPreview">JA</div>
+                </div>
+            </div>
+            <div class="tm-field">
+                <label>Avatar Colour</label>
+                <div class="tm-color-swatches" id="tmColorSwatches">
+                    <button type="button" class="tm-swatch active" data-bg="#00e27b" data-color="#27282f" style="background:#00e27b;"></button>
+                    <button type="button" class="tm-swatch" data-bg="#a063f5" data-color="#ffffff" style="background:#a063f5;"></button>
+                    <button type="button" class="tm-swatch" data-bg="#eab507" data-color="#27282f" style="background:#eab507;"></button>
+                    <button type="button" class="tm-swatch" data-bg="#ff4336" data-color="#ffffff" style="background:#ff4336;"></button>
+                    <button type="button" class="tm-swatch" data-bg="#1da1f2" data-color="#ffffff" style="background:#1da1f2;"></button>
+                    <button type="button" class="tm-swatch" data-bg="#27282f" data-color="#ffffff" style="background:#27282f;"></button>
+                </div>
+                <input type="hidden" id="tmAvatarBg"    value="#00e27b">
+                <input type="hidden" id="tmAvatarColor" value="#27282f">
+            </div>
+            <div class="tm-field tm-field--row">
+                <label for="tmVisible">Show on landing page</label>
+                <label class="tm-toggle">
+                    <input type="checkbox" id="tmVisible" checked>
+                    <span class="tm-toggle-track"></span>
+                </label>
+            </div>
+            <div class="tm-field">
+                <label>Sort Order <span class="tm-hint">(lower = first)</span></label>
+                <input type="number" id="tmSortOrder" class="tm-input" value="10" min="1" max="999">
+            </div>
+
+            <p class="tm-error" id="tmError"></p>
+
+            <div class="modal-actions tm-modal-footer">
+                <button class="action-btn" onclick="closeTmModal()" style="background:var(--color-light);color:var(--color-dark);">
+                    Cancel
+                </button>
+                <button class="action-btn approve" id="tmSaveBtn" onclick="saveTestimonial()">
+                    <i class="uil uil-check"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TESTIMONIAL DELETE MODAL ==================== -->
+    <div class="admin-modal-overlay" id="tmDeleteModal" onclick="closeTmDeleteModal(event)">
+        <div class="admin-modal" style="max-width:38rem;">
+            <div class="admin-modal-header">
+                <h3>Delete Testimonial</h3>
+                <button class="admin-modal-close" onclick="closeTmDeleteModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+            <p style="color:var(--color-gray-light);font-size:1.2rem;line-height:1.7;">
+                Delete the testimonial from <strong id="tmDeleteName"></strong>? This cannot be undone.
+            </p>
+            <input type="hidden" id="tmDeleteId">
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeTmDeleteModal()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
+                <button class="action-btn reject" id="tmDeleteBtn" onclick="confirmDeleteTestimonial()">
+                    <i class="uil uil-trash-alt"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../supabase.js"></script>
