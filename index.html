@@ -346,45 +346,80 @@
     </section>
 
 
-    <!-- ==================== COINS ==================== -->
-    <section class="land-section land-section--tint">
+    <!-- ==================== MARKETS ==================== -->
+    <section class="land-section land-section--tint" id="markets">
         <div class="land-container">
             <div class="land-section__header">
-                <span class="land-eyebrow">Supported Assets</span>
-                <h2>Deposit with 6 Major Coins</h2>
+                <span class="land-eyebrow">Live Markets</span>
+                <h2>Trade Across 4 Asset Classes</h2>
+                <p>Real-time prices updated every 60 seconds. Invest in what moves the world.</p>
             </div>
-            <div class="land-coins">
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin">
-                    <span>Bitcoin</span>
-                    <small>BTC</small>
-                </div>
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum">
-                    <span>Ethereum</span>
-                    <small>ETH</small>
-                </div>
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="Tether">
-                    <span>Tether</span>
-                    <small>USDT</small>
-                </div>
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
-                    <span>USD Coin</span>
-                    <small>USDC</small>
-                </div>
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="Solana">
-                    <span>Solana</span>
-                    <small>SOL</small>
-                </div>
-                <div class="land-coin">
-                    <img src="https://cryptologos.cc/logos/litecoin-ltc-logo.png" alt="Litecoin">
-                    <span>Litecoin</span>
-                    <small>LTC</small>
+
+            <!-- Tab nav -->
+            <div class="land-market-tabs">
+                <button class="land-market-tab active" data-tab="crypto" onclick="switchLandMarketTab('crypto', this)">
+                    <i class="uil uil-bitcoin-circle"></i> Crypto
+                </button>
+                <button class="land-market-tab" data-tab="stocks" onclick="switchLandMarketTab('stocks', this)">
+                    <i class="uil uil-chart-line"></i> Stocks
+                </button>
+                <button class="land-market-tab" data-tab="forex" onclick="switchLandMarketTab('forex', this)">
+                    <i class="uil uil-dollar-sign"></i> Forex
+                </button>
+                <button class="land-market-tab" data-tab="energy" onclick="switchLandMarketTab('energy', this)">
+                    <i class="uil uil-fire"></i> Energy
+                </button>
+            </div>
+
+            <!-- Panels -->
+            <div class="land-market-panel active" id="landMarket-crypto">
+                <div class="land-market-grid" id="landCryptoGrid">
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#f7931a22;color:#f7931a;">₿</div><div><span class="land-mkt-name">Bitcoin</span><small>BTC</small></div></div><div class="land-mkt-right"><span id="lBtcPrice">—</span><small id="lBtcChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#627eea22;color:#627eea;">Ξ</div><div><span class="land-mkt-name">Ethereum</span><small>ETH</small></div></div><div class="land-mkt-right"><span id="lEthPrice">—</span><small id="lEthChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#f3ba2f22;color:#f3ba2f;">B</div><div><span class="land-mkt-name">BNB</span><small>BNB</small></div></div><div class="land-mkt-right"><span id="lBnbPrice">—</span><small id="lBnbChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#9945ff22;color:#9945ff;">◎</div><div><span class="land-mkt-name">Solana</span><small>SOL</small></div></div><div class="land-mkt-right"><span id="lSolPrice">—</span><small id="lSolChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#2775ca22;color:#2775ca;">$</div><div><span class="land-mkt-name">USDT</span><small>USDT</small></div></div><div class="land-mkt-right"><span id="lUsdtPrice">—</span><small id="lUsdtChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#e8414222;color:#e84142;font-size:1rem;">ADA</div><div><span class="land-mkt-name">Cardano</span><small>ADA</small></div></div><div class="land-mkt-right"><span id="lAdaPrice">—</span><small id="lAdaChange" class="land-mkt-change">—</small></div></div>
                 </div>
             </div>
+
+            <div class="land-market-panel" id="landMarket-stocks">
+                <div class="land-market-grid">
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00000010;color:#555;font-size:1rem;">AAPL</div><div><span class="land-mkt-name">Apple</span><small>AAPL</small></div></div><div class="land-mkt-right"><span id="lAaplPrice">—</span><small id="lAaplChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#cc000015;color:#cc0000;font-size:1rem;">TSLA</div><div><span class="land-mkt-name">Tesla</span><small>TSLA</small></div></div><div class="land-mkt-right"><span id="lTslaPrice">—</span><small id="lTslaChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#ff990015;color:#ff9900;font-size:1rem;">AMZN</div><div><span class="land-mkt-name">Amazon</span><small>AMZN</small></div></div><div class="land-mkt-right"><span id="lAmznPrice">—</span><small id="lAmznChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00a4ef15;color:#00a4ef;font-size:1rem;">MSFT</div><div><span class="land-mkt-name">Microsoft</span><small>MSFT</small></div></div><div class="land-mkt-right"><span id="lMsftPrice">—</span><small id="lMsftChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#4285f415;color:#4285f4;font-size:.9rem;">GOOGL</div><div><span class="land-mkt-name">Alphabet</span><small>GOOGL</small></div></div><div class="land-mkt-right"><span id="lGooglPrice">—</span><small id="lGooglChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#1877f215;color:#1877f2;font-size:1rem;">META</div><div><span class="land-mkt-name">Meta</span><small>META</small></div></div><div class="land-mkt-right"><span id="lMetaPrice">—</span><small id="lMetaChange" class="land-mkt-change">—</small></div></div>
+                </div>
+            </div>
+
+            <div class="land-market-panel" id="landMarket-forex">
+                <div class="land-market-grid">
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#003ea615;color:#003ea6;">€/$</div><div><span class="land-mkt-name">EUR / USD</span><small>EURUSD</small></div></div><div class="land-mkt-right"><span id="lEurusdPrice">—</span><small id="lEurusdChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#01244615;color:#012446;">£/$</div><div><span class="land-mkt-name">GBP / USD</span><small>GBPUSD</small></div></div><div class="land-mkt-right"><span id="lGbpusdPrice">—</span><small id="lGbpusdChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#bc002d15;color:#bc002d;">¥</div><div><span class="land-mkt-name">USD / JPY</span><small>USDJPY</small></div></div><div class="land-mkt-right"><span id="lUsdjpyPrice">—</span><small id="lUsdjpyChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00832515;color:#008325;">₦</div><div><span class="land-mkt-name">USD / NGN</span><small>USDNGN</small></div></div><div class="land-mkt-right"><span id="lUsdngnPrice">—</span><small id="lUsdngnChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00008b15;color:#00008b;">A$</div><div><span class="land-mkt-name">AUD / USD</span><small>AUDUSD</small></div></div><div class="land-mkt-right"><span id="lAudusdPrice">—</span><small id="lAudusdChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#d8000015;color:#d80000;">C$</div><div><span class="land-mkt-name">USD / CAD</span><small>USDCAD</small></div></div><div class="land-mkt-right"><span id="lUsdcadPrice">—</span><small id="lUsdcadChange" class="land-mkt-change">—</small></div></div>
+                </div>
+            </div>
+
+            <div class="land-market-panel" id="landMarket-energy">
+                <div class="land-market-grid">
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#1a1a1a15;color:#333;font-size:1rem;">OIL</div><div><span class="land-mkt-name">Crude Oil</span><small>USOIL</small></div></div><div class="land-mkt-right"><span id="lUsoilPrice">—</span><small id="lUsoilChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#4169e115;color:#4169e1;font-size:1rem;">GAS</div><div><span class="land-mkt-name">Natural Gas</span><small>NATGAS</small></div></div><div class="land-mkt-right"><span id="lNatgasPrice">—</span><small id="lNatgasChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#ffd70015;color:#b8860b;">AU</div><div><span class="land-mkt-name">Gold</span><small>XAUUSD</small></div></div><div class="land-mkt-right"><span id="lXauusdPrice">—</span><small id="lXauusdChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#c0c0c015;color:#999;">AG</div><div><span class="land-mkt-name">Silver</span><small>XAGUSD</small></div></div><div class="land-mkt-right"><span id="lXagusdPrice">—</span><small id="lXagusdChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#006eff15;color:#006eff;font-size:1rem;">BRT</div><div><span class="land-mkt-name">Brent Oil</span><small>UKOIL</small></div></div><div class="land-mkt-right"><span id="lUkoilPrice">—</span><small id="lUkoilChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#b8733415;color:#b87334;">CU</div><div><span class="land-mkt-name">Copper</span><small>COPPER</small></div></div><div class="land-mkt-right"><span id="lCopperPrice">—</span><small id="lCopperChange" class="land-mkt-change">—</small></div></div>
+                </div>
+            </div>
+
+            <div class="land-market-cta">
+                <a href="./auth/signup/" class="land-btn land-btn--primary">Start Investing →</a>
+            </div>
+
         </div>
     </section>
 

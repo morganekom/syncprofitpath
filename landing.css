@@ -1143,3 +1143,137 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     .land-btn--lg { width: 100%; justify-content: center; }
     .land-hero__accent { display: none; }
 }
+
+
+/* ========================= LIVE MARKETS SECTION ========================= */
+.land-market-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.land-market-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    white-space: nowrap;
+    flex: 1;
+    justify-content: center;
+}
+
+.land-market-tab i { font-size: 1.4rem; }
+.land-market-tab:hover  { background: var(--color-light); color: var(--color-dark); }
+.land-market-tab.active { background: var(--color-primary); color: var(--color-dark); }
+
+/* ── Panels ── */
+.land-market-panel { display: none; }
+.land-market-panel.active { display: block; }
+
+/* ── Grid ── */
+.land-market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+}
+
+@media screen and (max-width: 900px) {
+    .land-market-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media screen and (max-width: 560px) {
+    .land-market-grid { grid-template-columns: 1fr; }
+    .land-market-tab span { display: none; }
+    .land-market-tab { padding: 0.9rem; }
+}
+
+/* ── Row ── */
+.land-mkt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-white);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem;
+    gap: 0.8rem;
+    transition: var(--transition);
+}
+
+.land-mkt-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.4rem 1.2rem rgba(0,0,0,0.07);
+}
+
+.land-mkt-left {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+.land-mkt-icon {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.land-mkt-name {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+}
+
+.land-mkt-left small {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}
+
+.land-mkt-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.land-mkt-right span {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.land-mkt-change {
+    font-size: 1rem;
+    font-weight: 600;
+    display: block;
+    margin-top: 0.2rem;
+}
+
+.land-mkt-up   { color: var(--color-success) !important; }
+.land-mkt-down { color: var(--color-danger)  !important; }
+
+/* ── CTA row below market grid ── */
+.land-market-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+}

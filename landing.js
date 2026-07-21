@@ -215,3 +215,137 @@ if (currentUser) {
     const role = currentUser.role || 'user';
     window.location.replace(role === 'admin' ? './admin/' : './dashboard/');
 }
+
+
+// ================================================================
+// LIVE MARKETS — Landing Page
+// ================================================================
+
+const LAND_FINNHUB_KEY  = 'd9fesbhr01qu5nhe7j1gd9fesbhr01qu5nhe7j20';
+const landMarketLoaded  = { crypto: false, stocks: false, forex: false, energy: false };
+const landMarketTimers  = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load crypto immediately (default tab)
+    landMarketLoaded.crypto = true;
+    loadLandCryptoPrices();
+    landMarketTimers.crypto = setInterval(loadLandCryptoPrices, 60000);
+});
+
+function switchLandMarketTab(tab, btn) {
+    document.querySelectorAll('.land-market-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.land-market-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('landMarket-' + tab).classList.add('active');
+
+    if (!landMarketLoaded[tab]) {
+        landMarketLoaded[tab] = true;
+        loadLandMarket(tab);
+        landMarketTimers[tab] = setInterval(() => loadLandMarket(tab), 60000);
+    }
+}
+
+function loadLandMarket(tab) {
+    if (tab === 'crypto') loadLandCryptoPrices();
+    if (tab === 'stocks') loadLandStockPrices();
+    if (tab === 'forex')  loadLandForexPrices();
+    if (tab === 'energy') loadLandEnergyPrices();
+}
+
+// ── Crypto ──
+async function loadLandCryptoPrices() {
+    const coins = [
+        { id: 'bitcoin', key: 'lBtc' }, { id: 'ethereum', key: 'lEth' },
+        { id: 'binancecoin', key: 'lBnb' }, { id: 'solana', key: 'lSol' },
+        { id: 'tether', key: 'lUsdt' }, { id: 'cardano', key: 'lAda' },
+    ];
+    try {
+        const ids = coins.map(c => c.id).join(',');
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        coins.forEach(c => {
+            const e = data[c.id];
+            if (e) setLandTicker(c.key, e.usd, e.usd_24h_change, 2);
+        });
+    } catch (err) { console.warn('Land crypto error:', err.message); }
+}
+
+// ── Stocks ──
+async function loadLandStockPrices() {
+    const stocks = [
+        { sym: 'AAPL', key: 'lAapl' }, { sym: 'TSLA', key: 'lTsla' },
+        { sym: 'AMZN', key: 'lAmzn' }, { sym: 'MSFT', key: 'lMsft' },
+        { sym: 'GOOGL', key: 'lGoogl' }, { sym: 'META', key: 'lMeta' },
+    ];
+    try {
+        await Promise.all(stocks.map(async s => {
+            const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${LAND_FINNHUB_KEY}`);
+            const d   = await res.json();
+            if (d.c) setLandTicker(s.key, d.c, d.dp, 2);
+        }));
+    } catch (err) { console.warn('Land stocks error:', err.message); }
+}
+
+// ── Forex ──
+async function loadLandForexPrices() {
+    const pairs = [
+        { base: 'EUR', quote: 'USD', key: 'lEurusd', dec: 4 },
+        { base: 'GBP', quote: 'USD', key: 'lGbpusd', dec: 4 },
+        { base: 'USD', quote: 'JPY', key: 'lUsdjpy', dec: 2 },
+        { base: 'USD', quote: 'NGN', key: 'lUsdngn', dec: 2 },
+        { base: 'AUD', quote: 'USD', key: 'lAudusd', dec: 4 },
+        { base: 'USD', quote: 'CAD', key: 'lUsdcad', dec: 4 },
+    ];
+    try {
+        const yest = new Date(); yest.setDate(yest.getDate() - 1);
+        const yStr = yest.toISOString().split('T')[0];
+        const bases = [...new Set(pairs.map(p => p.base))];
+        const ratesMap = {};
+        await Promise.all(bases.map(async base => {
+            const quotes = pairs.filter(p => p.base === base).map(p => p.quote).join(',');
+            const [t, y] = await Promise.all([
+                fetch(`https://api.frankfurter.app/latest?from=${base}&to=${quotes}`).then(r => r.json()),
+                fetch(`https://api.frankfurter.app/${yStr}?from=${base}&to=${quotes}`).then(r => r.json()),
+            ]);
+            ratesMap[base] = { today: t.rates, yesterday: y.rates };
+        }));
+        pairs.forEach(p => {
+            const rate = ratesMap[p.base]?.today?.[p.quote];
+            const prev = ratesMap[p.base]?.yesterday?.[p.quote];
+            if (!rate) return;
+            const chg = prev ? ((rate - prev) / prev) * 100 : 0;
+            setLandTicker(p.key, rate, chg, p.dec);
+        });
+    } catch (err) { console.warn('Land forex error:', err.message); }
+}
+
+// ── Energy ──
+async function loadLandEnergyPrices() {
+    const items = [
+        { sym: 'USOIL',         key: 'lUsoil'  },
+        { sym: 'NATGAS',        key: 'lNatgas' },
+        { sym: 'OANDA:XAU_USD', key: 'lXauusd' },
+        { sym: 'OANDA:XAG_USD', key: 'lXagusd' },
+        { sym: 'UKOIL',         key: 'lUkoil'  },
+        { sym: 'COPPER',        key: 'lCopper' },
+    ];
+    try {
+        await Promise.all(items.map(async s => {
+            const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${LAND_FINNHUB_KEY}`);
+            const d   = await res.json();
+            if (d.c) setLandTicker(s.key, d.c, d.dp, 2);
+        }));
+    } catch (err) { console.warn('Land energy error:', err.message); }
+}
+
+// ── Shared setter ──
+function setLandTicker(key, price, changePct, decimals) {
+    const priceEl  = document.getElementById(key + 'Price');
+    const changeEl = document.getElementById(key + 'Change');
+    if (!priceEl || !changeEl) return;
+    priceEl.textContent  = '$' + Number(price).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const pos = (changePct || 0) >= 0;
+    changeEl.textContent = (pos ? '+' : '') + Number(changePct || 0).toFixed(2) + '%';
+    changeEl.className   = 'land-mkt-change ' + (pos ? 'land-mkt-up' : 'land-mkt-down');
+}
