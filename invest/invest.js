@@ -44,9 +44,24 @@ async function loadPlans() {
             .eq('is_active', true)
             .order('sort_order', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+            // If asset_class column missing (SQL migration not run yet), fetch without it
+            if (error.message && error.message.includes('asset_class')) {
+                console.warn('asset_class column not found — run the SQL migration in Supabase.');
+                const fallback = await db
+                    .from('investment_plans')
+                    .select('id, name, slug, daily_rate, roi_multiplier, min_amount, max_amount, return_type, cancel_time, withdraw, badge_label, tier_class, is_active, sort_order')
+                    .eq('is_active', true)
+                    .order('sort_order', { ascending: true });
+                if (fallback.error) throw fallback.error;
+                allPlansCache = (fallback.data || []).map(p => ({ ...p, asset_class: 'crypto' }));
+            } else {
+                throw error;
+            }
+        } else {
+            allPlansCache = data || [];
+        }
 
-        allPlansCache = data || [];
         renderPlans();
 
     } catch (err) {
