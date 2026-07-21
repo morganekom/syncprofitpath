@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadActiveInvestments();
     checkKycAlert();
 
-    // Tickers: build DOM first, then fetch prices
-    buildTickerRows();
+    // Load crypto prices immediately (default tab)
+    marketLoaded.crypto = true;
     loadCryptoPrices();
-    setInterval(loadCryptoPrices, 60000);
+    marketIntervals.crypto = setInterval(loadCryptoPrices, 60000);
 
     // Chart
     injectChartControls();
@@ -169,36 +169,17 @@ function checkKycAlert() {
 
 
 // ================================================================
-// CRYPTO PRICE TICKERS — CoinGecko (single batch, all 7 coins)
+// CRYPTO PRICE TICKERS — CoinGecko (single batch)
 // ================================================================
 
 const TICKER_COINS = [
-    { key: 'btc',  id: 'bitcoin',     symbol: 'BTCUSDT', bg: '#f7931a22', color: '#f7931a', name: 'Bitcoin',  ticker: 'BTC'  },
-    { key: 'eth',  id: 'ethereum',    symbol: 'ETHUSDT', bg: '#627eea22', color: '#627eea', name: 'Ethereum', ticker: 'ETH'  },
-    { key: 'bnb',  id: 'binancecoin', symbol: 'BNBUSDT', bg: '#f3ba2f22', color: '#f3ba2f', name: 'BNB',      ticker: 'BNB'  },
-    { key: 'sol',  id: 'solana',      symbol: 'SOLUSDT', bg: '#9945ff22', color: '#9945ff', name: 'Solana',   ticker: 'SOL'  },
-    { key: 'ltc',  id: 'litecoin',    symbol: 'LTCUSDT', bg: '#bfbbbb22', color: '#a0a0a0', name: 'Litecoin', ticker: 'LTC'  },
-    { key: 'doge', id: 'dogecoin',    symbol: 'DOGEUSDT',bg: '#c2a63322', color: '#c2a633', name: 'Dogecoin', ticker: 'DOGE' },
-    { key: 'xrp',  id: 'ripple',      symbol: 'XRPUSDT', bg: '#00aae422', color: '#00aae4', name: 'XRP',      ticker: 'XRP'  },
+    { key: 'btc',  id: 'bitcoin',     symbol: 'BTCUSDT',  bg: '#f7931a22', color: '#f7931a', name: 'Bitcoin',  ticker: 'BTC'  },
+    { key: 'eth',  id: 'ethereum',    symbol: 'ETHUSDT',  bg: '#627eea22', color: '#627eea', name: 'Ethereum', ticker: 'ETH'  },
+    { key: 'bnb',  id: 'binancecoin', symbol: 'BNBUSDT',  bg: '#f3ba2f22', color: '#f3ba2f', name: 'BNB',      ticker: 'BNB'  },
+    { key: 'sol',  id: 'solana',      symbol: 'SOLUSDT',  bg: '#9945ff22', color: '#9945ff', name: 'Solana',   ticker: 'SOL'  },
+    { key: 'usdt', id: 'tether',      symbol: 'USDTUSDT', bg: '#2775ca22', color: '#2775ca', name: 'USDT',     ticker: 'USDT' },
+    { key: 'ada',  id: 'cardano',     symbol: 'ADAUSDT',  bg: '#e8414222', color: '#e84142', name: 'Cardano',  ticker: 'ADA'  },
 ];
-
-function buildTickerRows() {
-    const container = document.querySelector('.market-tickers');
-    if (!container) return;
-
-    container.innerHTML = TICKER_COINS.map(coin => `
-        <div class="ticker-row">
-            <div class="ticker-left">
-                <div class="ticker-icon" style="background:${coin.bg};color:${coin.color};">${coin.symbol.charAt(0)}</div>
-                <div><h4>${coin.name}</h4><small class="text-muted">${coin.ticker}</small></div>
-            </div>
-            <div class="ticker-right">
-                <h4 id="${coin.key}Price"><span class="ticker-skeleton"></span></h4>
-                <small id="${coin.key}Change" class="text-muted">—</small>
-            </div>
-        </div>
-    `).join('');
-}
 
 async function loadCryptoPrices() {
     try {
@@ -211,22 +192,177 @@ async function loadCryptoPrices() {
 
         TICKER_COINS.forEach(coin => {
             const entry = data[coin.id];
-            if (entry) setCryptoTicker(coin.key, entry.usd, entry.usd_24h_change);
+            if (entry) setTickerRow(coin.key, entry.usd, entry.usd_24h_change, 2);
         });
     } catch (err) {
-        console.warn('Ticker error:', err.message);
+        console.warn('Crypto ticker error:', err.message);
     }
 }
 
-function setCryptoTicker(key, price, change) {
+
+// ================================================================
+// MARKET TABS — switch between asset classes
+// ================================================================
+
+const FINNHUB_KEY = 'd9fesbhr01qu5nhe7j1gd9fesbhr01qu5nhe7j20';
+
+// Track which tabs have been loaded to avoid redundant fetches
+const marketLoaded = { crypto: false, stocks: false, forex: false, energy: false };
+
+// Refresh intervals per tab
+const marketIntervals = {};
+
+function switchMarketTab(tab, btn) {
+    // Update tab buttons
+    document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Show correct panel
+    document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('marketPanel-' + tab).classList.add('active');
+
+    // Load data if first visit to this tab
+    if (!marketLoaded[tab]) {
+        marketLoaded[tab] = true;
+        loadMarket(tab);
+        // Refresh every 60s
+        marketIntervals[tab] = setInterval(() => loadMarket(tab), 60000);
+    }
+}
+
+function loadMarket(tab) {
+    if (tab === 'crypto')  loadCryptoPrices();
+    if (tab === 'stocks')  loadStockPrices();
+    if (tab === 'forex')   loadForexPrices();
+    if (tab === 'energy')  loadEnergyPrices();
+}
+
+
+// ================================================================
+// STOCKS — Finnhub batch quotes
+// ================================================================
+
+const STOCK_SYMBOLS = [
+    { key: 'aapl',  sym: 'AAPL',  name: 'Apple'     },
+    { key: 'tsla',  sym: 'TSLA',  name: 'Tesla'     },
+    { key: 'amzn',  sym: 'AMZN',  name: 'Amazon'    },
+    { key: 'msft',  sym: 'MSFT',  name: 'Microsoft' },
+    { key: 'googl', sym: 'GOOGL', name: 'Alphabet'  },
+    { key: 'meta',  sym: 'META',  name: 'Meta'      },
+];
+
+async function loadStockPrices() {
+    try {
+        await Promise.all(STOCK_SYMBOLS.map(async s => {
+            const res  = await fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${FINNHUB_KEY}`
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const d = await res.json();
+            // d.c = current price, d.dp = % change
+            if (d.c) setTickerRow(s.key, d.c, d.dp, 2);
+        }));
+    } catch (err) {
+        console.warn('Stocks ticker error:', err.message);
+    }
+}
+
+
+// ================================================================
+// FOREX — frankfurter.app (free, no key)
+// ================================================================
+
+const FOREX_PAIRS = [
+    { key: 'eurusd', base: 'EUR', quote: 'USD', label: 'EUR/USD' },
+    { key: 'gbpusd', base: 'GBP', quote: 'USD', label: 'GBP/USD' },
+    { key: 'usdjpy', base: 'USD', quote: 'JPY', label: 'USD/JPY' },
+    { key: 'usdngn', base: 'USD', quote: 'NGN', label: 'USD/NGN' },
+    { key: 'audusd', base: 'AUD', quote: 'USD', label: 'AUD/USD' },
+    { key: 'usdcad', base: 'USD', quote: 'CAD', label: 'USD/CAD' },
+];
+
+async function loadForexPrices() {
+    try {
+        // Get today and yesterday for % change calculation
+        const today = new Date();
+        const yest  = new Date(today); yest.setDate(yest.getDate() - 1);
+        const fmt   = d => d.toISOString().split('T')[0];
+
+        // Fetch all unique bases in one call each
+        const bases = [...new Set(FOREX_PAIRS.map(p => p.base))];
+
+        const ratesMap = {};
+        await Promise.all(bases.map(async base => {
+            const quotes = FOREX_PAIRS.filter(p => p.base === base).map(p => p.quote).join(',');
+            const [todayRes, yestRes] = await Promise.all([
+                fetch(`https://api.frankfurter.app/latest?from=${base}&to=${quotes}`),
+                fetch(`https://api.frankfurter.app/${fmt(yest)}?from=${base}&to=${quotes}`),
+            ]);
+            const todayData = await todayRes.json();
+            const yestData  = await yestRes.json();
+            ratesMap[base] = { today: todayData.rates, yesterday: yestData.rates };
+        }));
+
+        FOREX_PAIRS.forEach(pair => {
+            const todayRate = ratesMap[pair.base]?.today?.[pair.quote];
+            const yestRate  = ratesMap[pair.base]?.yesterday?.[pair.quote];
+            if (!todayRate) return;
+            const change = yestRate ? ((todayRate - yestRate) / yestRate) * 100 : 0;
+            const decimals = pair.key === 'usdjpy' || pair.key === 'usdngn' ? 2 : 4;
+            setTickerRow(pair.key, todayRate, change, decimals);
+        });
+    } catch (err) {
+        console.warn('Forex ticker error:', err.message);
+    }
+}
+
+
+// ================================================================
+// ENERGY — Finnhub (commodities via forex endpoint)
+// ================================================================
+
+const ENERGY_SYMBOLS = [
+    { key: 'usoil',  sym: 'USOIL',  name: 'Crude Oil'   },
+    { key: 'natgas', sym: 'NATGAS', name: 'Natural Gas'  },
+    { key: 'xauusd', sym: 'OANDA:XAU_USD', name: 'Gold' },
+    { key: 'xagusd', sym: 'OANDA:XAG_USD', name: 'Silver' },
+    { key: 'ukoil',  sym: 'UKOIL',  name: 'Brent Oil'   },
+    { key: 'copper', sym: 'COPPER', name: 'Copper'       },
+];
+
+async function loadEnergyPrices() {
+    try {
+        await Promise.all(ENERGY_SYMBOLS.map(async s => {
+            const res = await fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${FINNHUB_KEY}`
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const d = await res.json();
+            if (d.c) setTickerRow(s.key, d.c, d.dp, 2);
+        }));
+    } catch (err) {
+        console.warn('Energy ticker error:', err.message);
+    }
+}
+
+
+// ================================================================
+// SHARED TICKER SETTER
+// ================================================================
+
+function setTickerRow(key, price, changePct, decimals) {
     const priceEl  = document.getElementById(key + 'Price');
     const changeEl = document.getElementById(key + 'Change');
     if (!priceEl || !changeEl) return;
 
-    priceEl.textContent = '$' + price.toLocaleString('en-US', { maximumFractionDigits: 2 });
-    const pos = change >= 0;
-    changeEl.textContent = (pos ? '+' : '') + change.toFixed(2) + '%';
+    priceEl.textContent  = '$' + Number(price).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const pos = (changePct || 0) >= 0;
+    changeEl.textContent = (pos ? '+' : '') + (changePct || 0).toFixed(2) + '%';
     changeEl.className   = pos ? 'success' : 'danger';
+}
+
+function setCryptoTicker(key, price, change) {
+    setTickerRow(key, price, change, 2);
 }
 
 
