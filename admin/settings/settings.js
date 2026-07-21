@@ -516,6 +516,7 @@ function openEditModal(id) {
     document.getElementById('pmId').value         = p.id;
     document.getElementById('pmName').value       = p.name         || '';
     document.getElementById('pmSlug').value       = p.slug         || '';
+    document.getElementById('pmAssetClass').value = p.asset_class  || 'crypto';
     document.getElementById('pmTier').value       = p.tier_class   || '';
     document.getElementById('pmBadge').value      = p.badge_label  || '';
     document.getElementById('pmSlug').readOnly    = true;
@@ -550,6 +551,7 @@ function openAddModal() {
             el.value    = '';
             el.readOnly = false;
         });
+    document.getElementById('pmAssetClass').value        = 'crypto';
     document.getElementById('pmIsActive').checked        = true;
     setText('pmActiveLabel', 'Active');
     document.getElementById('pmDeleteBtn').style.display = 'none';
@@ -573,19 +575,20 @@ async function savePlan() {
     const saveBtn = document.getElementById('pmSaveBtn');
     const errorEl = document.getElementById('pmError');
 
-    const name      = document.getElementById('pmName').value.trim();
-    const slug      = document.getElementById('pmSlug').value.trim();
-    const tierClass = document.getElementById('pmTier').value.trim();
-    const badge     = document.getElementById('pmBadge').value.trim();
-    const dailyRate = document.getElementById('pmDailyRate').value;
-    const roi       = document.getElementById('pmRoi').value;
-    const minAmt    = document.getElementById('pmMin').value;
-    const maxAmt    = document.getElementById('pmMax').value;
-    const retType   = document.getElementById('pmReturnType').value.trim();
-    const withdraw  = document.getElementById('pmWithdraw').value.trim();
-    const cancel    = document.getElementById('pmCancelTime').value.trim();
-    const sortOrder = document.getElementById('pmSortOrder').value;
-    const isActive  = document.getElementById('pmIsActive').checked;
+    const name       = document.getElementById('pmName').value.trim();
+    const slug       = document.getElementById('pmSlug').value.trim();
+    const assetClass = document.getElementById('pmAssetClass').value || 'crypto';
+    const tierClass  = document.getElementById('pmTier').value.trim();
+    const badge      = document.getElementById('pmBadge').value.trim();
+    const dailyRate  = document.getElementById('pmDailyRate').value;
+    const roi        = document.getElementById('pmRoi').value;
+    const minAmt     = document.getElementById('pmMin').value;
+    const maxAmt     = document.getElementById('pmMax').value;
+    const retType    = document.getElementById('pmReturnType').value.trim();
+    const withdraw   = document.getElementById('pmWithdraw').value.trim();
+    const cancel     = document.getElementById('pmCancelTime').value.trim();
+    const sortOrder  = document.getElementById('pmSortOrder').value;
+    const isActive   = document.getElementById('pmIsActive').checked;
 
     errorEl.textContent = '';
 
@@ -596,6 +599,7 @@ async function savePlan() {
     const payload = {
         name,
         slug,
+        asset_class:    assetClass,
         tier_class:     tierClass  || null,
         badge_label:    badge      || null,
         daily_rate:     dailyRate  !== '' ? parseFloat(dailyRate)   : null,
