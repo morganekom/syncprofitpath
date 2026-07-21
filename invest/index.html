@@ -117,7 +117,23 @@
     </section>
     <section class="invest-section">
 
-        <h1>Investment Plan</h1>
+        <h1>Investment Plans</h1>
+
+        <!-- Asset class filter tabs -->
+        <div class="asset-tabs" id="assetTabs">
+            <button class="asset-tab active" data-class="crypto" onclick="switchAssetTab('crypto', this)">
+                <i class="uil uil-bitcoin-circle"></i> Crypto
+            </button>
+            <button class="asset-tab" data-class="stocks" onclick="switchAssetTab('stocks', this)">
+                <i class="uil uil-chart-line"></i> Stocks
+            </button>
+            <button class="asset-tab" data-class="forex" onclick="switchAssetTab('forex', this)">
+                <i class="uil uil-dollar-sign"></i> Forex
+            </button>
+            <button class="asset-tab" data-class="energy" onclick="switchAssetTab('energy', this)">
+                <i class="uil uil-fire"></i> Energy
+            </button>
+        </div>
 
         <!-- Skeleton shown while plans load from Supabase -->
         <div class="plans-loading" id="plansLoading">

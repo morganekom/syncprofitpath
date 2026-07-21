@@ -10,6 +10,10 @@ let activePlan = {
     max:  0
 };
 
+// ── ASSET CLASS STATE ──
+let allPlansCache    = [];   // all plans fetched once
+let activeAssetClass = 'crypto';
+
 // ── STORE SELECTED CALCULATOR PLAN ──
 let calcPlan = {
     name: '',
@@ -42,10 +46,45 @@ async function loadPlans() {
 
         if (error) throw error;
 
-        const plans = data || [];
+        allPlansCache = data || [];
+        renderPlans();
 
-        // ── Render plan cards ──
-        grid.innerHTML = plans.map(p => {
+    } catch (err) {
+        console.error('Failed to load investment plans:', err.message);
+        if (skelEl) skelEl.style.display = 'none';
+        grid.style.display = '';
+        grid.innerHTML = '<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>';
+    }
+}
+
+
+// ── RENDER PLANS (filtered by active asset class) ──
+function renderPlans() {
+    const grid   = document.getElementById('plansGrid');
+    const skelEl = document.getElementById('plansLoading');
+
+    const plans = allPlansCache.filter(p =>
+        (p.asset_class || 'crypto') === activeAssetClass
+    );
+
+    if (skelEl) skelEl.style.display = 'none';
+
+    if (plans.length === 0) {
+        grid.style.display = '';
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--color-gray-light);">
+                <i class="uil uil-chart" style="font-size:4rem;display:block;margin-bottom:1rem;opacity:0.4;"></i>
+                <p style="font-size:1.3rem;">No ${activeAssetClass} plans available yet.</p>
+            </div>`;
+
+        // Reset calculator
+        document.getElementById('calcDropdown').innerHTML = '';
+        document.getElementById('calcPlanLabel').textContent = 'No plans available';
+        return;
+    }
+
+    // ── Render plan cards ──
+    grid.innerHTML = plans.map(p => {
             const tierClass  = p.tier_class  || 'plan-basic';
             const name       = p.name        || 'Plan';
             const slug       = p.slug        || name.toLowerCase().replace(/\s+/g, '-');
@@ -57,6 +96,12 @@ async function loadPlans() {
             const cancelTime = p.cancel_time || '—';
             const withdraw   = p.withdraw    || '—';
             const badge      = p.badge_label || `Daily ${dailyRate}%`;
+            const assetClass = p.asset_class || 'crypto';
+
+            const assetIcons = { crypto: 'uil-bitcoin-circle', stocks: 'uil-chart-line', forex: 'uil-dollar-sign', energy: 'uil-fire' };
+            const assetLabels = { crypto: 'Crypto', stocks: 'Stocks', forex: 'Forex', energy: 'Energy' };
+            const assetIcon  = assetIcons[assetClass]  || 'uil-chart';
+            const assetLabel = assetLabels[assetClass] || assetClass;
 
             return `
             <article class="plan-card ${tierClass}">
@@ -65,6 +110,7 @@ async function loadPlans() {
                     <div class="plan-card_indicator"></div>
                 </div>
                 <span class="plan-badge">${escapeHtml(badge)}</span>
+                <span class="plan-asset-badge"><i class="uil ${assetIcon}"></i> ${assetLabel}</span>
                 <div class="plan-details">
                     <div class="plan-row">
                         <h3>Investment</h3>
@@ -99,16 +145,14 @@ async function loadPlans() {
             </article>`;
         }).join('');
 
-        // ── Hide skeleton, show grid ──
-        if (skelEl) skelEl.style.display = 'none';
-        grid.style.display = '';
-
         // ── Re-attach invest button listeners ──
         grid.querySelectorAll('.invest-now-btn').forEach(btn => {
             btn.addEventListener('click', () => openInvestModal(btn));
         });
 
-        // ── Populate calculator dropdown ──
+        grid.style.display = '';
+
+        // ── Populate calculator dropdown with current asset class plans ──
         const dropdown = document.getElementById('calcDropdown');
         dropdown.innerHTML = plans.map(p => {
             const name      = p.name || 'Plan';
@@ -122,9 +166,26 @@ async function loadPlans() {
 
     } catch (err) {
         console.error('Failed to load investment plans:', err.message);
+        const skelEl = document.getElementById('plansLoading');
+        const grid   = document.getElementById('plansGrid');
         if (skelEl) skelEl.style.display = 'none';
         grid.style.display = '';
         grid.innerHTML = '<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>';
+    }
+}
+
+
+// ── ASSET CLASS TAB SWITCHING ──
+function switchAssetTab(assetClass, btn) {
+    activeAssetClass = assetClass;
+
+    // Update tab buttons
+    document.querySelectorAll('.asset-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Re-render with filter
+    if (allPlansCache.length > 0) {
+        renderPlans();
     }
 }
 

@@ -688,3 +688,67 @@ body {
     height: 28rem;
     border-radius: var(--radius-3);
 }
+
+
+/* ========================= ASSET CLASS TABS ========================= */
+.asset-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 0.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.asset-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    white-space: nowrap;
+}
+
+.asset-tab i { font-size: 1.4rem; }
+
+.asset-tab:hover {
+    background: var(--color-light);
+    color: var(--color-dark);
+}
+
+.asset-tab.active {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+@media screen and (max-width: 480px) {
+    .asset-tab span { display: none; }
+    .asset-tab { padding: 0.8rem 1rem; }
+}
+
+
+/* ========================= ASSET CLASS BADGE ON PLAN CARD ========================= */
+.plan-asset-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: var(--radius-1);
+    padding: 0.3rem 0.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    width: fit-content;
+    margin-top: -0.6rem;
+}
+
+.plan-asset-badge i { font-size: 1.2rem; }
