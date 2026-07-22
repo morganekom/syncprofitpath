@@ -223,3 +223,20 @@ function logout() {
         if (btn) btn.style.display = '';
     });
 })();
+
+
+// ================================================================
+// SIDEBAR — Investment Plans dropdown
+// ================================================================
+function toggleInvestDropdown(btn) {
+    const items = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+
+    if (isOpen) {
+        btn.classList.remove('open');
+        items.classList.remove('open');
+    } else {
+        btn.classList.add('open');
+        items.classList.add('open');
+    }
+}

@@ -436,6 +436,100 @@ nav {
     color: var(--color-primary);
 }
 
+/* ========================= SIDEBAR DROPDOWN (Investment Plans) ========================= */
+.sidebar-dropdown {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sidebar-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.4rem 2vw;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    transition: var(--transition);
+    color: var(--color-gray-dark);
+}
+
+.sidebar-dropdown-btn h5 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: inherit;
+}
+
+.sidebar-dropdown-btn i:first-child {
+    font-size: 1.6rem;
+    color: inherit;
+}
+
+.sidebar-dropdown-arrow {
+    margin-left: auto;
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+    color: inherit;
+}
+
+.sidebar-dropdown-btn:hover {
+    background: var(--color-white);
+    color: var(--color-dark);
+}
+
+.sidebar-dropdown-btn.active {
+    background: var(--color-white);
+    border-left: 0.5rem solid var(--color-primary);
+    padding-left: calc(2vw - 0.5rem);
+    color: var(--color-primary);
+}
+
+.sidebar-dropdown-btn.open .sidebar-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.sidebar-dropdown-items {
+    display: none;
+    flex-direction: column;
+    background: var(--color-light);
+}
+
+.sidebar-dropdown-items.open {
+    display: flex;
+}
+
+.sidebar-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 2vw 1rem 4rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-gray-dark);
+    text-decoration: none;
+    transition: var(--transition);
+    border-left: 0.5rem solid transparent;
+}
+
+.sidebar-dropdown-item i {
+    font-size: 1.3rem;
+}
+
+.sidebar-dropdown-item:hover {
+    color: var(--color-primary);
+    background: rgba(0,226,123,0.07);
+}
+
+.sidebar-dropdown-item.active {
+    color: var(--color-primary);
+    font-weight: 600;
+    border-left-color: var(--color-primary);
+    background: var(--color-white);
+}
+
 .sidebar_close-btn {
     display: none !important;
 }
