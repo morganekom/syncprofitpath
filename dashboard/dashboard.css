@@ -497,6 +497,149 @@
     gap: 1rem;
 }
 
+/* Markets moved into main content — full width */
+.dash-markets-main {
+    /* inherits dash-panel-card styles, no extra needed */
+}
+
+/* ========================= PLACE A TRADE ========================= */
+.dash-place-trade {
+    background: var(--color-dark);
+}
+
+.dash-place-trade .dash-panel-header h2 {
+    color: #fff;
+}
+
+.trade-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.trade-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.65);
+}
+
+.trade-select-wrap,
+.trade-input-wrap {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-2);
+    transition: border-color 0.2s;
+}
+
+.trade-select-wrap:focus-within,
+.trade-input-wrap:focus-within {
+    border-color: var(--color-primary);
+}
+
+.trade-select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.9rem 1rem;
+    color: #fff;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.trade-select option {
+    background: var(--color-dark);
+    color: #fff;
+}
+
+.trade-currency {
+    padding: 0 0.4rem 0 1rem;
+    color: rgba(255,255,255,0.4);
+    font-size: 1.2rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.trade-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.9rem 1rem 0.9rem 0.2rem;
+    color: #fff;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+}
+
+.trade-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.trade-input::-webkit-inner-spin-button,
+.trade-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.trade-hint {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.4);
+    min-height: 1.4rem;
+}
+
+.trade-hint.error { color: var(--color-danger); }
+
+.trade-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--radius-2);
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: "Poppins", sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.4rem;
+}
+
+.trade-submit-btn:hover { filter: brightness(1.08); }
+.trade-submit-btn i { font-size: 1.4rem; }
+
+.trade-disclaimer {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    line-height: 1.5;
+}
+
+.trade-disclaimer a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: underline;
+}
+
+.quick-trade-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    background: rgba(var(--color-primary-rgb, 39,214,132), 0.15);
+    background: rgba(39,214,132,0.15);
+    color: var(--color-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .dash-panel-header {
     display: flex;
     align-items: center;

@@ -244,39 +244,13 @@
             <canvas id="chart"></canvas>
         </section>
 
-        <!-- Recent Transactions -->
-        <section class="dash-recent">
-            <div class="dash-section-header">
-                <h2>Recent Transactions</h2>
-                <a href="../transactions/" class="dash-see-all">
-                    See all <i class="uil uil-angle-right"></i>
-                </a>
-            </div>
-            <div id="recentLoading">
-                <div class="recent-skeleton skeleton"></div>
-                <div class="recent-skeleton skeleton"></div>
-                <div class="recent-skeleton skeleton"></div>
-            </div>
-            <div class="recent-empty" id="recentEmpty" style="display:none;">
-                <i class="uil uil-history"></i>
-                <p>No transactions yet. <a href="../deposit/">Make your first deposit →</a></p>
-            </div>
-            <div id="recentList" style="display:none;"></div>
-        </section>
-
-    </main>
-
-    <!--==================== RIGHT PANEL ====================-->
-    <aside class="dash-right">
-
-        <!-- Market Tickers -->
-        <div class="dash-panel-card">
+        <!-- Markets (moved from right panel) -->
+        <section class="dash-panel-card dash-markets-main">
             <div class="dash-panel-header">
                 <h2>Markets</h2>
                 <span class="live-dot"><span></span>Live</span>
             </div>
 
-            <!-- Asset class tabs -->
             <div class="market-tabs">
                 <button class="market-tab active" data-market="crypto" onclick="switchMarketTab('crypto', this)">
                     <i class="uil uil-bitcoin-circle"></i> Crypto
@@ -292,7 +266,6 @@
                 </button>
             </div>
 
-            <!-- Ticker panels — one per asset class -->
             <div class="market-panel active" id="marketPanel-crypto">
                 <div class="market-tickers" id="cryptoTickers">
                     <div class="ticker-row">
@@ -391,6 +364,80 @@
                 </div>
             </div>
 
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="dash-recent">
+            <div class="dash-section-header">
+                <h2>Recent Transactions</h2>
+                <a href="../transactions/" class="dash-see-all">
+                    See all <i class="uil uil-angle-right"></i>
+                </a>
+            </div>
+            <div id="recentLoading">
+                <div class="recent-skeleton skeleton"></div>
+                <div class="recent-skeleton skeleton"></div>
+                <div class="recent-skeleton skeleton"></div>
+            </div>
+            <div class="recent-empty" id="recentEmpty" style="display:none;">
+                <i class="uil uil-history"></i>
+                <p>No transactions yet. <a href="../deposit/">Make your first deposit →</a></p>
+            </div>
+            <div id="recentList" style="display:none;"></div>
+        </section>
+
+    </main>
+
+    <!--==================== RIGHT PANEL ====================-->
+    <aside class="dash-right">
+
+        <!-- Place a Trade -->
+        <div class="dash-panel-card dash-place-trade">
+            <div class="dash-panel-header">
+                <h2>Place a Trade</h2>
+                <span class="quick-trade-badge">Quick Trade</span>
+            </div>
+
+            <div class="trade-field">
+                <label class="trade-label">Asset Class</label>
+                <div class="trade-select-wrap">
+                    <select id="tradeAssetClass" class="trade-select" onchange="updateTradePlans()">
+                        <option value="crypto">Crypto</option>
+                        <option value="stocks">Stocks</option>
+                        <option value="forex">Forex</option>
+                        <option value="energy">Energy</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="trade-field">
+                <label class="trade-label">Investment Plan</label>
+                <div class="trade-select-wrap">
+                    <select id="tradePlan" class="trade-select">
+                        <option value="">Loading plans...</option>
+                    </select>
+                </div>
+                <small class="trade-hint" id="tradePlanHint"></small>
+            </div>
+
+            <div class="trade-field">
+                <label class="trade-label">Amount (USD)</label>
+                <div class="trade-input-wrap">
+                    <span class="trade-currency">$</span>
+                    <input type="number" id="tradeAmount" class="trade-input"
+                        placeholder="0.00" min="0" step="0.01">
+                </div>
+                <small class="trade-hint" id="tradeAmountHint"></small>
+            </div>
+
+            <button class="trade-submit-btn" onclick="submitTrade()">
+                <i class="uil uil-rocket"></i> Start Investing
+            </button>
+
+            <p class="trade-disclaimer">
+                By investing you agree to our <a href="../faq/">terms of service</a>.
+                Returns are not guaranteed.
+            </p>
         </div>
 
         <!-- Active Investments -->

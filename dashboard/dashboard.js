@@ -825,3 +825,127 @@ function buildActiveInvCard(inv) {
         <div class="active-inv-ref">Ref: ${escapeHtml(inv.reference || inv.id.slice(0,8).toUpperCase())}</div>
     </div>`;
 }
+
+
+// ================================================================
+// PLACE A TRADE
+// ================================================================
+
+// Cache of plans by asset class — reuse what loadPlans already fetched
+let tradePlansCache = {};
+
+async function loadTradePlans() {
+    try {
+        const { data, error } = await db
+            .from('investment_plans')
+            .select('id, name, slug, daily_rate, min_amount, max_amount, asset_class')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+
+        // Group by asset class
+        tradePlansCache = {};
+        (data || []).forEach(p => {
+            const cls = p.asset_class || 'crypto';
+            if (!tradePlansCache[cls]) tradePlansCache[cls] = [];
+            tradePlansCache[cls].push(p);
+        });
+
+        updateTradePlans();
+    } catch (err) {
+        console.warn('Could not load plans for trade widget:', err.message);
+        document.getElementById('tradePlan').innerHTML =
+            '<option value="">No plans available</option>';
+    }
+}
+
+function updateTradePlans() {
+    const assetClass = document.getElementById('tradeAssetClass')?.value || 'crypto';
+    const plans = tradePlansCache[assetClass] || [];
+    const select = document.getElementById('tradePlan');
+    const hint   = document.getElementById('tradePlanHint');
+
+    if (!select) return;
+
+    if (plans.length === 0) {
+        select.innerHTML = '<option value="">No plans for this asset class</option>';
+        if (hint) hint.textContent = '';
+        return;
+    }
+
+    select.innerHTML = plans.map(p =>
+        `<option value="${p.id}"
+            data-min="${p.min_amount || 0}"
+            data-max="${p.max_amount || 0}"
+            data-rate="${p.daily_rate || 0}">
+            ${p.name} — ${p.daily_rate}% daily
+        </option>`
+    ).join('');
+
+    updateTradeHint();
+    select.addEventListener('change', updateTradeHint);
+}
+
+function updateTradeHint() {
+    const select = document.getElementById('tradePlan');
+    const hint   = document.getElementById('tradePlanHint');
+    if (!select || !hint) return;
+    const opt = select.options[select.selectedIndex];
+    if (!opt) return;
+    const min = parseFloat(opt.dataset.min) || 0;
+    const max = parseFloat(opt.dataset.max) || 0;
+    const rate = parseFloat(opt.dataset.rate) || 0;
+    hint.textContent = min && max
+        ? `Min $${min.toLocaleString()} — Max $${max.toLocaleString()} · ${rate}% daily`
+        : rate ? `${rate}% daily return` : '';
+}
+
+function submitTrade() {
+    const select     = document.getElementById('tradePlan');
+    const amountEl   = document.getElementById('tradeAmount');
+    const amountHint = document.getElementById('tradeAmountHint');
+    const assetClass = document.getElementById('tradeAssetClass')?.value || 'crypto';
+
+    if (!select || !amountEl) return;
+
+    const planId = select.value;
+    const amount = parseFloat(amountEl.value);
+    const opt    = select.options[select.selectedIndex];
+    const min    = parseFloat(opt?.dataset.min) || 0;
+    const max    = parseFloat(opt?.dataset.max) || 0;
+
+    // Validate
+    if (!planId) {
+        amountHint.textContent = 'Please select a plan.';
+        amountHint.classList.add('error');
+        return;
+    }
+    if (!amount || amount <= 0) {
+        amountHint.textContent = 'Please enter a valid amount.';
+        amountHint.classList.add('error');
+        return;
+    }
+    if (min && amount < min) {
+        amountHint.textContent = `Minimum amount is $${min.toLocaleString()}.`;
+        amountHint.classList.add('error');
+        return;
+    }
+    if (max && amount > max) {
+        amountHint.textContent = `Maximum amount is $${max.toLocaleString()}.`;
+        amountHint.classList.add('error');
+        return;
+    }
+
+    amountHint.textContent = '';
+    amountHint.classList.remove('error');
+
+    // Redirect to invest page with pre-filled params
+    window.location.href = `../invest/?plan=${encodeURIComponent(planId)}&amount=${encodeURIComponent(amount)}&asset=${encodeURIComponent(assetClass)}`;
+}
+
+// Load plans for trade widget on page ready
+document.addEventListener('DOMContentLoaded', () => {
+    loadTradePlans();
+    document.getElementById('tradePlan')?.addEventListener('change', updateTradeHint);
+});
