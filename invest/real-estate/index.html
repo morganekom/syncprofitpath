@@ -1,1 +1,285 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function(){var s=localStorage.getItem('currrentTheme');var d=s==='dark-theme'||(s===null&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark-theme');document.body.classList.add('dark-theme');}})();
+    </script>
+    <title>Real Estate Investment Plans — SyncProfitPath</title>
+    <link rel="icon" type="image/png" href="../../assets/favicon.png">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../invest.css">
+</head>
+<body>
+
+<nav>
+    <div class="container nav_container">
+        <button class="nav_menu-btn nav_menu-btn--mobile"><i class="uil uil-bars"></i></button>
+        <a href="../../dashboard/" class="nav_logo"><img src="../../assets/logo.png" alt="Logo"></a>
+        <div class="nav_search"><i class="uil uil-search"></i><input type="search" placeholder="Search..."></div>
+        <div class="nav_profile-wrapper">
+            <div class="nav_bell-wrap" id="navBellWrap" style="display:none;">
+                <button class="nav_bell-btn" id="navBellBtn" onclick="toggleNotifDropdown(event)">
+                    <i class="uil uil-bell"></i>
+                    <span class="nav_bell-badge" id="navBellBadge" style="display:none;">0</span>
+                </button>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-dropdown-header"><span>Notifications</span><button class="notif-mark-read" onclick="markAllRead()">Mark all read</button></div>
+                    <div class="notif-dropdown-list" id="notifDropdownList"><div class="notif-loading"><i class="uil uil-spinner-alt spin"></i></div></div>
+                    <a class="notif-see-all" href="../../notifications/">See all notifications</a>
+                </div>
+            </div>
+            <div class="nav_profile">
+                <div class="nav_profile-photo"><img src="../../assets/profile-1.jpg" alt="Profile" id="navProfilePhoto"></div>
+                <h5 id="navName">User Name</h5>
+            </div>
+            <button class="nav_menu-btn nav_menu-btn--desktop"><i class="uil uil-bars"></i></button>
+        </div>
+    </div>
+</nav>
+
+<menu class="sidebar">
+    <a href="../../dashboard/"><i class="uil uil-create-dashboard"></i><h5>Dashboard</h5></a>
+    <a href="../../deposit/"><i class="uil uil-arrow-circle-down"></i><h5>Deposit</h5></a>
+    <div class="sidebar-dropdown">
+        <button class="sidebar-dropdown-btn active open" onclick="toggleInvestDropdown(this)">
+            <i class="uil uil-diamond"></i>
+            <h5>Investment Plans</h5>
+            <i class="uil uil-angle-down sidebar-dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-dropdown-items open">
+            <a href="../crypto/" class="sidebar-dropdown-item"><i class="uil uil-bitcoin-circle"></i> Crypto</a>
+            <a href="../stocks/" class="sidebar-dropdown-item"><i class="uil uil-chart-line"></i> Stocks</a>
+            <a href="../real-estate/" class="sidebar-dropdown-item active"><i class="uil uil-home-alt"></i> Real Estate</a>
+        </div>
+    </div>
+    <a href="../../withdraw/"><i class="uil uil-arrow-circle-up"></i><h5>Withdraw</h5></a>
+    <a href="../../transactions/"><i class="uil uil-history"></i><h5>Transactions</h5></a>
+    <a href="../../refer/"><i class="uil uil-user-plus"></i><h5>Refer & Earn</h5></a>
+    <a href="../../settings/"><i class="uil uil-setting"></i><h5>Settings</h5></a>
+    <a href="../../admin/" class="sidebar-admin-back" id="adminBackBtn" style="display:none;"><i class="uil uil-shield-check"></i><h5>Admin Panel</h5></a>
+    <button class="sidebar_close-btn"><i class="uil uil-multiply"></i></button>
+    <button class="sidebar_logout-btn" onclick="logout()"><i class="uil uil-sign-out-alt"></i><h5>Logout</h5></button>
+</menu>
+
+<main class="invest-page">
+
+    <div class="inv-breadcrumb">
+        <a href="../../dashboard/">Home</a>
+        <i class="uil uil-angle-right"></i>
+        <a href="../real-estate/">Investment Plans</a>
+        <i class="uil uil-angle-right"></i>
+        <span>Real Estate</span>
+    </div>
+
+    <div class="inv-hero">
+        <div class="inv-hero-left">
+            <h1 class="realestate">
+                <span class="inv-hero-icon">🏠</span>
+                Real Estate Investment Plans
+            </h1>
+            <p class="inv-hero-tagline">Build wealth through strategic real estate investments with proven stable returns</p>
+            <div class="inv-hero-badges">
+                <span class="inv-hero-badge primary"><i class="uil uil-chart-bar"></i> Stable Returns</span>
+                <span class="inv-hero-badge purple"><i class="uil uil-layers"></i> Diversified Portfolio</span>
+                <span class="inv-hero-badge warning"><i class="uil uil-shield-check"></i> Secure Investments</span>
+            </div>
+        </div>
+        <div class="inv-return-card">
+            <span class="inv-return-pct" style="color:var(--color-primary);">4–20%</span>
+            <small>Annual Returns</small>
+        </div>
+    </div>
+
+    <div class="inv-insights">
+        <div>
+            <span class="inv-insight-val" style="color:var(--color-primary);">$2.4T</span>
+            <p>Global Market Size</p>
+        </div>
+        <div>
+            <span class="inv-insight-val" style="color:var(--color-purple);">8.2%</span>
+            <p>Avg. Annual Growth</p>
+        </div>
+        <div>
+            <span class="inv-insight-val" style="color:#f7931a;">15+</span>
+            <p>Property Types</p>
+        </div>
+        <div>
+            <span class="inv-insight-val" style="color:var(--color-warning);">50+</span>
+            <p>Global Markets</p>
+        </div>
+    </div>
+
+    <h2 class="inv-section-title">Choose Your Real Estate Plan</h2>
+
+    <div class="plans-loading" id="plansLoading">
+        <div class="plan-skel skeleton"></div>
+        <div class="plan-skel skeleton"></div>
+        <div class="plan-skel skeleton"></div>
+    </div>
+    <div class="plans-grid" id="plansGrid" style="display:none;"></div>
+
+    <!-- How It Works -->
+    <div class="inv-why">
+        <h2 class="inv-section-title">How Real Estate Investment Works</h2>
+        <div class="inv-why-grid">
+            <div class="inv-why-card">
+                <div class="inv-why-icon" style="background:var(--color-success-light);">
+                    <i class="uil uil-list-ul" style="color:var(--color-success);"></i>
+                </div>
+                <div>
+                    <h4>Stable Returns</h4>
+                    <p>Real estate typically provides consistent, predictable returns with lower volatility than stocks.</p>
+                </div>
+            </div>
+            <div class="inv-why-card">
+                <div class="inv-why-icon" style="background:var(--color-purple-light);">
+                    <i class="uil uil-shield-check" style="color:var(--color-purple);"></i>
+                </div>
+                <div>
+                    <h4>Inflation Protection</h4>
+                    <p>Property values and rental income typically increase with inflation, protecting your purchasing power.</p>
+                </div>
+            </div>
+            <div class="inv-why-card">
+                <div class="inv-why-icon" style="background:rgba(0,226,123,0.12);">
+                    <i class="uil uil-money-bill" style="color:var(--color-primary);"></i>
+                </div>
+                <div>
+                    <h4>Passive Income</h4>
+                    <p>Generate regular rental income without active management, creating a reliable passive income stream.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio -->
+    <div class="inv-portfolio">
+        <div class="inv-portfolio-inner">
+            <h3>Our Real Estate Portfolio</h3>
+            <div class="inv-portfolio-grid">
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:rgba(0,226,123,0.12);color:var(--color-primary);">
+                        <i class="uil uil-building"></i>
+                    </div>
+                    <span>Residential</span>
+                </div>
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:var(--color-purple-light);color:var(--color-purple);">
+                        <i class="uil uil-shop"></i>
+                    </div>
+                    <span>Commercial</span>
+                </div>
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:rgba(247,147,26,0.12);color:#f7931a;">
+                        <i class="uil uil-drill"></i>
+                    </div>
+                    <span>Industrial</span>
+                </div>
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:rgba(255,67,54,0.1);color:var(--color-danger);">
+                        <i class="uil uil-store"></i>
+                    </div>
+                    <span>Retail</span>
+                </div>
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:rgba(234,181,7,0.12);color:var(--color-warning);">
+                        <i class="uil uil-estate"></i>
+                    </div>
+                    <span>Mixed-Use</span>
+                </div>
+                <div class="inv-portfolio-item">
+                    <div class="inv-portfolio-icon" style="background:var(--color-success-light);color:var(--color-success);">
+                        <i class="uil uil-chart-bar"></i>
+                    </div>
+                    <span>REITs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Info -->
+    <div class="inv-notice">
+        <i class="uil uil-exclamation-triangle"></i>
+        <p><strong>Important Investment Information:</strong> Property values may fluctuate with market conditions. Real estate investments are generally less liquid than stocks. Returns may vary based on property performance and market trends. All investments carry inherent risks.</p>
+    </div>
+
+    <div class="calculator-section">
+        <h2>Profit Calculator</h2>
+        <div class="calculator-card">
+            <div class="calc-field">
+                <div class="calc-select" onclick="toggleCalcDropdown()">
+                    <i class="uil uil-angle-down calc-chevron" id="calcChevron"></i>
+                    <span id="calcPlanLabel">Select plan</span>
+                </div>
+                <div class="calc-dropdown" id="calcDropdown"></div>
+            </div>
+            <div class="calc-field">
+                <label class="calc-label">Enter Amount</label>
+                <div class="calc-input-row">
+                    <span class="calc-currency">$</span>
+                    <input type="number" class="calc-input" id="calcAmount" placeholder="0.00" min="0" oninput="calculateProfit()">
+                </div>
+            </div>
+            <div class="calc-field calc-profit-field">
+                <label class="calc-label">Estimated 30-day Profit</label>
+                <span class="calc-value profit-value" id="calcProfit">$0.00</span>
+            </div>
+            <p class="calc-error" id="calcError"></p>
+            <button class="calculate-btn" id="calculateBtn" onclick="calculateProfit()" disabled>Calculate</button>
+        </div>
+    </div>
+
+</main>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="investModal">
+        <div class="modal-header">
+            <h3 id="modalTitle">Invest in Plan</h3>
+            <button class="modal-close-btn" onclick="closeInvestModal()"><i class="uil uil-multiply"></i></button>
+        </div>
+        <p class="modal-subtitle" id="modalSubtitle"></p>
+        <div class="modal-field">
+            <label>Amount (USD)</label>
+            <div class="modal-input-wrapper">
+                <span>$</span>
+                <input type="number" id="modalAmount" class="modal-input" placeholder="0.00" oninput="validateModalAmount()">
+            </div>
+            <p class="modal-range-hint" id="modalRangeHint"></p>
+            <p class="modal-error" id="modalError"></p>
+        </div>
+        <div class="modal-return-preview">
+            <div class="modal-return-row"><span>1 Return:</span><span id="modalReturnSingle">$0.00</span></div>
+            <div class="modal-return-row"><span>Total Return:</span><span id="modalReturnTotal">$0.00</span></div>
+        </div>
+        <div class="modal-success" id="modalSuccess">
+            <div class="modal-success-icon"><i class="uil uil-check-circle"></i></div>
+            <h3>Investment Submitted!</h3>
+            <p>Your investment is being processed. You'll receive a confirmation shortly.</p>
+        </div>
+        <div class="modal-footer" id="modalFooter">
+            <button class="modal-cancel-btn" onclick="closeInvestModal()">Cancel</button>
+            <button class="modal-confirm-btn" id="modalConfirmBtn" onclick="confirmInvestment()" disabled>Confirm Investment</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../supabase.js"></script>
+<script src="../../auth.js"></script>
+<script src="../../main.js"></script>
+<script src="../../chat-widget.js"></script>
+<script src="../../notify.js"></script>
+<script src="../../notify-inapp.js"></script>
+<script>
+    activeAssetClass = 'real-estate';
+    function toggleInvestDropdown(btn) {
+        btn.classList.toggle('open');
+        btn.nextElementSibling.classList.toggle('open');
+    }
+</script>
+<script src="../invest.js"></script>
+</body>
+</html>
