@@ -112,59 +112,87 @@
             </div>
         </div>
 
-        <!-- Balance Cards -->
-        <section class="dash-cards">
+        <!-- Balance Section -->
+        <section class="dash-balance-section">
 
-            <article class="dash-card dash-card-green">
-                <div class="dash-card-top">
-                    <p class="dash-card-label">Available Balance</p>
-                    <div class="dash-card-icon"><i class="uil uil-wallet"></i></div>
+            <!-- Left: Available Balance -->
+            <div class="dash-balance-main">
+                <p class="dash-balance-label">Account Balance</p>
+                <div class="dash-balance-amount-wrap">
+                    <h1 class="dash-balance-amount" id="dashBalance" style="display:none;">$0.00</h1>
+                    <div class="skeleton-amount dash-balance-skel" id="skelBalance"></div>
                 </div>
-                <div class="dash-card-amount-wrap">
-                    <h1 class="dash-card-amount" id="dashBalance" style="display:none;">$0.00</h1>
-                    <div class="skeleton-amount" id="skelBalance"></div>
-                </div>
-                <div class="dash-card-actions">
-                    <a href="../deposit/" class="dash-card-btn">
-                        <i class="uil uil-plus"></i> Add Cash
+                <p class="dash-balance-sub">Available for Withdrawal</p>
+                <div class="dash-balance-actions">
+                    <a href="../deposit/" class="dash-bal-btn dash-bal-btn--primary">
+                        <i class="uil uil-arrow-circle-down"></i> Deposit
                     </a>
-                    <a href="../withdraw/" class="dash-card-btn dash-card-btn-outline">
-                        <i class="uil uil-arrow-up"></i> Withdraw
+                    <a href="../withdraw/" class="dash-bal-btn dash-bal-btn--outline">
+                        <i class="uil uil-arrow-circle-up"></i> Withdraw
                     </a>
                 </div>
-            </article>
+            </div>
 
-            <article class="dash-card dash-card-yellow">
-                <div class="dash-card-top">
-                    <p class="dash-card-label">Pending Deposit</p>
-                    <div class="dash-card-icon"><i class="uil uil-clock"></i></div>
-                </div>
-                <div class="dash-card-amount-wrap">
-                    <h1 class="dash-card-amount" id="dashPending" style="display:none;">$0.00</h1>
-                    <div class="skeleton-amount" id="skelPending"></div>
-                </div>
-                <div class="dash-card-actions">
-                    <a href="../transactions/" class="dash-card-btn">
-                        <i class="uil uil-eye"></i> View
-                    </a>
-                </div>
-            </article>
+            <!-- Right: 2×2 stat grid -->
+            <div class="dash-stat-grid">
 
-            <article class="dash-card dash-card-dark">
-                <div class="dash-card-top">
-                    <p class="dash-card-label">Investment Profit</p>
-                    <div class="dash-card-icon"><i class="uil uil-chart-line"></i></div>
+                <div class="dash-stat-tile">
+                    <div class="dash-stat-tile__top">
+                        <p class="dash-stat-tile__label">Total Profit</p>
+                        <div class="dash-stat-tile__icon" style="background:rgba(39,174,96,0.12);">
+                            <i class="uil uil-chart-growth" style="color:#27ae60;"></i>
+                        </div>
+                    </div>
+                    <div class="dash-stat-tile__amount-wrap">
+                        <h3 class="dash-stat-tile__amount" id="statProfit" style="display:none;">$0.00</h3>
+                        <div class="skeleton-stat" id="skelProfit"></div>
+                    </div>
+                    <small class="dash-stat-tile__sub">All time</small>
                 </div>
-                <div class="dash-card-amount-wrap">
-                    <h1 class="dash-card-amount" id="dashProfit" style="display:none;">$0.00</h1>
-                    <div class="skeleton-amount" id="skelProfit"></div>
+
+                <div class="dash-stat-tile">
+                    <div class="dash-stat-tile__top">
+                        <p class="dash-stat-tile__label">Total Deposit</p>
+                        <div class="dash-stat-tile__icon" style="background:rgba(52,152,219,0.12);">
+                            <i class="uil uil-arrow-circle-down" style="color:#3498db;"></i>
+                        </div>
+                    </div>
+                    <div class="dash-stat-tile__amount-wrap">
+                        <h3 class="dash-stat-tile__amount" id="statDeposit" style="display:none;">$0.00</h3>
+                        <div class="skeleton-stat" id="skelDeposit"></div>
+                    </div>
+                    <small class="dash-stat-tile__sub">All time</small>
                 </div>
-                <div class="dash-card-actions">
-                    <a href="../invest/" class="dash-card-btn">
-                        <i class="uil uil-diamond"></i> Invest More
-                    </a>
+
+                <div class="dash-stat-tile">
+                    <div class="dash-stat-tile__top">
+                        <p class="dash-stat-tile__label">Total Withdrawal</p>
+                        <div class="dash-stat-tile__icon" style="background:rgba(231,76,60,0.12);">
+                            <i class="uil uil-arrow-circle-up" style="color:#e74c3c;"></i>
+                        </div>
+                    </div>
+                    <div class="dash-stat-tile__amount-wrap">
+                        <h3 class="dash-stat-tile__amount" id="statWithdrawal" style="display:none;">$0.00</h3>
+                        <div class="skeleton-stat" id="skelWithdrawal"></div>
+                    </div>
+                    <small class="dash-stat-tile__sub">All time</small>
                 </div>
-            </article>
+
+                <div class="dash-stat-tile">
+                    <div class="dash-stat-tile__top">
+                        <p class="dash-stat-tile__label">Investment Interest</p>
+                        <div class="dash-stat-tile__icon" style="background:rgba(155,89,182,0.12);">
+                            <i class="uil uil-percentage" style="color:#9b59b6;"></i>
+                        </div>
+                    </div>
+                    <div class="dash-stat-tile__amount-wrap">
+                        <h3 class="dash-stat-tile__amount" id="statInterest" style="display:none;">$0.00</h3>
+                        <div class="skeleton-stat" id="skelInterest"></div>
+                    </div>
+                    <small class="dash-stat-tile__sub">Daily returns</small>
+                </div>
+
+            </div>
 
         </section>
 

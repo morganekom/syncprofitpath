@@ -39,32 +39,66 @@ async function loadUserBalances() {
 
     if (!userId) {
         setBalances(
-            parseFloat(localStorage.getItem('userBalance')) || 0,
-            parseFloat(localStorage.getItem('userPending')) || 0,
-            parseFloat(localStorage.getItem('userProfit'))  || 0
+            parseFloat(localStorage.getItem('userBalance'))    || 0,
+            parseFloat(localStorage.getItem('userProfit'))     || 0,
+            parseFloat(localStorage.getItem('userDeposit'))    || 0,
+            parseFloat(localStorage.getItem('userWithdrawal')) || 0,
+            parseFloat(localStorage.getItem('userInterest'))   || 0,
         );
         return;
     }
 
     try {
+        // Fetch user row for balance, profit (interest)
         const { data, error } = await db
             .from('users')
-            .select('balance, profit, pending')
+            .select('balance, profit')
             .eq('id', userId)
             .single();
 
         if (error) throw error;
 
-        localStorage.setItem('userBalance', String(data.balance || 0));
-        localStorage.setItem('userProfit',  String(data.profit  || 0));
-        localStorage.setItem('userPending', String(data.pending || 0));
+        // Sum total deposits and withdrawals from transactions table
+        const [depRes, wdrRes] = await Promise.allSettled([
+            db.from('transactions')
+                .select('amount')
+                .eq('user_id', userId)
+                .eq('type', 'deposit')
+                .eq('status', 'completed'),
+            db.from('transactions')
+                .select('amount')
+                .eq('user_id', userId)
+                .eq('type', 'withdrawal')
+                .eq('status', 'completed'),
+        ]);
 
-        setBalances(data.balance || 0, data.pending || 0, data.profit || 0);
+        const totalDeposit = depRes.status === 'fulfilled' && !depRes.value.error
+            ? (depRes.value.data || []).reduce((sum, r) => sum + (r.amount || 0), 0)
+            : parseFloat(localStorage.getItem('userDeposit')) || 0;
+
+        const totalWithdrawal = wdrRes.status === 'fulfilled' && !wdrRes.value.error
+            ? (wdrRes.value.data || []).reduce((sum, r) => sum + (r.amount || 0), 0)
+            : parseFloat(localStorage.getItem('userWithdrawal')) || 0;
+
+        const balance  = data.balance || 0;
+        const profit   = data.profit  || 0;  // total investment profit (all time)
+        const interest = profit;              // Investment Interest = same profit column (cron adds daily)
+
+        localStorage.setItem('userBalance',    String(balance));
+        localStorage.setItem('userProfit',     String(profit));
+        localStorage.setItem('userDeposit',    String(totalDeposit));
+        localStorage.setItem('userWithdrawal', String(totalWithdrawal));
+        localStorage.setItem('userInterest',   String(interest));
+
+        setBalances(balance, profit, totalDeposit, totalWithdrawal, interest);
+
     } catch (err) {
         setBalances(
-            parseFloat(localStorage.getItem('userBalance')) || 0,
-            parseFloat(localStorage.getItem('userPending')) || 0,
-            parseFloat(localStorage.getItem('userProfit'))  || 0
+            parseFloat(localStorage.getItem('userBalance'))    || 0,
+            parseFloat(localStorage.getItem('userProfit'))     || 0,
+            parseFloat(localStorage.getItem('userDeposit'))    || 0,
+            parseFloat(localStorage.getItem('userWithdrawal')) || 0,
+            parseFloat(localStorage.getItem('userInterest'))   || 0,
         );
     }
 }
@@ -84,10 +118,12 @@ function revealAmount(elId, skelId, value) {
     requestAnimationFrame(() => { el.style.opacity = '1'; });
 }
 
-function setBalances(balance, pending, profit) {
-    revealAmount('dashBalance', 'skelBalance', balance);
-    revealAmount('dashPending', 'skelPending', pending);
-    revealAmount('dashProfit',  'skelProfit',  profit);
+function setBalances(balance, profit, totalDeposit, totalWithdrawal, interest) {
+    revealAmount('dashBalance',   'skelBalance',    balance);
+    revealAmount('statProfit',    'skelProfit',     profit);
+    revealAmount('statDeposit',   'skelDeposit',    totalDeposit);
+    revealAmount('statWithdrawal','skelWithdrawal', totalWithdrawal);
+    revealAmount('statInterest',  'skelInterest',   interest);
 }
 
 
