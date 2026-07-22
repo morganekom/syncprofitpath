@@ -555,7 +555,7 @@ body { grid-template-columns: 1fr; }
     text-align: left;
 }
 .sidebar-dropdown-btn:hover { background: var(--color-primary); color: var(--color-dark); }
-.sidebar-dropdown-btn.active { background: var(--color-dark); color: var(--color-dark); }
+.sidebar-dropdown-btn.active { background: var(--color-primary); color: var(--color-dark); }
 
 .sidebar-dropdown-btn i:first-child { font-size: 1.6rem; }
 .sidebar-dropdown-arrow { margin-left: auto; font-size: 1.4rem; transition: transform 0.3s ease; }
