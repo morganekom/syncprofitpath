@@ -1,230 +1,196 @@
-// invest.js — All interactivity for the invest page
+// invest.js — Investment Plans (Crypto / Stocks / Real Estate)
+// Shared across all three asset pages
 
+// ── STATE ──
+let activePlan = { name: '', rate: 0, roi: 0, min: 0, max: 0, duration: '' };
+let allPlansCache    = [];
+let activeAssetClass = 'crypto'; // overridden by each page on load
 
-// ── STORE SELECTED PLAN FOR MODAL ──
-let activePlan = {
-    name: '',
-    rate: 0,
-    roi:  0,
-    min:  0,
-    max:  0
-};
-
-// ── ASSET CLASS STATE ──
-let allPlansCache    = [];   // all plans fetched once
-let activeAssetClass = 'crypto';
-
-// ── STORE SELECTED CALCULATOR PLAN ──
-let calcPlan = {
-    name: '',
-    rate: 0,
-    roi:  0
-};
-
-// ── STORE SELECTED COIN IN MODAL ──
-let selectedModalCoin = null;
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function formatNum(num) {
+    return Number(num).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function capitalise(str) { return String(str).charAt(0).toUpperCase()+String(str).slice(1); }
 
 
 // ================================================================
-// LOAD PLANS FROM SUPABASE
+// LOAD PLANS
 // ================================================================
-
 async function loadPlans() {
-    const grid    = document.getElementById('plansGrid');
-    const skelEl  = document.getElementById('plansLoading');
-
-    // Show skeleton, hide grid until data is ready
+    const grid   = document.getElementById('plansGrid');
+    const skelEl = document.getElementById('plansLoading');
     if (skelEl) skelEl.style.display = '';
-    grid.style.display = 'none';
+    if (grid)   grid.style.display   = 'none';
 
     try {
         const { data, error } = await db
-            .from('investment_plans')
-            .select('*')
-            .eq('is_active', true)
+            .from('investment_plans').select('*')
+            .eq('is_active', true).eq('asset_class', activeAssetClass)
             .order('sort_order', { ascending: true });
-
-        if (error) {
-            // If asset_class column missing (SQL migration not run yet), fetch without it
-            if (error.message && error.message.includes('asset_class')) {
-                console.warn('asset_class column not found — run the SQL migration in Supabase.');
-                const fallback = await db
-                    .from('investment_plans')
-                    .select('id, name, slug, daily_rate, roi_multiplier, min_amount, max_amount, return_type, cancel_time, withdraw, badge_label, tier_class, is_active, sort_order')
-                    .eq('is_active', true)
-                    .order('sort_order', { ascending: true });
-                if (fallback.error) throw fallback.error;
-                allPlansCache = (fallback.data || []).map(p => ({ ...p, asset_class: 'crypto' }));
-            } else {
-                throw error;
-            }
-        } else {
-            allPlansCache = data || [];
-        }
-
+        if (error) throw error;
+        allPlansCache = data || [];
         renderPlans();
-
     } catch (err) {
-        console.error('Failed to load investment plans:', err.message);
+        console.error('loadPlans error:', err.message);
         if (skelEl) skelEl.style.display = 'none';
-        grid.style.display = '';
-        grid.innerHTML = '<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>';
+        if (grid) { grid.style.display=''; grid.innerHTML='<p style="padding:1rem;color:var(--color-danger)">Failed to load plans. Please refresh.</p>'; }
     }
 }
 
 
-// ── RENDER PLANS (filtered by active asset class) ──
+// ================================================================
+// RENDER PLAN CARDS
+// ================================================================
 function renderPlans() {
     const grid   = document.getElementById('plansGrid');
     const skelEl = document.getElementById('plansLoading');
-
-    const plans = allPlansCache.filter(p =>
-        (p.asset_class || 'crypto') === activeAssetClass
-    );
-
     if (skelEl) skelEl.style.display = 'none';
+    if (!grid) return;
 
-    if (plans.length === 0) {
+    if (allPlansCache.length === 0) {
         grid.style.display = '';
-        grid.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--color-gray-light);">
-                <i class="uil uil-chart" style="font-size:4rem;display:block;margin-bottom:1rem;opacity:0.4;"></i>
-                <p style="font-size:1.3rem;">No ${activeAssetClass} plans available yet.</p>
-            </div>`;
-
-        // Reset calculator
-        document.getElementById('calcDropdown').innerHTML = '';
-        document.getElementById('calcPlanLabel').textContent = 'No plans available';
+        grid.innerHTML = '<div class="inv-empty"><i class="uil uil-chart"></i><p>No plans available yet.</p></div>';
         return;
     }
 
-    // ── Render plan cards ──
-    grid.innerHTML = plans.map(p => {
-            const tierClass  = p.tier_class  || 'plan-basic';
-            const name       = p.name        || 'Plan';
-            const slug       = p.slug        || name.toLowerCase().replace(/\s+/g, '-');
-            const dailyRate  = p.daily_rate  != null ? p.daily_rate  : 0;
-            const roi        = p.roi_multiplier != null ? p.roi_multiplier : 0;
-            const minAmt     = p.min_amount  != null ? p.min_amount  : 0;
-            const maxAmt     = p.max_amount  != null ? p.max_amount  : 0;
-            const returnType = p.return_type || '—';
-            const cancelTime = p.cancel_time || '—';
-            const withdraw   = p.withdraw    || '—';
-            const badge      = p.badge_label || `Daily ${dailyRate}%`;
-            const assetClass = p.asset_class || 'crypto';
+    const headerClass = {'crypto':'inv-card-header--crypto','stocks':'inv-card-header--stocks','real-estate':'inv-card-header--realestate'}[activeAssetClass] || 'inv-card-header--crypto';
+    const assetIcon   = {'crypto':'₿','stocks':'≡','real-estate':'⌂'}[activeAssetClass] || '◆';
+    const btnLabel    = {'crypto':'Invest in Crypto','stocks':'Invest in Stocks','real-estate':'Invest in Real Estate'}[activeAssetClass] || 'Invest Now';
+    const badgeLabels = ['Hot','Popular','Premium'];
 
-            const assetIcons = { crypto: 'uil-bitcoin-circle', stocks: 'uil-chart-line', forex: 'uil-dollar-sign', energy: 'uil-fire' };
-            const assetLabels = { crypto: 'Crypto', stocks: 'Stocks', forex: 'Forex', energy: 'Energy' };
-            const assetIcon  = assetIcons[assetClass]  || 'uil-chart';
-            const assetLabel = assetLabels[assetClass] || assetClass;
+    grid.innerHTML = allPlansCache.map((p, i) => {
+        const name          = p.name || 'Plan';
+        const slug          = p.slug || 'plan-'+i;
+        const dailyRate     = p.daily_rate ?? 0;
+        const roi           = p.roi_multiplier ?? 0;
+        const minAmt        = p.min_amount ?? 0;
+        const maxAmt        = p.max_amount ?? 0;
+        const withdraw      = p.withdraw || '30 days';
+        const returnType    = p.return_type || 'Daily';
+        const badgeLabel    = badgeLabels[i] || badgeLabels[badgeLabels.length-1];
+        const durationDays  = parseInt(withdraw) || 30;
+        const initReturn    = (minAmt * dailyRate / 100).toFixed(2);
+        const initTotal     = (minAmt * dailyRate / 100 * durationDays).toFixed(2);
 
-            return `
-            <article class="plan-card ${tierClass}">
-                <div class="plan-card_header">
-                    <h2>${escapeHtml(name)}</h2>
-                    <div class="plan-card_indicator"></div>
+        return `<article class="inv-card" id="invCard-${slug}">
+            <div class="inv-card-header ${headerClass}">
+                <span class="inv-badge-label">${badgeLabel}</span>
+                <div class="inv-card-icon">${assetIcon}</div>
+                <p class="inv-card-header-type">${escapeHtml(name)}</p>
+                <div class="inv-roi-badge"><span>${dailyRate}%</span><small>${returnType} ROI</small></div>
+            </div>
+            <div class="inv-card-body">
+                <h3 class="inv-card-name">${escapeHtml(name)}</h3>
+                <div class="inv-card-meta">
+                    <span>$${formatNum(minAmt)} <small>minimum</small></span>
+                    <span class="inv-meta-duration">Duration <strong>${escapeHtml(withdraw)}</strong></span>
                 </div>
-                <span class="plan-badge">${escapeHtml(badge)}</span>
-                <span class="plan-asset-badge"><i class="uil ${assetIcon}"></i> ${assetLabel}</span>
-                <div class="plan-details">
-                    <div class="plan-row">
-                        <h3>Investment</h3>
-                        <p>$${formatNum(minAmt)} – $${formatNum(maxAmt)}</p>
+                <div class="inv-card-details">
+                    <div class="inv-detail-row"><span>Investment Range</span><span>$${formatNum(minAmt)} – $${formatNum(maxAmt)}</span></div>
+                    <div class="inv-detail-row"><span>Return Rate</span><span class="inv-rate">${dailyRate}% ${returnType}</span></div>
+                    <div class="inv-detail-row"><span>ROI</span><span>${roi}×</span></div>
+                </div>
+                <div class="inv-amount-section">
+                    <label class="inv-amount-label">Investment Amount ($)</label>
+                    <div class="inv-amount-input-wrap">
+                        <span>$</span>
+                        <input type="number" class="inv-amount-input" id="amountInput-${slug}"
+                            value="${minAmt}" min="${minAmt}" max="${maxAmt}" step="1"
+                            oninput="onAmountInput('${slug}',${minAmt},${maxAmt},${dailyRate},${durationDays})">
                     </div>
-                    <div class="plan-row">
-                        <h3>Return type</h3>
-                        <p>${escapeHtml(returnType)}</p>
+                    <input type="range" class="inv-slider" id="slider-${slug}"
+                        min="${minAmt}" max="${maxAmt}" value="${minAmt}" step="1"
+                        oninput="onSliderInput('${slug}',${minAmt},${maxAmt},${dailyRate},${durationDays})">
+                    <div class="inv-slider-labels"><span>$${formatNum(minAmt)}</span><span>$${formatNum(maxAmt)}</span></div>
+                </div>
+                <div class="inv-return-preview">
+                    <div class="inv-return-row">
+                        <span>1 Return:</span>
+                        <span class="inv-return-val" id="returnSingle-${slug}">$${initReturn}</span>
                     </div>
-                    <div class="plan-row">
-                        <h3>ROI</h3>
-                        <p>${roi}×</p>
-                    </div>
-                    <div class="plan-row">
-                        <h3>Maturity Period</h3>
-                        <p>${escapeHtml(withdraw)}</p>
-                    </div>
-                    <div class="plan-row">
-                        <h3>Cancel time</h3>
-                        <p>${escapeHtml(cancelTime)}</p>
+                    <div class="inv-return-row">
+                        <span>Total Return (${escapeHtml(withdraw)}):</span>
+                        <span class="inv-return-val" id="returnTotal-${slug}">$${initTotal}</span>
                     </div>
                 </div>
-                <button class="invest-now-btn"
-                    data-plan="${escapeHtml(slug)}"
-                    data-planname="${escapeHtml(name)}"
-                    data-min="${minAmt}"
-                    data-max="${maxAmt}"
-                    data-rate="${dailyRate}"
-                    data-roi="${roi}">
-                    Invest Now
+                <button class="inv-btn"
+                    data-slug="${escapeHtml(slug)}" data-planname="${escapeHtml(name)}"
+                    data-min="${minAmt}" data-max="${maxAmt}" data-rate="${dailyRate}"
+                    data-roi="${roi}" data-duration="${escapeHtml(withdraw)}"
+                    onclick="openInvestModal(this)">
+                    ${btnLabel}
                 </button>
-            </article>`;
-        }).join('');
+            </div>
+        </article>`;
+    }).join('');
 
-        // ── Re-attach invest button listeners ──
-        grid.querySelectorAll('.invest-now-btn').forEach(btn => {
-            btn.addEventListener('click', () => openInvestModal(btn));
-        });
-
-        grid.style.display = '';
-
-        // ── Populate calculator dropdown with current asset class plans ──
-        const dropdown = document.getElementById('calcDropdown');
-        dropdown.innerHTML = plans.map(p => {
-            const name      = p.name || 'Plan';
-            const dailyRate = p.daily_rate != null ? p.daily_rate : 0;
-            const roi       = p.roi_multiplier != null ? p.roi_multiplier : 0;
-            return `<div class="calc-dropdown-item"
-                        onclick="selectCalcPlan('${escapeHtml(name)}', ${dailyRate}, ${roi})">
-                        ${escapeHtml(name)} <span>Daily ${dailyRate}%</span>
-                    </div>`;
-        }).join('');
-}
-
-
-// ── ASSET CLASS TAB SWITCHING ──
-function switchAssetTab(assetClass, btn) {
-    activeAssetClass = assetClass;
-
-    // Update tab buttons
-    document.querySelectorAll('.asset-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Re-render with filter
-    if (allPlansCache.length > 0) {
-        renderPlans();
-    }
-}
-
-// ── Simple HTML escaper (mirrors admin.js utility) ──
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    grid.style.display = '';
+    populateCalculator();
 }
 
 
 // ================================================================
-// INVEST NOW MODAL
+// SLIDER + INPUT SYNC
 // ================================================================
+function onSliderInput(slug, min, max, rate, days) {
+    const slider = document.getElementById('slider-'+slug);
+    const input  = document.getElementById('amountInput-'+slug);
+    if (!slider||!input) return;
+    input.value = slider.value;
+    updateReturnPreview(slug, parseFloat(slider.value), rate, days);
+}
 
+function onAmountInput(slug, min, max, rate, days) {
+    const input  = document.getElementById('amountInput-'+slug);
+    const slider = document.getElementById('slider-'+slug);
+    if (!input||!slider) return;
+    let val = Math.min(Math.max(parseFloat(input.value)||min, min), max);
+    slider.value = val;
+    updateReturnPreview(slug, val, rate, days);
+}
+
+function updateReturnPreview(slug, amount, rate, days) {
+    const sEl = document.getElementById('returnSingle-'+slug);
+    const tEl = document.getElementById('returnTotal-'+slug);
+    if (!sEl||!tEl) return;
+    sEl.textContent = '$'+formatNum(amount*rate/100);
+    tEl.textContent = '$'+formatNum(amount*rate/100*days);
+}
+
+
+// ================================================================
+// MODAL — no coin selector
+// ================================================================
 function openInvestModal(btn) {
-    activePlan.name = btn.dataset.planname || capitalise(btn.dataset.plan);
-    activePlan.rate = parseFloat(btn.dataset.rate);
-    activePlan.roi  = parseFloat(btn.dataset.roi);
-    activePlan.min  = parseFloat(btn.dataset.min);
-    activePlan.max  = parseFloat(btn.dataset.max);
+    activePlan.name     = btn.dataset.planname || capitalise(btn.dataset.slug);
+    activePlan.rate     = parseFloat(btn.dataset.rate);
+    activePlan.roi      = parseFloat(btn.dataset.roi);
+    activePlan.min      = parseFloat(btn.dataset.min);
+    activePlan.max      = parseFloat(btn.dataset.max);
+    activePlan.duration = btn.dataset.duration || '';
 
-    document.getElementById('modalTitle').textContent =
-        `Invest in ${activePlan.name}`;
-    document.getElementById('modalSubtitle').textContent =
-        `Daily ${activePlan.rate}% · ROI ${activePlan.roi}×`;
-    document.getElementById('modalRangeHint').textContent =
-        `Min $${formatNum(activePlan.min)} – Max $${formatNum(activePlan.max)}`;
+    const sliderEl  = document.getElementById('slider-'+btn.dataset.slug);
+    const prefilled = sliderEl ? parseFloat(sliderEl.value) : activePlan.min;
 
-    resetModal();
+    document.getElementById('modalTitle').textContent    = `Invest in ${activePlan.name}`;
+    document.getElementById('modalSubtitle').textContent = `${activePlan.rate}% Daily · ROI ${activePlan.roi}×`;
+    document.getElementById('modalRangeHint').textContent= `Min $${formatNum(activePlan.min)} – Max $${formatNum(activePlan.max)}`;
+
+    const amountInput    = document.getElementById('modalAmount');
+    amountInput.value    = prefilled;
+    amountInput.min      = activePlan.min;
+    amountInput.max      = activePlan.max;
+    amountInput.disabled = false;
+
+    document.getElementById('modalError').textContent   = '';
+    document.getElementById('modalSuccess').classList.remove('show');
+    document.getElementById('modalFooter').style.display= 'flex';
+
+    updateModalReturnPreview(prefilled);
+    validateModalAmount();
 
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -236,170 +202,106 @@ function closeInvestModal() {
 }
 
 function closeModal(event) {
-    if (event.target === document.getElementById('modalOverlay')) {
-        closeInvestModal();
-    }
+    if (event.target === document.getElementById('modalOverlay')) closeInvestModal();
 }
-
-function resetModal() {
-    document.getElementById('modalAmount').value    = '';
-    document.getElementById('modalAmount').disabled = true;
-    document.getElementById('modalError').textContent = '';
-
-    document.getElementById('modalInputWrapper').classList.add('locked');
-
-    selectedModalCoin = null;
-    document.querySelectorAll('.modal-coin').forEach(c => c.classList.remove('selected'));
-
-    const hint = document.getElementById('modalCoinHint');
-    hint.textContent = 'Select a coin to continue';
-    hint.classList.remove('coin-chosen');
-
-    document.getElementById('modalSuccess').classList.remove('show');
-    document.getElementById('modalFooter').style.display      = 'flex';
-    document.getElementById('modalConfirmBtn').disabled       = true;
-    document.getElementById('modalConfirmBtn').textContent    = 'Confirm Investment';
-    document.querySelector('.modal-field').style.display      = 'block';
-}
-
-
-// ================================================================
-// COIN SELECTOR
-// ================================================================
-
-function selectModalCoin(btn) {
-    document.querySelectorAll('.modal-coin').forEach(c => c.classList.remove('selected'));
-
-    btn.classList.add('selected');
-    selectedModalCoin = btn.dataset.coin;
-
-    const coinName = btn.getAttribute('title');
-    const hint     = document.getElementById('modalCoinHint');
-    hint.textContent = `✓ ${coinName} selected`;
-    hint.classList.add('coin-chosen');
-
-    const amountInput   = document.getElementById('modalAmount');
-    const inputWrapper  = document.getElementById('modalInputWrapper');
-    amountInput.disabled = false;
-    inputWrapper.classList.remove('locked');
-    amountInput.focus();
-
-    validateModalAmount();
-}
-
-
-// ================================================================
-// AMOUNT VALIDATION
-// ================================================================
 
 function validateModalAmount() {
     const input  = document.getElementById('modalAmount');
     const error  = document.getElementById('modalError');
     const btn    = document.getElementById('modalConfirmBtn');
     const amount = parseFloat(input.value);
-
     error.textContent = '';
-    btn.disabled      = true;
-
-    if (!selectedModalCoin) return;
-    if (!input.value)        return;
-
-    if (isNaN(amount) || amount <= 0) {
-        error.textContent = 'Please enter a valid amount.';
-        return;
-    }
-
-    if (amount < activePlan.min) {
-        error.textContent = `Minimum investment for this plan is $${formatNum(activePlan.min)}.`;
-        return;
-    }
-
-    if (amount > activePlan.max) {
-        error.textContent = `Maximum investment for this plan is $${formatNum(activePlan.max)}.`;
-        return;
-    }
-
+    btn.disabled = true;
+    if (!input.value||isNaN(amount)||amount<=0) return;
+    if (amount < activePlan.min) { error.textContent=`Minimum is $${formatNum(activePlan.min)}.`; return; }
+    if (amount > activePlan.max) { error.textContent=`Maximum is $${formatNum(activePlan.max)}.`; return; }
     btn.disabled = false;
+    updateModalReturnPreview(amount);
+}
+
+function updateModalReturnPreview(amount) {
+    const sEl = document.getElementById('modalReturnSingle');
+    const tEl = document.getElementById('modalReturnTotal');
+    if (!sEl||!tEl) return;
+    const days = parseInt(activePlan.duration)||30;
+    sEl.textContent = '$'+formatNum(amount*activePlan.rate/100);
+    tEl.textContent = '$'+formatNum(amount*activePlan.rate/100*days);
 }
 
 
 // ================================================================
-// CONFIRM INVESTMENT — writes to Supabase transactions table
+// CONFIRM INVESTMENT
 // ================================================================
-
 async function confirmInvestment() {
-    const confirmBtn = document.getElementById('modalConfirmBtn');
-    const errorEl    = document.getElementById('modalError');
-
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const confirmBtn  = document.getElementById('modalConfirmBtn');
+    const errorEl     = document.getElementById('modalError');
     const amount      = parseFloat(document.getElementById('modalAmount').value);
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'{}');
 
-    // ── BALANCE CHECK — fetch live balance from Supabase ──
-    const { data: userData, error: balanceError } = await db
-        .from('users')
-        .select('balance')
-        .eq('id', currentUser.id)
-        .single();
-
-    if (balanceError || !userData) {
-        errorEl.textContent = 'Could not verify your balance. Please try again.';
-        return;
-    }
-
-    const availableBalance = parseFloat(userData.balance || 0);
-
-    if (amount > availableBalance) {
-        errorEl.textContent = `Insufficient balance. Your available balance is $${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`;
-        return;
-    }
-
-    confirmBtn.textContent = 'Submitting...';
+    errorEl.textContent    = '';
     confirmBtn.disabled    = true;
-    const reference   = 'INV-' + Date.now().toString(36).toUpperCase();
+    confirmBtn.textContent = 'Checking…';
 
-    const { error } = await db
-        .from('transactions')
-        .insert([{
-            user_id:   currentUser.id,
-            type:      'investment',
-            amount:    amount,
-            coin:      selectedModalCoin,
-            status:    'pending',
-            note:      `${capitalise(activePlan.name)} plan — ${activePlan.rate}% daily`,
-            method:    activePlan.name,
-            reference: reference,
-        }]);
+    const { data: userData, error: balErr } = await db
+        .from('users').select('balance').eq('id', currentUser.id).single();
+
+    if (balErr||!userData) {
+        errorEl.textContent    = 'Could not verify balance. Please try again.';
+        confirmBtn.disabled    = false;
+        confirmBtn.textContent = 'Confirm Investment';
+        return;
+    }
+
+    if (amount > parseFloat(userData.balance||0)) {
+        errorEl.textContent    = `Insufficient balance. Available: $${formatNum(userData.balance||0)}`;
+        confirmBtn.disabled    = false;
+        confirmBtn.textContent = 'Confirm Investment';
+        return;
+    }
+
+    confirmBtn.textContent = 'Submitting…';
+    const reference = 'INV-'+Date.now().toString(36).toUpperCase();
+
+    const { error } = await db.from('transactions').insert([{
+        user_id: currentUser.id, type: 'investment', amount,
+        coin: activeAssetClass, status: 'pending',
+        note: `${activePlan.name} — ${activePlan.rate}% daily`,
+        method: activePlan.name, reference,
+    }]);
 
     if (error) {
-        console.error('Investment insert error:', error.message);
-        confirmBtn.textContent = 'Confirm Investment';
+        console.error('Investment error:', error.message);
+        errorEl.textContent    = 'Something went wrong. Please try again.';
         confirmBtn.disabled    = false;
-        document.getElementById('modalError').textContent = 'Something went wrong. Please try again.';
+        confirmBtn.textContent = 'Confirm Investment';
         return;
     }
 
-    // Show the modal's built-in success state
-    document.querySelector('.modal-field').style.display   = 'none';
-    document.getElementById('modalFooter').style.display  = 'none';
-    // Send pending notification
-    const invUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     sendNotification({
-        type:   'investment_pending',
-        email:  currentUser.email || '',
-        name:   currentUser.full_name || currentUser.first_name || 'there',
-        amount: amount,
-        plan:   activePlan?.name || '',
-        coin:   selectedModalCoin || '',
-        ref:    reference,
+        type: 'investment_pending', email: currentUser.email||'',
+        name: currentUser.full_name||currentUser.first_name||'there',
+        amount, plan: activePlan.name, coin: activeAssetClass, ref: reference,
     });
 
+    document.getElementById('modalFooter').style.display = 'none';
     document.getElementById('modalSuccess').classList.add('show');
 }
 
 
 // ================================================================
-// PROFIT CALCULATOR
+// CALCULATOR
 // ================================================================
+let calcPlan = { name:'', rate:0, roi:0 };
+
+function populateCalculator() {
+    const dropdown = document.getElementById('calcDropdown');
+    if (!dropdown) return;
+    dropdown.innerHTML = allPlansCache.map(p =>
+        `<div class="calc-dropdown-item" onclick="selectCalcPlan('${escapeHtml(p.name||'')}',${p.daily_rate??0},${p.roi_multiplier??0})">
+            ${escapeHtml(p.name||'Plan')} <span>${p.daily_rate??0}% Daily</span>
+        </div>`
+    ).join('');
+}
 
 function toggleCalcDropdown() {
     document.getElementById('calcDropdown').classList.toggle('open');
@@ -407,76 +309,31 @@ function toggleCalcDropdown() {
 }
 
 function selectCalcPlan(name, rate, roi) {
-    calcPlan.name = name;
-    calcPlan.rate = rate;
-    calcPlan.roi  = roi;
-
-    document.getElementById('calcPlanLabel').textContent    = name;
-    document.getElementById('calcPlanLabel').style.color    = 'var(--color-dark)';
-
+    calcPlan = { name, rate, roi };
+    document.getElementById('calcPlanLabel').textContent = name;
     document.getElementById('calcDropdown').classList.remove('open');
     document.getElementById('calcChevron').classList.remove('open');
-
     calculateProfit();
     checkCalculatorReady();
 }
 
 function calculateProfit() {
-    const amountInput   = document.getElementById('calcAmount');
-    const profitDisplay = document.getElementById('calcProfit');
-    const amountDisplay = document.getElementById('calcAmountDisplay');
-    const error         = document.getElementById('calcError');
-    const amount        = parseFloat(amountInput.value);
-
-    amountDisplay.textContent = amountInput.value ? `$${formatNum(amount)}` : '$0.00';
-    error.textContent         = '';
-
-    if (!calcPlan.name || !amountInput.value) {
-        profitDisplay.textContent = '$0.00';
-        checkCalculatorReady();
-        return;
-    }
-
-    if (isNaN(amount) || amount <= 0) {
-        error.textContent         = 'Please enter a valid amount.';
-        profitDisplay.textContent = '$0.00';
-        return;
-    }
-
-    const profit          = amount * (calcPlan.rate / 100) * 30;  // daily_rate × 30 days
-    profitDisplay.textContent = `$${formatNum(profit)}`;
-
+    const amountInput = document.getElementById('calcAmount');
+    const profitEl    = document.getElementById('calcProfit');
+    const errorEl     = document.getElementById('calcError');
+    if (!profitEl||!errorEl) return;
+    const amount = parseFloat(amountInput.value);
+    errorEl.textContent = '';
+    if (!calcPlan.name||!amountInput.value) { profitEl.textContent='$0.00'; checkCalculatorReady(); return; }
+    if (isNaN(amount)||amount<=0) { errorEl.textContent='Please enter a valid amount.'; profitEl.textContent='$0.00'; return; }
+    profitEl.textContent = '$'+formatNum(amount*(calcPlan.rate/100)*30);
     checkCalculatorReady();
 }
 
 function checkCalculatorReady() {
-    const amount = parseFloat(document.getElementById('calcAmount').value);
-    document.getElementById('calculateBtn').disabled = !(calcPlan.name && amount > 0);
+    const amount = parseFloat(document.getElementById('calcAmount')?.value);
+    const btn = document.getElementById('calculateBtn');
+    if (btn) btn.disabled = !(calcPlan.name && amount > 0);
 }
 
-
-// ================================================================
-// ATTACH INVEST NOW BUTTONS
-// ================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadPlans();
-});
-
-
-// ================================================================
-// UTILITY FUNCTIONS
-// ================================================================
-
-function capitalise(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function formatNum(num) {
-    return Number(num).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-
-// ================================================================
+document.addEventListener('DOMContentLoaded', () => { loadPlans(); });

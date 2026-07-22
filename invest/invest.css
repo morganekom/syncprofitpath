@@ -1,317 +1,410 @@
-/* invest.css — Invest page styles
-   Follows the same variable system as style.css
-   Mobile first
+/* invest.css — Investment Plans Redesign
+   Mobile first. Uses platform variables from style.css
 */
 
-body {
-    grid-template-columns: 1fr;
-    overflow-x: hidden;
-}
-
-@media screen and (min-width: 1024px) {
-    body {
-        grid-template-columns: 17rem auto;
-    }
-}
+body { grid-template-columns: 1fr; }
+@media (min-width: 1024px) { body { grid-template-columns: 17rem auto; } }
 
 
-/* ========================= INVEST SECTION ========================= */
-.invest-section {
+/* ================================================================
+   PAGE WRAPPER
+   ================================================================ */
+.invest-page {
     margin-top: 6rem;
-    padding: 0 1rem 5rem;
-    overflow-x: hidden;
+    padding: 0 1rem 6rem;
 }
-
-@media screen and (min-width: 600px) {
-    .invest-section {
-        margin-top: 7rem;
-        margin-right: 0;
-        padding: 0 1rem 5rem;
-    }
-}
-
-@media screen and (min-width: 1024px) {
-    .invest-section {
-        margin-right: 2vw;
-        padding: 0 0 5rem;
-    }
-}
-
-.invest-section>h1 {
-    color: var(--color-dark);
-    margin-bottom: 2rem;
-}
+@media (min-width: 600px)  { .invest-page { margin-top: 7rem; padding: 0 1.5rem 6rem; } }
+@media (min-width: 1024px) { .invest-page { margin-right: 2vw; padding: 0 0 6rem; } }
 
 
-/* ========================= PLAN CARDS GRID ========================= */
-.plans-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 3.5rem;
-    align-items: start;
-}
-
-@media screen and (min-width: 600px) {
-    .plans-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media screen and (min-width: 1024px) {
-    .plans-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-.plan-card {
-    border-radius: var(--radius-3);
-    padding: var(--card-padding);
+/* ================================================================
+   BREADCRUMB
+   ================================================================ */
+.inv-breadcrumb {
     display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    transition: var(--transition);
-}
-
-.plan-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.12);
-}
-
-.plan-basic {
-    background: var(--color-primary);
-}
-
-.plan-standard {
-    background: var(--color-dark);
-}
-
-.plan-premium {
-    background: var(--color-purple);
-}
-
-.plan-card * {
-    color: #fff;
-}
-
-.plan-card_header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.6rem;
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+    margin-bottom: 1.6rem;
+    flex-wrap: wrap;
+}
+.inv-breadcrumb a { color: var(--color-gray-light); transition: var(--transition); }
+.inv-breadcrumb a:hover { color: var(--color-primary); }
+.inv-breadcrumb i { font-size: 1rem; }
+.inv-breadcrumb span { color: var(--color-dark); font-weight: 600; }
+
+
+/* ================================================================
+   HERO HEADER
+   ================================================================ */
+.inv-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
-.plan-card_indicator {
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.35);
+.inv-hero-left h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin-bottom: 0.5rem;
+}
+@media (min-width: 600px) { .inv-hero-left h1 { font-size: 2.8rem; } }
+
+.inv-hero-left h1 .inv-hero-icon { font-size: 2.4rem; }
+.inv-hero-left h1.crypto  .inv-hero-icon { color: #f7931a; }
+.inv-hero-left h1.stocks  .inv-hero-icon { color: var(--color-purple); }
+.inv-hero-left h1.realestate .inv-hero-icon { color: var(--color-primary); }
+
+.inv-hero-tagline {
+    font-size: 1.2rem;
+    color: var(--color-gray-light);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
 }
 
-.plan-badge {
-    display: inline-block;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius-2);
+.inv-hero-badges {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.inv-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0.4rem 1rem;
+    border-radius: 99px;
     font-size: 1rem;
     font-weight: 600;
-    width: fit-content;
+    background: var(--color-light);
+    color: var(--color-gray-dark);
 }
+.inv-hero-badge i { font-size: 1.2rem; }
+.inv-hero-badge.primary { background: rgba(0,226,123,0.12); color: var(--color-primary); }
+.inv-hero-badge.purple  { background: var(--color-purple-light); color: var(--color-purple); }
+.inv-hero-badge.warning { background: rgba(234,181,7,0.12); color: var(--color-warning); }
 
-.plan-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.plan-details p {
-    font-size: 1.3rem;
-}
-
-.plan-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    padding-bottom: 0.6rem;
-}
-
-.plan-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.invest-now-btn {
-    margin-top: 0.5rem;
-    padding: 1.1rem;
-    border-radius: var(--radius-2);
-    background: rgba(0, 0, 0, 0.2);
-    color: #fff;
-    font-size: 1.3rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
+.inv-return-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 1.4rem 2rem;
     text-align: center;
-    font-family: "Poppins", sans-serif;
+    border: 2px solid var(--color-light);
+    flex-shrink: 0;
+}
+.inv-return-card .inv-return-pct {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    display: block;
+}
+.inv-return-card small {
+    font-size: 1.05rem;
+    color: var(--color-gray-light);
 }
 
-.invest-now-btn:hover {
-    background: rgba(0, 0, 0, 0.35);
+
+/* ================================================================
+   MARKET INSIGHTS BAR
+   ================================================================ */
+.inv-insights {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 2rem var(--card-padding);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
 }
+@media (min-width: 600px) { .inv-insights { grid-template-columns: repeat(4, 1fr); } }
 
+.inv-insights h2 { font-size: 1.6rem; }
+@media (min-width: 600px) { .inv-insights h2 { font-size: 2rem; } }
 
-/* ========================= CALCULATOR ========================= */
-.calculator-section {
-    margin-top: 1rem;
+.inv-insight-val {
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 0.3rem;
 }
+.inv-insights p { font-size: 1.1rem; color: var(--color-gray-light); margin: 0; }
 
-.calculator-section>h2 {
+
+/* ================================================================
+   SECTION TITLE
+   ================================================================ */
+.inv-section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
     color: var(--color-dark);
     margin-bottom: 1.5rem;
 }
 
-.calculator-card {
+
+/* ================================================================
+   PLAN CARDS GRID
+   ================================================================ */
+.plans-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    align-items: start;
+}
+@media (min-width: 700px)  { .plans-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .plans-grid { grid-template-columns: repeat(3, 1fr); } }
+
+
+/* ================================================================
+   SKELETON
+   ================================================================ */
+@keyframes shimmer {
+    0%   { background-position: -60rem 0; }
+    100% { background-position:  60rem 0; }
+}
+.skeleton {
+    background: linear-gradient(90deg, var(--color-light) 25%, #e0dfe8 50%, var(--color-light) 75%);
+    background-size: 120rem 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-1);
+}
+.plans-loading { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 3rem; }
+@media (min-width: 700px)  { .plans-loading { grid-template-columns: repeat(2,1fr); } }
+@media (min-width: 1100px) { .plans-loading { grid-template-columns: repeat(3,1fr); } }
+.plan-skel { height: 42rem; border-radius: var(--radius-3); }
+
+
+/* ================================================================
+   PLAN CARD
+   ================================================================ */
+.inv-card {
     background: var(--color-white);
     border-radius: var(--radius-3);
-    padding: var(--card-padding);
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: 0 0.2rem 1rem rgba(0,0,0,0.06);
+}
+.inv-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.12);
+}
+
+/* ── Card header ── */
+.inv-card-header {
+    padding: 2rem 1.8rem 1.6rem;
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    max-width: 100%;
-}
-
-.calc-field {
-    background: var(--color-light);
-    border-radius: var(--radius-2);
-    padding: 1.4rem 1.6rem;
-    position: relative;
-}
-
-.calc-select {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    user-select: none;
-}
-
-.calc-select span {
-    font-size: 1.3rem;
-    color: var(--color-gray-dark);
-}
-
-.calc-chevron {
-    font-size: 1.6rem;
-    color: var(--color-gray-dark);
-    transition: transform 0.25s ease;
-}
-
-.calc-chevron.open {
-    transform: rotate(180deg);
-}
-
-.calc-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    left: 0;
-    right: 0;
-    background: var(--color-white);
-    border-radius: var(--radius-2);
-    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
-    z-index: 5;
-    overflow: hidden;
-}
-
-.calc-dropdown.open {
-    display: block;
-}
-
-.calc-dropdown-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.6rem;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: var(--color-dark);
-    transition: var(--transition);
-}
-
-.calc-dropdown-item:hover {
-    background: var(--color-light);
-    color: var(--color-primary);
-}
-
-.calc-dropdown-item span {
-    font-size: 1rem;
-    color: var(--color-gray-light);
-}
-
-.calc-label {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--color-dark);
-    margin-bottom: 0.6rem;
-}
-
-.calc-input-row {
-    display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.8rem;
 }
 
-.calc-currency {
-    font-size: 1.4rem;
-    color: var(--color-gray-dark);
-    font-weight: 600;
-}
+/* Asset colour themes */
+.inv-card-header--crypto      { background: #f7931a; }
+.inv-card-header--stocks      { background: var(--color-purple); }
+.inv-card-header--realestate  { background: var(--color-primary); }
 
-#calcAmountDisplay {
-    display: none;
-}
-
-.calc-input {
-    flex: 1;
-    background: transparent;
-    font-size: 1.3rem;
+.inv-badge-label {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 1rem;
     font-weight: 700;
+    padding: 0.3rem 1rem;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.inv-card-icon {
+    font-size: 3.2rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1;
+    font-weight: 700;
+}
+
+.inv-card-header-type {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+    margin: 0;
+}
+
+.inv-roi-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-2);
+    padding: 0.4rem 1rem;
+}
+.inv-roi-badge span {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+}
+.inv-roi-badge small {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+}
+
+
+/* ── Card body ── */
+.inv-card-body {
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.inv-card-name {
+    font-size: 1.6rem;
+    font-weight: 800;
     color: var(--color-dark);
-    font-family: "Poppins", sans-serif;
-    border: none;
-    outline: none;
+    margin: 0;
 }
 
-.calc-input::placeholder {
-    color: var(--color-gray-light);
+.inv-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--color-light);
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
+.inv-card-meta span { font-size: 1.3rem; font-weight: 700; color: var(--color-dark); }
+.inv-card-meta small { font-size: 1rem; font-weight: 400; color: var(--color-gray-light); }
+.inv-meta-duration { font-size: 1.1rem !important; font-weight: 400 !important; color: var(--color-gray-light) !important; text-align: right; }
+.inv-meta-duration strong { color: var(--color-dark); }
 
-.calc-value {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-    margin-left: auto;
-}
 
-.calc-profit-field {
+/* ── Detail rows ── */
+.inv-card-details { display: flex; flex-direction: column; gap: 0.8rem; }
+.inv-detail-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.profit-value {
-    color: var(--color-primary);
-}
-
-.calc-error {
     font-size: 1.1rem;
-    color: var(--color-danger);
-    min-height: 1.5rem;
-    padding-left: 0.4rem;
+    border-bottom: 1px solid var(--color-light);
+    padding-bottom: 0.6rem;
+}
+.inv-detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+.inv-detail-row span:first-child { color: var(--color-gray-light); }
+.inv-detail-row span:last-child  { color: var(--color-dark); font-weight: 600; }
+.inv-rate { color: var(--color-primary) !important; }
+
+
+/* ── Amount section ── */
+.inv-amount-section { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.inv-amount-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
 }
 
-.calculate-btn {
+.inv-amount-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1rem 1.4rem;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+.inv-amount-input-wrap:focus-within { border-color: var(--color-primary); }
+.inv-amount-input-wrap span { font-size: 1.4rem; font-weight: 600; color: var(--color-gray-dark); }
+
+.inv-amount-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    font-family: "Poppins", sans-serif;
+}
+
+/* ── Range slider ── */
+.inv-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 0.4rem;
+    border-radius: 99px;
+    background: var(--color-light);
+    outline: none;
+    cursor: pointer;
+}
+.inv-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 3px solid var(--color-white);
+    box-shadow: 0 0.2rem 0.6rem rgba(0,0,0,0.15);
+    transition: var(--transition);
+}
+.inv-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.inv-slider::-moz-range-thumb {
+    width: 1.8rem; height: 1.8rem; border-radius: 50%;
+    background: var(--color-primary); cursor: pointer;
+    border: 3px solid var(--color-white);
+}
+
+.inv-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    margin-top: -0.4rem;
+}
+
+
+/* ── Return preview ── */
+.inv-return-preview {
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.inv-return-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+}
+.inv-return-val {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+
+/* ── Invest button ── */
+.inv-btn {
+    width: 100%;
     padding: 1.4rem;
     border-radius: var(--radius-2);
     background: var(--color-primary);
@@ -322,433 +415,312 @@ body {
     cursor: pointer;
     transition: var(--transition);
     font-family: "Poppins", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
 }
+.inv-btn:hover { box-shadow: 0 0.8rem 1.5rem rgba(0,226,123,0.35); }
 
-.calculate-btn:hover:not(:disabled) {
-    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
+
+/* ── Empty state ── */
+.inv-empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 5rem 1rem;
+    color: var(--color-gray-light);
 }
-
-.calculate-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
+.inv-empty i { font-size: 4rem; display: block; margin-bottom: 1rem; opacity: 0.4; }
+.inv-empty p { font-size: 1.3rem; }
 
 
-/* ========================= INVEST MODAL ========================= */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 100;
-    place-items: center;
-    backdrop-filter: blur(3px);
-}
+/* ================================================================
+   WHY CHOOSE SECTION
+   ================================================================ */
+.inv-why { margin-bottom: 3rem; }
 
-.modal-overlay.open {
+.inv-why-grid {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
 }
+@media (min-width: 600px) { .inv-why-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.inv-why-card {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    transition: var(--transition);
+}
+@media (min-width: 600px) { .inv-why-card { flex-direction: column; } }
+
+.inv-why-card:hover { transform: translateY(-2px); box-shadow: 0 0.6rem 2rem rgba(0,0,0,0.07); }
+
+.inv-why-icon {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: var(--radius-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.inv-why-icon i { font-size: 2rem; }
+
+.inv-why-card h4 { font-size: 1.3rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.4rem; }
+.inv-why-card p  { font-size: 1.1rem; color: var(--color-gray-light); line-height: 1.6; }
+
+
+/* ================================================================
+   PORTFOLIO SECTION
+   ================================================================ */
+.inv-portfolio { margin-bottom: 3rem; }
+
+.inv-portfolio-inner {
+    background: var(--color-white);
+    border-radius: var(--radius-3);
+    padding: 2.5rem var(--card-padding);
+    text-align: center;
+}
+.inv-portfolio-inner h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 2rem;
+}
+
+.inv-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+@media (min-width: 600px) { .inv-portfolio-grid { grid-template-columns: repeat(6, 1fr); } }
+
+.inv-portfolio-item { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+
+.inv-portfolio-icon {
+    width: 5rem;
+    height: 5rem;
+    border-radius: var(--radius-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+}
+.inv-portfolio-item span { font-size: 1.1rem; color: var(--color-gray-dark); font-weight: 600; }
+
+
+/* ================================================================
+   RISK / INFO NOTICE
+   ================================================================ */
+.inv-notice {
+    background: rgba(234,181,7,0.1);
+    border: 1px solid rgba(234,181,7,0.3);
+    border-radius: var(--radius-3);
+    padding: var(--card-padding);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+.inv-notice i { font-size: 2rem; color: var(--color-warning); flex-shrink: 0; margin-top: 0.2rem; }
+.inv-notice p { font-size: 1.1rem; color: var(--color-gray-light); line-height: 1.7; margin: 0; }
+.inv-notice strong { color: var(--color-dark); }
+
+
+/* ================================================================
+   SIDEBAR DROPDOWN
+   ================================================================ */
+.sidebar-dropdown { display: flex; flex-direction: column; width: 100%; }
+
+.sidebar-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-2);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+    text-align: left;
+}
+.sidebar-dropdown-btn:hover { background: var(--color-primary); color: var(--color-dark); }
+.sidebar-dropdown-btn.active { background: var(--color-primary); color: var(--color-dark); }
+
+.sidebar-dropdown-btn i:first-child { font-size: 1.6rem; }
+.sidebar-dropdown-arrow { margin-left: auto; font-size: 1.4rem; transition: transform 0.3s ease; }
+.sidebar-dropdown-btn.open .sidebar-dropdown-arrow { transform: rotate(180deg); }
+
+.sidebar-dropdown-items {
+    display: none;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-left: 3.2rem;
+    padding-top: 0.3rem;
+}
+.sidebar-dropdown-items.open { display: flex; }
+
+.sidebar-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-1);
+    font-size: 1.1rem;
+    color: var(--color-gray-light);
+    transition: var(--transition);
+    text-decoration: none;
+}
+.sidebar-dropdown-item:hover { color: var(--color-primary); background: rgba(0,226,123,0.07); }
+.sidebar-dropdown-item.active { color: var(--color-primary); font-weight: 600; }
+.sidebar-dropdown-item i { font-size: 1.3rem; }
+
+
+/* ================================================================
+   INVEST MODAL — updated (no coin selector)
+   ================================================================ */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 100;
+    place-items: center; backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: grid; }
 
 .modal {
     background: var(--color-white);
     border-radius: var(--radius-3);
-    width: 100%;
-    max-width: 100%;
-    margin: 0 1rem;
+    width: 100%; max-width: 100%; margin: 0 1rem;
     padding: var(--card-padding);
-    display: flex;
-    flex-direction: column;
-    gap: 1.4rem;
+    display: flex; flex-direction: column; gap: 1.4rem;
     animation: slideUp 250ms ease;
+    max-height: 90vh; overflow-y: auto;
 }
-
-@media screen and (min-width: 600px) {
-    .modal {
-        max-width: 44rem;
-        margin: 0;
-    }
-}
-
-.modal-footer {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-}
-
-@media screen and (min-width: 600px) {
-    .modal-footer {
-        flex-direction: row;
-    }
-}
+@media (min-width: 600px) { .modal { max-width: 44rem; margin: 0; } }
 
 @keyframes slideUp {
-    from {
-        transform: translateY(2rem);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(2rem); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
+.modal-header { display: flex; justify-content: space-between; align-items: center; }
+.modal-subtitle { color: var(--color-gray-light); font-size: 1.1rem; margin-top: -0.5rem; }
 .modal-close-btn {
-    background: var(--color-light);
-    border: none;
-    border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    color: var(--color-dark);
-    cursor: pointer;
-    transition: var(--transition);
+    background: var(--color-light); border: none; border-radius: 50%;
+    width: 3rem; height: 3rem; display: flex; align-items: center;
+    justify-content: center; font-size: 1.4rem; color: var(--color-dark);
+    cursor: pointer; transition: var(--transition);
 }
+.modal-close-btn:hover { background: var(--color-danger-light); color: var(--color-danger); }
 
-.modal-close-btn:hover {
-    background: var(--color-danger-light);
-    color: var(--color-danger);
-}
-
-.modal-subtitle {
-    color: var(--color-gray-light);
-    font-size: 1.1rem;
-    margin-top: -0.5rem;
-}
-
-/* ── COIN SELECTOR ── */
-.modal-coin-section {
-    background: var(--color-light);
-    border-radius: var(--radius-2);
-    padding: 1.2rem 1.4rem;
-}
-
-.modal-coin-label {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-    margin-bottom: 1rem;
-}
-
-.modal-coin-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.6rem;
-}
-
-.modal-coin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    background: none;
-    border: 2px solid transparent;
-    border-radius: var(--radius-2);
-    padding: 0.6rem 0.4rem;
-    cursor: pointer;
-    transition: var(--transition);
-    flex: 1;
-}
-
-.modal-coin:hover {
-    background: var(--color-white);
-}
-
-.modal-coin.selected {
-    border-color: var(--color-primary);
-    background: var(--color-white);
-}
-
-.modal-coin-icon {
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 700;
-}
-
-@media screen and (min-width: 600px) {
-    .modal-coin-icon {
-        width: 3.2rem;
-        height: 3.2rem;
-        font-size: 1.5rem;
-    }
-}
-
-.modal-coin small {
-    font-size: 1rem;
-    color: var(--color-gray-dark);
-    font-weight: 600;
-}
-
-.modal-coin.selected small {
-    color: var(--color-primary);
-}
-
-.modal-coin-hint {
-    font-size: 1rem;
-    color: var(--color-gray-light);
-    margin-top: 0.8rem;
-    text-align: center;
-}
-
-.modal-coin-hint.coin-chosen {
-    color: var(--color-success);
-}
-
-.modal-field label {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-    margin-bottom: 0.8rem;
-}
-
+.modal-field label { display: block; font-size: 1.1rem; font-weight: 600; color: var(--color-gray-dark); margin-bottom: 0.8rem; }
 .modal-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    background: var(--color-light); border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem; border: 2px solid transparent; transition: var(--transition);
+}
+.modal-input-wrapper:focus-within { border-color: var(--color-primary); }
+.modal-input-wrapper span { font-size: 1.6rem; font-weight: 600; color: var(--color-gray-dark); }
+.modal-input {
+    flex: 1; background: transparent; font-size: 1.5rem; font-weight: 600;
+    color: var(--color-dark); font-family: "Poppins", sans-serif; border: none; outline: none;
+}
+.modal-range-hint { font-size: 1rem; color: var(--color-gray-light); margin-top: 0.5rem; }
+.modal-error { font-size: 1.1rem; color: var(--color-danger); min-height: 1.4rem; }
+
+/* Modal return preview */
+.modal-return-preview {
     background: var(--color-light);
     border-radius: var(--radius-2);
-    padding: 1.2rem 1.4rem;
-    border: 2px solid transparent;
-    transition: var(--transition);
+    padding: 1rem 1.4rem;
+    display: flex; flex-direction: column; gap: 0.4rem;
 }
-
-.modal-input-wrapper.locked {
-    opacity: 0.45;
-    cursor: not-allowed;
+.modal-return-row {
+    display: flex; justify-content: space-between;
+    font-size: 1.1rem; color: var(--color-gray-light);
 }
-
-.modal-input-wrapper:not(.locked):focus-within {
-    border-color: var(--color-primary);
-}
-
-.modal-input-wrapper span {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-}
-
-.modal-input {
-    flex: 1;
-    background: transparent;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-dark);
-    font-family: "Poppins", sans-serif;
-    border: none;
-    outline: none;
-}
-
-.modal-input:disabled {
-    cursor: not-allowed;
-}
-
-.modal-range-hint {
-    font-size: 1rem;
-    color: var(--color-gray-light);
-    margin-top: 0.6rem;
-}
-
-.modal-error {
-    font-size: 1.1rem;
-    color: var(--color-danger);
-    margin-top: 0.5rem;
-    min-height: 1.5rem;
-}
+.modal-return-row span:last-child { font-weight: 700; color: var(--color-primary); }
 
 .modal-success {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 1rem;
-    padding: 1.5rem 0;
+    display: none; flex-direction: column; align-items: center;
+    text-align: center; gap: 1rem; padding: 1.5rem 0;
 }
+.modal-success.show { display: flex; }
+.modal-success-icon { font-size: 4rem; color: var(--color-primary); }
+.modal-success h3 { color: var(--color-dark); }
+.modal-success p  { color: var(--color-gray-light); font-size: 1.1rem; }
 
-.modal-success.show {
-    display: flex;
-}
-
-.modal-success-icon {
-    font-size: 4rem;
-    color: var(--color-primary);
-    line-height: 1;
-}
-
-.modal-success h3 {
-    color: var(--color-dark);
-}
-
-.modal-success p {
-    color: var(--color-gray-light);
-    font-size: 1.1rem;
-}
+.modal-footer { display: flex; gap: 1rem; flex-direction: column; }
+@media (min-width: 600px) { .modal-footer { flex-direction: row; } }
 
 .modal-cancel-btn {
-    flex: 1;
-    padding: 1.2rem;
-    border-radius: var(--radius-2);
-    background: var(--color-light);
-    color: var(--color-dark);
-    font-size: 1.2rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-    font-family: "Poppins", sans-serif;
+    flex: 1; padding: 1.2rem; border-radius: var(--radius-2);
+    background: var(--color-light); color: var(--color-dark);
+    font-size: 1.2rem; font-weight: 600; border: none; cursor: pointer;
+    transition: var(--transition); font-family: "Poppins", sans-serif;
 }
-
-.modal-cancel-btn:hover {
-    background: var(--color-danger-light);
-    color: var(--color-danger);
-}
+.modal-cancel-btn:hover { background: var(--color-danger-light); color: var(--color-danger); }
 
 .modal-confirm-btn {
-    flex: 2;
-    padding: 1.2rem;
-    border-radius: var(--radius-2);
-    background: var(--color-primary);
-    color: var(--color-dark);
-    font-size: 1.2rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-    font-family: "Poppins", sans-serif;
+    flex: 2; padding: 1.2rem; border-radius: var(--radius-2);
+    background: var(--color-primary); color: var(--color-dark);
+    font-size: 1.2rem; font-weight: 700; border: none; cursor: pointer;
+    transition: var(--transition); font-family: "Poppins", sans-serif;
 }
-
-.modal-confirm-btn:hover:not(:disabled) {
-    box-shadow: 0 0.8rem 1.5rem rgba(0, 226, 123, 0.35);
-}
-
-.modal-confirm-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-
-/* ========================= LOADING SKELETONS ========================= */
-@keyframes shimmer {
-    0% {
-        background-position: -60rem 0;
-    }
-
-    100% {
-        background-position: 60rem 0;
-    }
-}
-
-.skeleton {
-    background: linear-gradient(90deg, var(--color-light) 25%, #e0dfe8 50%, var(--color-light) 75%);
-    background-size: 120rem 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: var(--radius-1);
-}
+.modal-confirm-btn:hover:not(:disabled) { box-shadow: 0 0.8rem 1.5rem rgba(0,226,123,0.35); }
+.modal-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 
 /* ================================================================
-   ACTIVE INVESTMENTS SECTION
+   CALCULATOR
    ================================================================ */
-
-/* ========================= PLANS LOADING SKELETON ========================= */
-.plans-loading {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 3.5rem;
+.calculator-section { margin-top: 1rem; margin-bottom: 3rem; }
+.calculator-section h2 { color: var(--color-dark); margin-bottom: 1.5rem; font-size: 1.6rem; }
+.calculator-card {
+    background: var(--color-white); border-radius: var(--radius-3);
+    padding: var(--card-padding); display: flex; flex-direction: column; gap: 1rem;
 }
-
-@media screen and (min-width: 600px) {
-    .plans-loading {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.calc-field { background: var(--color-light); border-radius: var(--radius-2); padding: 1.4rem 1.6rem; position: relative; }
+.calc-select { display: flex; align-items: center; gap: 1rem; cursor: pointer; user-select: none; }
+.calc-select span { font-size: 1.3rem; color: var(--color-gray-dark); }
+.calc-chevron { font-size: 1.6rem; color: var(--color-gray-dark); transition: transform 0.25s ease; }
+.calc-chevron.open { transform: rotate(180deg); }
+.calc-dropdown {
+    display: none; position: absolute; top: calc(100% + 0.5rem); left: 0; right: 0;
+    background: var(--color-white); border-radius: var(--radius-2);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,0.1); z-index: 5; overflow: hidden;
 }
-
-@media screen and (min-width: 1024px) {
-    .plans-loading {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.calc-dropdown.open { display: block; }
+.calc-dropdown-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 1.6rem; cursor: pointer; font-size: 1.2rem; color: var(--color-dark); transition: var(--transition);
 }
-
-.plan-skel {
-    height: 28rem;
-    border-radius: var(--radius-3);
+.calc-dropdown-item:hover { background: var(--color-light); color: var(--color-primary); }
+.calc-dropdown-item span { font-size: 1rem; color: var(--color-gray-light); }
+.calc-label { display: block; font-size: 1.2rem; font-weight: 600; color: var(--color-dark); margin-bottom: 0.6rem; }
+.calc-input-row { display: flex; align-items: center; gap: 0.8rem; }
+.calc-currency { font-size: 1.4rem; color: var(--color-gray-dark); font-weight: 600; }
+.calc-input {
+    flex: 1; background: transparent; font-size: 1.3rem; font-weight: 700;
+    color: var(--color-dark); font-family: "Poppins", sans-serif; border: none; outline: none;
 }
-
-
-/* ========================= ASSET CLASS TABS ========================= */
-.asset-tabs {
-    display: flex;
-    gap: 0.5rem;
-    background: var(--color-white);
-    border-radius: var(--radius-3);
-    padding: 0.5rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
+.calc-profit-field { display: flex; justify-content: space-between; align-items: center; }
+.calc-value { font-size: 1.3rem; font-weight: 600; color: var(--color-gray-dark); margin-left: auto; }
+.profit-value { color: var(--color-primary) !important; }
+.calc-error { font-size: 1.1rem; color: var(--color-danger); min-height: 1.5rem; padding-left: 0.4rem; }
+.calculate-btn {
+    padding: 1.4rem; border-radius: var(--radius-2); background: var(--color-primary);
+    color: var(--color-dark); font-size: 1.2rem; font-weight: 700; border: none;
+    cursor: pointer; transition: var(--transition); font-family: "Poppins", sans-serif;
 }
-
-.asset-tab {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.4rem;
-    border-radius: var(--radius-2);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-gray-dark);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-    font-family: "Poppins", sans-serif;
-    white-space: nowrap;
-}
-
-.asset-tab i { font-size: 1.4rem; }
-
-.asset-tab:hover {
-    background: var(--color-light);
-    color: var(--color-dark);
-}
-
-.asset-tab.active {
-    background: var(--color-primary);
-    color: var(--color-dark);
-}
-
-@media screen and (max-width: 480px) {
-    .asset-tab span { display: none; }
-    .asset-tab { padding: 0.8rem 1rem; }
-}
-
-
-/* ========================= ASSET CLASS BADGE ON PLAN CARD ========================= */
-.plan-asset-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: rgba(255,255,255,0.15);
-    border-radius: var(--radius-1);
-    padding: 0.3rem 0.8rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-    width: fit-content;
-    margin-top: -0.6rem;
-}
-
-.plan-asset-badge i { font-size: 1.2rem; }
+.calculate-btn:hover:not(:disabled) { box-shadow: 0 0.8rem 1.5rem rgba(0,226,123,0.35); }
+.calculate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
