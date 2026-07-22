@@ -504,7 +504,7 @@
 
 /* ========================= PLACE A TRADE ========================= */
 .dash-place-trade {
-    background: var(--color-dark);
+    background: var(--color-white);
 }
 
 .dash-place-trade .dash-panel-header h2 {
