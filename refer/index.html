@@ -73,10 +73,18 @@
             <i class="uil uil-arrow-circle-down"></i>
             <h5>Deposit</h5>
         </a>
-        <a href="../invest/">
+        <div class="sidebar-dropdown">
+        <button class="sidebar-dropdown-btn" onclick="toggleInvestDropdown(this)">
             <i class="uil uil-diamond"></i>
-            <h5>Invest</h5>
-        </a>
+            <h5>Investment Plans</h5>
+            <i class="uil uil-angle-down sidebar-dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-dropdown-items">
+            <a href="../invest/crypto/" class="sidebar-dropdown-item"><i class="uil uil-bitcoin-circle"></i> Crypto</a>
+            <a href="../invest/stocks/" class="sidebar-dropdown-item"><i class="uil uil-chart-line"></i> Stocks</a>
+            <a href="../invest/real-estate/" class="sidebar-dropdown-item"><i class="uil uil-home-alt"></i> Real Estate</a>
+        </div>
+    </div>
         <a href="../withdraw/">
             <i class="uil uil-arrow-circle-up"></i>
             <h5>Withdraw</h5>
