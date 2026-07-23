@@ -344,6 +344,93 @@
             ════════════════════════════════════════════════════ -->
             <div class="settings-tab-panel" id="tab-landing">
 
+                <!-- HERO SECTION -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-star"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Hero Section</h2>
+                            <p class="settings-section-desc">The headline, subtext, buttons, and stats shown at the top of the landing page.</p>
+                        </div>
+                    </div>
+                    <div class="settings-form-grid">
+                        <div class="settings-field" style="grid-column: 1 / -1;">
+                            <label class="settings-label">Eyebrow Text</label>
+                            <input type="text" id="heroEyebrowInput" class="settings-input" placeholder="Live investments · Daily payouts">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Headline — Before Highlight</label>
+                            <input type="text" id="heroHeadlineBeforeInput" class="settings-input" placeholder="Grow Your Wealth with">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Headline — Highlighted Words</label>
+                            <input type="text" id="heroHeadlineHighlightInput" class="settings-input" placeholder="Smart Crypto">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Headline — After Highlight</label>
+                            <input type="text" id="heroHeadlineAfterInput" class="settings-input" placeholder="Investing">
+                        </div>
+                        <div class="settings-field" style="grid-column: 1 / -1;">
+                            <label class="settings-label">Subheadline</label>
+                            <input type="text" id="heroSubInput" class="settings-input" placeholder="SyncProfitPath gives you access to structured investment plans…">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Primary Button Text</label>
+                            <input type="text" id="heroPrimaryBtnInput" class="settings-input" placeholder="Start Earning">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Secondary Button Text</label>
+                            <input type="text" id="heroSecondaryBtnInput" class="settings-input" placeholder="View Plans">
+                        </div>
+                    </div>
+
+                    <p class="settings-label" style="margin: 1.6rem 0 0.8rem;">Stats Bar</p>
+                    <div class="settings-form-grid">
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 1 Value</label>
+                            <input type="text" id="heroStat1ValueInput" class="settings-input" placeholder="$12M+">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 1 Label</label>
+                            <input type="text" id="heroStat1LabelInput" class="settings-input" placeholder="Total Invested">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 2 Value</label>
+                            <input type="text" id="heroStat2ValueInput" class="settings-input" placeholder="4,800+">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 2 Label</label>
+                            <input type="text" id="heroStat2LabelInput" class="settings-input" placeholder="Active Investors">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 3 Value</label>
+                            <input type="text" id="heroStat3ValueInput" class="settings-input" placeholder="Daily">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 3 Label</label>
+                            <input type="text" id="heroStat3LabelInput" class="settings-input" placeholder="Profit Payouts">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 4 Value</label>
+                            <input type="text" id="heroStat4ValueInput" class="settings-input" placeholder="99.9%">
+                        </div>
+                        <div class="settings-field">
+                            <label class="settings-label">Stat 4 Label</label>
+                            <input type="text" id="heroStat4LabelInput" class="settings-input" placeholder="Uptime">
+                        </div>
+                    </div>
+
+                    <div class="settings-save-row">
+                        <p class="settings-feedback" id="heroFeedback"></p>
+                        <button class="settings-save-btn settings-save-btn--idle" id="heroSaveBtn" onclick="saveSection('hero')">
+                            <i class="uil uil-check-circle"></i> Saved
+                        </button>
+                    </div>
+                </div>
+
+
                 <!-- FAQ -->
                 <div class="settings-section">
                     <div class="settings-section-header">

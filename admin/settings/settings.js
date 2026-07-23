@@ -22,6 +22,7 @@ let activeFaq          = null;
 let pendingDeleteFaqId = null;
 
 let landingFooter = null;
+let landingHero   = null;
 
 
 // ================================================================
@@ -50,7 +51,7 @@ async function loadSettings() {
     if (refreshBtn) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
 
     try {
-        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings(), loadTestimonials()]);
+        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings(), loadHeroSettings(), loadTestimonials()]);
         contentEl.style.display = 'block';
     } catch (err) {
         console.error('loadSettings error:', err.message);
@@ -128,7 +129,7 @@ function populateDepositLockedView(s) {
 // Btn starts as color-light / "Saved", turns primary / "Save" on input
 // ================================================================
 
-const DIRTY_SECTIONS = ['withdrawal', 'referral', 'email', 'footer'];
+const DIRTY_SECTIONS = ['withdrawal', 'referral', 'email', 'footer', 'hero'];
 
 function bindDirtyListeners() {
     // Withdrawal inputs
@@ -142,6 +143,15 @@ function bindDirtyListeners() {
     // Email inputs
     ['emailFromName', 'emailSupport'].forEach(id => {
         document.getElementById(id)?.addEventListener('input', () => markDirty('email'));
+    });
+    // Hero inputs
+    [
+        'heroEyebrowInput', 'heroHeadlineBeforeInput', 'heroHeadlineHighlightInput', 'heroHeadlineAfterInput',
+        'heroSubInput', 'heroPrimaryBtnInput', 'heroSecondaryBtnInput',
+        'heroStat1ValueInput', 'heroStat1LabelInput', 'heroStat2ValueInput', 'heroStat2LabelInput',
+        'heroStat3ValueInput', 'heroStat3LabelInput', 'heroStat4ValueInput', 'heroStat4LabelInput',
+    ].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => markDirty('hero'));
     });
     // Footer inputs
     [
@@ -216,6 +226,26 @@ async function saveSection(section) {
             };
             break;
 
+        case 'hero':
+            payload = {
+                eyebrow_text:        document.getElementById('heroEyebrowInput').value.trim()          || null,
+                headline_before:     document.getElementById('heroHeadlineBeforeInput').value.trim()   || null,
+                headline_highlight:  document.getElementById('heroHeadlineHighlightInput').value.trim() || null,
+                headline_after:      document.getElementById('heroHeadlineAfterInput').value.trim()    || null,
+                subheadline_text:    document.getElementById('heroSubInput').value.trim()               || null,
+                primary_btn_text:    document.getElementById('heroPrimaryBtnInput').value.trim()        || null,
+                secondary_btn_text:  document.getElementById('heroSecondaryBtnInput').value.trim()      || null,
+                stat1_value:         document.getElementById('heroStat1ValueInput').value.trim()        || null,
+                stat1_label:         document.getElementById('heroStat1LabelInput').value.trim()        || null,
+                stat2_value:         document.getElementById('heroStat2ValueInput').value.trim()        || null,
+                stat2_label:         document.getElementById('heroStat2LabelInput').value.trim()        || null,
+                stat3_value:         document.getElementById('heroStat3ValueInput').value.trim()        || null,
+                stat3_label:         document.getElementById('heroStat3LabelInput').value.trim()        || null,
+                stat4_value:         document.getElementById('heroStat4ValueInput').value.trim()        || null,
+                stat4_label:         document.getElementById('heroStat4LabelInput').value.trim()        || null,
+            };
+            break;
+
         case 'footer':
             payload = {
                 brand_tagline:        document.getElementById('footerTaglineInput').value.trim()    || null,
@@ -235,7 +265,7 @@ async function saveSection(section) {
     payload.updated_at = new Date().toISOString();
 
     try {
-        const table = section === 'footer' ? 'landing_footer' : 'site_settings';
+        const table = section === 'footer' ? 'landing_footer' : section === 'hero' ? 'landing_hero' : 'site_settings';
 
         const { error } = await db
             .from(table)
@@ -246,6 +276,8 @@ async function saveSection(section) {
 
         if (section === 'footer') {
             landingFooter = { ...landingFooter, ...payload };
+        } else if (section === 'hero') {
+            landingHero = { ...landingHero, ...payload };
         } else {
             siteSettings = { ...siteSettings, ...payload };
         }
@@ -1055,6 +1087,46 @@ async function saveFaqOrder() {
 
     saveBtn.disabled  = false;
     saveBtn.innerHTML = '<i class="uil uil-check"></i> Save Order';
+}
+
+
+// ================================================================
+// LANDING PAGE HERO — LOAD & POPULATE
+// ================================================================
+
+async function loadHeroSettings() {
+    const { data, error } = await db
+        .from('landing_hero')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+    if (error) {
+        console.error('Load hero settings error:', error.message);
+        return;
+    }
+
+    landingHero = data;
+    populateHeroSettings(data);
+}
+
+function populateHeroSettings(h) {
+    document.getElementById('heroEyebrowInput').value          = h.eyebrow_text       ?? '';
+    document.getElementById('heroHeadlineBeforeInput').value    = h.headline_before    ?? '';
+    document.getElementById('heroHeadlineHighlightInput').value = h.headline_highlight ?? '';
+    document.getElementById('heroHeadlineAfterInput').value     = h.headline_after     ?? '';
+    document.getElementById('heroSubInput').value                = h.subheadline_text   ?? '';
+    document.getElementById('heroPrimaryBtnInput').value         = h.primary_btn_text   ?? '';
+    document.getElementById('heroSecondaryBtnInput').value       = h.secondary_btn_text ?? '';
+    document.getElementById('heroStat1ValueInput').value         = h.stat1_value ?? '';
+    document.getElementById('heroStat1LabelInput').value         = h.stat1_label ?? '';
+    document.getElementById('heroStat2ValueInput').value         = h.stat2_value ?? '';
+    document.getElementById('heroStat2LabelInput').value         = h.stat2_label ?? '';
+    document.getElementById('heroStat3ValueInput').value         = h.stat3_value ?? '';
+    document.getElementById('heroStat3LabelInput').value         = h.stat3_label ?? '';
+    document.getElementById('heroStat4ValueInput').value         = h.stat4_value ?? '';
+    document.getElementById('heroStat4LabelInput').value         = h.stat4_label ?? '';
+    resetDirty('hero');
 }
 
 
