@@ -16,6 +16,14 @@
             if (isDark) document.documentElement.classList.add('dark-theme');
         })();
     </script>
+    <style>
+        /* Anti-FOUC: applied instantly before external CSS loads */
+        html { background: #f0eff5; }
+        html.dark-theme { background: #0d242c; }
+        @media (min-width: 1024px) {
+            body { display: grid; grid-template-columns: 17rem auto; }
+        }
+    </style>
 </head>
 <body>
 
