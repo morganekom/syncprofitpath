@@ -459,7 +459,7 @@ nav {
 }
 
 .sidebar-dropdown-btn h5 {
-    font-size: inherit;
+    font-size: 1rem;
     font-weight: 500;
     color: inherit;
     white-space: nowrap;
@@ -505,7 +505,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 4vw 1.5rem 2vw;
+    padding: 1.5rem 4vw 1.5rem calc(2vw + 1.5rem);
     font-weight: 500;
     color: var(--color-gray-dark);
     text-decoration: none;
@@ -528,6 +528,8 @@ nav {
 .sidebar-dropdown-item.active {
     background: var(--color-white);
     color: var(--color-primary);
+    border-left: none;
+    padding-left: calc(2vw + 1.5rem);
 }
 
 .sidebar_close-btn {
