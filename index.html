@@ -2,6 +2,24 @@
 <html lang="en">
 
 <head>
+    <!-- THIS GOES FIRST — matches the dashboard/app pages so theme is consistent site-wide -->
+    <script>
+        (function () {
+            var pref  = localStorage.getItem('themePreference');
+            var saved = localStorage.getItem('currrentTheme');
+            var isDark;
+            if (pref === 'dark')       isDark = true;
+            else if (pref === 'light') isDark = false;
+            else if (pref === 'system') isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            else if (saved === 'dark-theme') isDark = true;
+            else if (saved === '')           isDark = false;
+            else isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark-theme');
+                if (document.body) document.body.classList.add('dark-theme');
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SyncProfitPath</title>
@@ -57,20 +75,20 @@
         <div class="land-container land-hero__inner">
             <div class="land-hero__text">
                 <span class="land-hero__eyebrow">
-                    <i class="uil uil-chart-line"></i> Live investments · Daily payouts
+                    <i class="uil uil-chart-line"></i> <span id="heroEyebrow">Live investments · Daily payouts</span>
                 </span>
                 <h1 class="land-hero__headline">
-                    Grow Your Wealth with <span class="land-highlight">Smart Crypto</span> Investing
+                    <span id="heroHeadlineBefore">Grow Your Wealth with</span> <span class="land-highlight" id="heroHeadlineHighlight">Smart Crypto</span> <span id="heroHeadlineAfter">Investing</span>
                 </h1>
-                <p class="land-hero__sub">
+                <p class="land-hero__sub" id="heroSub">
                     SyncProfitPath gives you access to structured investment plans that generate daily returns — starting from just $100. No experience needed.
                 </p>
                 <div class="land-hero__actions">
                     <a href="./auth/signup/" class="land-btn land-btn--primary land-btn--lg">
-                        Start Earning <i class="uil uil-arrow-right"></i>
+                        <span id="heroPrimaryBtn">Start Earning</span> <i class="uil uil-arrow-right"></i>
                     </a>
                     <a href="#plans" class="land-btn land-btn--outline land-btn--lg">
-                        View Plans
+                        <span id="heroSecondaryBtn">View Plans</span>
                     </a>
                 </div>
                 <div class="land-hero__trust">
@@ -116,17 +134,14 @@
                         <div class="hero-plan-item">
                             <span class="hero-plan-dot" style="background:#00e27b"></span>
                             <span>Basic</span>
-                            <strong>+1.5%/day</strong>
                         </div>
                         <div class="hero-plan-item">
                             <span class="hero-plan-dot" style="background:rgb(160,99,245)"></span>
                             <span>Standard</span>
-                            <strong>+3%/day</strong>
                         </div>
                         <div class="hero-plan-item">
                             <span class="hero-plan-dot" style="background:rgb(234,181,7)"></span>
                             <span>Premium</span>
-                            <strong>+5%/day</strong>
                         </div>
                     </div>
                 </div>
@@ -151,23 +166,23 @@
         <div class="land-hero__stats">
             <div class="land-container land-hero__stats-inner">
                 <div class="hero-stat">
-                    <h3>$12M+</h3>
-                    <p>Total Invested</p>
+                    <h3 id="heroStat1Value">$12M+</h3>
+                    <p id="heroStat1Label">Total Invested</p>
                 </div>
                 <div class="hero-stat-divider"></div>
                 <div class="hero-stat">
-                    <h3>4,800+</h3>
-                    <p>Active Investors</p>
+                    <h3 id="heroStat2Value">4,800+</h3>
+                    <p id="heroStat2Label">Active Investors</p>
                 </div>
                 <div class="hero-stat-divider"></div>
                 <div class="hero-stat">
-                    <h3>Daily</h3>
-                    <p>Profit Payouts</p>
+                    <h3 id="heroStat3Value">Daily</h3>
+                    <p id="heroStat3Label">Profit Payouts</p>
                 </div>
                 <div class="hero-stat-divider"></div>
                 <div class="hero-stat">
-                    <h3>99.9%</h3>
-                    <p>Uptime</p>
+                    <h3 id="heroStat4Value">99.9%</h3>
+                    <p id="heroStat4Label">Uptime</p>
                 </div>
             </div>
         </div>

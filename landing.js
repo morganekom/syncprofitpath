@@ -111,14 +111,79 @@ function formatLandNum(num) {
     });
 }
 
+// ========================= THEME SYNC =========================
+// Landing page has no toggle UI of its own, but should match the
+// app pages: respect a stored preference (shared via localStorage
+// across the whole site) or fall back to the OS setting, and follow
+// live OS changes while the page is open.
+const LAND_THEME_KEY      = 'currrentTheme';
+const LAND_THEME_PREF_KEY = 'themePreference';
+const landSystemDark      = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyLandTheme(isDark) {
+    document.documentElement.classList.toggle('dark-theme', isDark);
+    document.body.classList.toggle('dark-theme', isDark);
+    document.dispatchEvent(new Event('themechange'));
+}
+
+function resolveLandTheme() {
+    const pref = localStorage.getItem(LAND_THEME_PREF_KEY);
+    if (pref === 'dark')   return true;
+    if (pref === 'light')  return false;
+    if (pref === 'system') return landSystemDark.matches;
+    const saved = localStorage.getItem(LAND_THEME_KEY);
+    if (saved === 'dark-theme') return true;
+    if (saved === '')           return false;
+    return landSystemDark.matches;
+}
+
+applyLandTheme(resolveLandTheme());
+
+landSystemDark.addEventListener('change', e => {
+    const pref  = localStorage.getItem(LAND_THEME_PREF_KEY);
+    const saved = localStorage.getItem(LAND_THEME_KEY);
+    if (pref === 'system' || (pref === null && saved === null)) {
+        applyLandTheme(e.matches);
+    }
+});
+
+
 document.addEventListener('DOMContentLoaded', loadLandingPlans);
 document.addEventListener('DOMContentLoaded', loadLandingFaqs);
 document.addEventListener('DOMContentLoaded', loadLandingFooter);
+document.addEventListener('DOMContentLoaded', loadLandingHero);
 
 
 // ── LOAD FOOTER CONTENT FROM SUPABASE ──
 // Updates tagline, social links, support links, copyright and disclaimer text.
 // Static HTML values remain as fallback if the row is missing or a field is empty.
+async function loadLandingHero() {
+    try {
+        const { data, error } = await db
+            .from('landing_hero')
+            .select('*')
+            .eq('id', 1)
+            .single();
+
+        if (error || !data) return;
+
+        setLandText('heroEyebrow',          data.eyebrow_text);
+        setLandText('heroHeadlineBefore',    data.headline_before);
+        setLandText('heroHeadlineHighlight', data.headline_highlight);
+        setLandText('heroHeadlineAfter',     data.headline_after);
+        setLandText('heroSub',               data.subheadline_text);
+        setLandText('heroPrimaryBtn',        data.primary_btn_text);
+        setLandText('heroSecondaryBtn',      data.secondary_btn_text);
+        setLandText('heroStat1Value', data.stat1_value); setLandText('heroStat1Label', data.stat1_label);
+        setLandText('heroStat2Value', data.stat2_value); setLandText('heroStat2Label', data.stat2_label);
+        setLandText('heroStat3Value', data.stat3_value); setLandText('heroStat3Label', data.stat3_label);
+        setLandText('heroStat4Value', data.stat4_value); setLandText('heroStat4Label', data.stat4_label);
+
+    } catch (err) {
+        console.warn('Landing hero fetch failed:', err.message);
+    }
+}
+
 async function loadLandingFooter() {
     try {
         const { data, error } = await db
@@ -539,6 +604,11 @@ function renderLandChart(coinKey, labels, prices, rangeKey, colorOverride) {
 
     if (landChartInstance) { landChartInstance.destroy(); landChartInstance = null; }
 
+    const isDark    = document.documentElement.classList.contains('dark-theme');
+    const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+    const tickColor = isDark ? '#adacb5' : '#86848c';
+    const legendColor = isDark ? '#ddd' : '#56555e';
+
     const ctx = canvas.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, color + '33');
@@ -570,7 +640,7 @@ function renderLandChart(coinKey, labels, prices, rangeKey, colorOverride) {
                 legend: {
                     display: true,
                     position: 'top',
-                    labels: { usePointStyle: true, padding: 16, color: '#56555e', font: { size: 12 } }
+                    labels: { usePointStyle: true, padding: 16, color: legendColor, font: { size: 12 } }
                 },
                 tooltip: {
                     callbacks: {
@@ -583,13 +653,13 @@ function renderLandChart(coinKey, labels, prices, rangeKey, colorOverride) {
             scales: {
                 x: {
                     grid: { display: false },
-                    ticks: { color: '#86848c', maxTicksLimit: maxTicks, maxRotation: 0 }
+                    ticks: { color: tickColor, maxTicksLimit: maxTicks, maxRotation: 0 }
                 },
                 y: {
                     beginAtZero: false,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    grid: { color: gridColor },
                     ticks: {
-                        color: '#86848c',
+                        color: tickColor,
                         callback: val => {
                             if (val < 1)  return '$' + val.toFixed(4);
                             if (val < 10) return '$' + val.toFixed(2);
@@ -620,3 +690,14 @@ function dimLandCanvas(on) {
 }
 
 document.addEventListener('DOMContentLoaded', initLandChart);
+
+// Re-render on theme change so chart tick/legend colors stay correct
+document.addEventListener('themechange', () => {
+    const cacheKey = `${activeLandCoin}_${activeLandRange}`;
+    const cached   = landChartCache[cacheKey];
+    if (activeLandAsset === 'crypto' && cached) {
+        renderLandChart(activeLandCoin, cached.labels, cached.prices, activeLandRange);
+    } else if (activeLandAsset !== 'crypto' && landChartInstance) {
+        loadLandSimulatedChart(activeLandAsset, activeLandCoin, activeLandRange);
+    }
+});
