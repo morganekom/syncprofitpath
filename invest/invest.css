@@ -571,7 +571,7 @@ body { grid-template-columns: 1fr; }
 .sidebar-dropdown-btn.active h5,
 .sidebar-dropdown-btn.active i { color: var(--color-primary); }
 
-.sidebar-dropdown-btn i:first-child { font-size: 2rem; color: var(--color-gray-dark); transition: var(--transition); }
+.sidebar-dropdown-btn i:first-child { font-size: 2rem; color: inherit; transition: var(--transition); }
 .sidebar-dropdown-arrow { margin-left: auto; font-size: 1.6rem; transition: transform 0.3s ease; }
 .sidebar-dropdown-btn.open .sidebar-dropdown-arrow { transform: rotate(180deg); }
 
