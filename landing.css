@@ -18,7 +18,15 @@
     --success:       rgb(34, 202, 75);
     --danger:        rgb(255, 67, 54);
 
-    --r1: 0.6rem;
+
+    /* Hero portfolio card — always dark surface */
+    --card-surface:  #27282f;
+    --card-text:     #ffffff;
+    --card-muted:    rgba(255,255,255,0.5);
+
+    /* Hero bg */
+    --hero-bg:       #f0eff5;
+        --r1: 0.6rem;
     --r2: 1.2rem;
     --r3: 2rem;
     --r4: 2.8rem;
@@ -82,6 +90,15 @@
     --testimonial-text:       rgba(255,255,255,0.65);
     --testimonial-author-name:#ddd;
     --testimonial-author-sub: rgba(255,255,255,0.4);
+
+
+    /* Hero portfolio card — stays dark in dark mode too */
+    --card-surface:  #0d1f27;
+    --card-text:     #e8e8e8;
+    --card-muted:    rgba(255,255,255,0.45);
+
+    /* Hero bg */
+    --hero-bg:       #0a191e;
 
 }
 
@@ -286,7 +303,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 ════════════════════════════════ */
 .land-hero {
     padding-top: 10rem;
-    background: linear-gradient(145deg, #f8fff8 0%, var(--light) 60%, #eef8f6 100%);
+    background: var(--hero-bg, var(--light));
     overflow: hidden;
 }
 
@@ -365,10 +382,10 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 .land-hero__visual { position: relative; }
 
 .land-hero__card {
-    background: var(--dark);
+    background: var(--card-surface);
     border-radius: var(--r3);
     padding: 2.4rem;
-    color: var(--white);
+    color: var(--card-text);
     box-shadow: var(--shadow-lg);
     position: relative;
     z-index: 1;
@@ -379,7 +396,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     justify-content: space-between;
     align-items: center;
     font-size: 1.1rem;
-    color: rgba(255,255,255,0.5);
+    color: var(--card-muted);
     margin-bottom: 1.2rem;
 }
 
@@ -407,7 +424,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 .hero-card__balance {
     font-size: 3.6rem;
     font-weight: 800;
-    color: var(--white);
+    color: var(--card-text);
     line-height: 1;
     margin-bottom: 0.6rem;
 }
@@ -446,7 +463,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     align-items: center;
     gap: 0.6rem;
     font-size: 1.1rem;
-    color: rgba(255,255,255,0.7);
+    color: var(--card-muted);
     white-space: nowrap;
 }
 
@@ -709,8 +726,8 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     position: absolute;
     top: 1.6rem;
     right: 1.6rem;
-    background: var(--dark);
-    color: var(--primary);
+    background: rgba(255,255,255,0.9);
+    color: #1a1b21;
     font-size: 1rem;
     font-weight: 700;
     padding: 0.4rem 1rem;
@@ -737,7 +754,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     margin-bottom: 1rem;
 }
 
-.land-plan--featured .land-plan__badge { color: var(--dark); }
+.land-plan--featured .land-plan__badge { color: #1a1b21; }
 
 .land-plan__rate {
     font-size: 6rem;
@@ -747,7 +764,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     margin-bottom: 0.4rem;
 }
 
-.land-plan--featured .land-plan__rate { color: var(--dark); }
+.land-plan--featured .land-plan__rate { color: #1a1b21; }
 
 .land-plan__rate span {
     font-size: 2.4rem;
@@ -760,7 +777,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     color: var(--plan-rate-label, rgba(255,255,255,0.5));
 }
 
-.land-plan--featured .land-plan__rate-label { color: rgba(0,0,0,0.55); }
+.land-plan--featured .land-plan__rate-label { color: rgba(0,0,0,0.6); }
 
 .land-plan__body {
     padding: 2.4rem;
@@ -776,7 +793,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     text-align: center;
 }
 
-.land-plan--featured .land-plan__range { color: var(--dark); }
+.land-plan--featured .land-plan__range { color: #1a1b21; }
 
 .land-plan__features {
     list-style: none;
@@ -793,7 +810,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     color: var(--plan-feature-color, rgba(255,255,255,0.75));
 }
 
-.land-plan--featured .land-plan__features li { color: rgba(0,0,0,0.7); }
+.land-plan--featured .land-plan__features li { color: rgba(0,0,0,0.75); }
 
 .land-plan__features i {
     font-size: 1.4rem;
@@ -801,7 +818,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     flex-shrink: 0;
 }
 
-.land-plan--featured .land-plan__features i { color: var(--dark); }
+.land-plan--featured .land-plan__features i { color: #1a1b21; }
 
 
 /* ════════════════════════════════
