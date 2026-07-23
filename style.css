@@ -453,6 +453,8 @@ nav {
     border: none;
     cursor: pointer;
     font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
     transition: var(--transition);
     color: var(--color-gray-dark);
     border-radius: 0 0.5rem 0.5rem 0;
@@ -501,11 +503,13 @@ nav {
     display: flex;
 }
 
-.sidebar-dropdown-item {
+/* Higher specificity (.sidebar .sidebar-dropdown-item = 0,2,0)
+   beats .sidebar a (0,1,1) so padding-left actually takes effect */
+.sidebar .sidebar-dropdown-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 4vw 1.5rem calc(2vw + 1.5rem);
+    padding: 1.2rem 4vw 1.2rem calc(2vw + 2rem);
     font-weight: 500;
     color: var(--color-gray-dark);
     text-decoration: none;
@@ -514,22 +518,24 @@ nav {
     background: transparent;
 }
 
-.sidebar-dropdown-item i {
-    font-size: 2rem;
+.sidebar .sidebar-dropdown-item i {
+    font-size: 1.6rem;
     color: inherit;
     flex-shrink: 0;
 }
 
-.sidebar-dropdown-item:hover {
+.sidebar .sidebar-dropdown-item:hover {
     background: var(--color-white);
     color: var(--color-primary);
 }
 
-.sidebar-dropdown-item.active {
+/* Higher specificity (.sidebar .sidebar-dropdown-item.active = 0,3,0)
+   beats .sidebar a.active (0,2,1) so border-left: none actually wins */
+.sidebar .sidebar-dropdown-item.active {
     background: var(--color-white);
     color: var(--color-primary);
     border-left: none;
-    padding-left: calc(2vw + 1.5rem);
+    padding-left: calc(2vw + 2rem);
 }
 
 .sidebar_close-btn {
