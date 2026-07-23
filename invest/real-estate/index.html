@@ -205,32 +205,6 @@
         <p><strong>Important Investment Information:</strong> Property values may fluctuate with market conditions. Real estate investments are generally less liquid than stocks. Returns may vary based on property performance and market trends. All investments carry inherent risks.</p>
     </div>
 
-    <div class="calculator-section">
-        <h2>Profit Calculator</h2>
-        <div class="calculator-card">
-            <div class="calc-field">
-                <div class="calc-select" onclick="toggleCalcDropdown()">
-                    <i class="uil uil-angle-down calc-chevron" id="calcChevron"></i>
-                    <span id="calcPlanLabel">Select plan</span>
-                </div>
-                <div class="calc-dropdown" id="calcDropdown"></div>
-            </div>
-            <div class="calc-field">
-                <label class="calc-label">Enter Amount</label>
-                <div class="calc-input-row">
-                    <span class="calc-currency">$</span>
-                    <input type="number" class="calc-input" id="calcAmount" placeholder="0.00" min="0" oninput="calculateProfit()">
-                </div>
-            </div>
-            <div class="calc-field calc-profit-field">
-                <label class="calc-label">Estimated 30-day Profit</label>
-                <span class="calc-value profit-value" id="calcProfit">$0.00</span>
-            </div>
-            <p class="calc-error" id="calcError"></p>
-            <button class="calculate-btn" id="calculateBtn" onclick="calculateProfit()" disabled>Calculate</button>
-        </div>
-    </div>
-
 </main>
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
