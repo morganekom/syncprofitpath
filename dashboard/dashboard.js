@@ -261,9 +261,8 @@ function switchMarketTab(tab, btn) {
     const chartNote = document.getElementById('chartMarketNote');
     if (chartNote) {
         const notes = {
-            stocks:      'Chart shows crypto market overview. Stock chart data coming soon.',
-            forex:       'Chart shows crypto market overview. Forex chart data coming soon.',
-            energy:      'Chart shows crypto market overview. Commodities chart data coming soon.',
+            stocks:     'Chart shows crypto market overview. Stock chart data coming soon.',
+            realestate: 'Chart shows crypto market overview. Real estate chart data coming soon.',
         };
         const note = notes[tab] || '';
         chartNote.textContent = note;
