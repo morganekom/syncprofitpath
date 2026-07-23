@@ -280,11 +280,8 @@
                 <button class="market-tab" data-market="stocks" onclick="switchMarketTab('stocks', this)">
                     <i class="uil uil-chart-line"></i> Stocks
                 </button>
-                <button class="market-tab" data-market="forex" onclick="switchMarketTab('forex', this)">
-                    <i class="uil uil-dollar-sign"></i> Forex
-                </button>
-                <button class="market-tab" data-market="energy" onclick="switchMarketTab('energy', this)">
-                    <i class="uil uil-fire"></i> Energy
+                <button class="market-tab" data-market="realestate" onclick="switchMarketTab('realestate', this)">
+                    <i class="uil uil-estate"></i> Real Estate
                 </button>
             </div>
 
@@ -365,25 +362,14 @@
                 </div>
             </div>
 
-            <div class="market-panel" id="marketPanel-forex">
-                <div class="market-tickers" id="forexTickers">
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#003ea615;color:#003ea6;">€/$</div><div><h4>EUR / USD</h4><small class="text-muted">EURUSD</small></div></div><div class="ticker-right"><h4 id="eurusdPrice">—</h4><small id="eurusdChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#01244615;color:#012446;">£/$</div><div><h4>GBP / USD</h4><small class="text-muted">GBPUSD</small></div></div><div class="ticker-right"><h4 id="gbpusdPrice">—</h4><small id="gbpusdChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#bc002d15;color:#bc002d;">¥</div><div><h4>USD / JPY</h4><small class="text-muted">USDJPY</small></div></div><div class="ticker-right"><h4 id="usdjpyPrice">—</h4><small id="usdjpyChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#00832515;color:#008325;">₦</div><div><h4>USD / NGN</h4><small class="text-muted">USDNGN</small></div></div><div class="ticker-right"><h4 id="usdngnPrice">—</h4><small id="usdngnChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#00008b15;color:#00008b;">A$</div><div><h4>AUD / USD</h4><small class="text-muted">AUDUSD</small></div></div><div class="ticker-right"><h4 id="audusdPrice">—</h4><small id="audusdChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#d8000015;color:#d80000;">C$</div><div><h4>USD / CAD</h4><small class="text-muted">USDCAD</small></div></div><div class="ticker-right"><h4 id="usdcadPrice">—</h4><small id="usdcadChange" class="text-muted">—</small></div></div>
-                </div>
-            </div>
-
-            <div class="market-panel" id="marketPanel-energy">
-                <div class="market-tickers" id="energyTickers">
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#1a1a1a15;color:#333;">OIL</div><div><h4>Crude Oil</h4><small class="text-muted">USOIL</small></div></div><div class="ticker-right"><h4 id="usoilPrice">—</h4><small id="usoilChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#4169e115;color:#4169e1;">GAS</div><div><h4>Natural Gas</h4><small class="text-muted">NATGAS</small></div></div><div class="ticker-right"><h4 id="natgasPrice">—</h4><small id="natgasChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#ffd70015;color:#b8860b;">AU</div><div><h4>Gold</h4><small class="text-muted">XAUUSD</small></div></div><div class="ticker-right"><h4 id="xauusdPrice">—</h4><small id="xauusdChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#c0c0c015;color:#999;">AG</div><div><h4>Silver</h4><small class="text-muted">XAGUSD</small></div></div><div class="ticker-right"><h4 id="xagusdPrice">—</h4><small id="xagusdChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#006eff15;color:#006eff;">BRT</div><div><h4>Brent Oil</h4><small class="text-muted">UKOIL</small></div></div><div class="ticker-right"><h4 id="ukoilPrice">—</h4><small id="ukoilChange" class="text-muted">—</small></div></div>
-                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#b8733415;color:#b87334;">CU</div><div><h4>Copper</h4><small class="text-muted">COPPER</small></div></div><div class="ticker-right"><h4 id="copperPrice">—</h4><small id="copperChange" class="text-muted">—</small></div></div>
+            <div class="market-panel" id="marketPanel-realestate">
+                <div class="market-tickers" id="realEstateTickers">
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#1d6f4215;color:#1d6f42;">VNQ</div><div><h4>Vanguard REIT</h4><small class="text-muted">VNQ</small></div></div><div class="ticker-right"><h4 id="vnqPrice">—</h4><small id="vnqChange" class="text-muted">—</small></div></div>
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#e63b2e15;color:#e63b2e;">O</div><div><h4>Realty Income</h4><small class="text-muted">O</small></div></div><div class="ticker-right"><h4 id="oPrice">—</h4><small id="oChange" class="text-muted">—</small></div></div>
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#0070f315;color:#0070f3;">PLD</div><div><h4>Prologis</h4><small class="text-muted">PLD</small></div></div><div class="ticker-right"><h4 id="pldPrice">—</h4><small id="pldChange" class="text-muted">—</small></div></div>
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#7b2d8b15;color:#7b2d8b;">AMT</div><div><h4>American Tower</h4><small class="text-muted">AMT</small></div></div><div class="ticker-right"><h4 id="amtPrice">—</h4><small id="amtChange" class="text-muted">—</small></div></div>
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#d4891415;color:#d48914;">SPG</div><div><h4>Simon Property</h4><small class="text-muted">SPG</small></div></div><div class="ticker-right"><h4 id="spgPrice">—</h4><small id="spgChange" class="text-muted">—</small></div></div>
+                    <div class="ticker-row"><div class="ticker-left"><div class="ticker-icon" style="background:#00897b15;color:#00897b;">WELL</div><div><h4>Welltower</h4><small class="text-muted">WELL</small></div></div><div class="ticker-right"><h4 id="wellPrice">—</h4><small id="wellChange" class="text-muted">—</small></div></div>
                 </div>
             </div>
 

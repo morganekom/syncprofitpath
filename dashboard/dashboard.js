@@ -243,7 +243,7 @@ async function loadCryptoPrices() {
 const FINNHUB_KEY = 'd9fesbhr01qu5nhe7j1gd9fesbhr01qu5nhe7j20';
 
 // Track which tabs have been loaded to avoid redundant fetches
-const marketLoaded = { crypto: false, stocks: false, forex: false, energy: false };
+const marketLoaded = { crypto: false, stocks: false, realestate: false };
 
 // Refresh intervals per tab
 const marketIntervals = {};
@@ -267,10 +267,9 @@ function switchMarketTab(tab, btn) {
 }
 
 function loadMarket(tab) {
-    if (tab === 'crypto')  loadCryptoPrices();
-    if (tab === 'stocks')  loadStockPrices();
-    if (tab === 'forex')   loadForexPrices();
-    if (tab === 'energy')  loadEnergyPrices();
+    if (tab === 'crypto')      loadCryptoPrices();
+    if (tab === 'stocks')      loadStockPrices();
+    if (tab === 'realestate')  loadRealEstatePrices();
 }
 
 
@@ -303,6 +302,31 @@ async function loadStockPrices() {
     }
 }
 
+
+
+const REIT_SYMBOLS = [
+    { key: 'vnq',  sym: 'VNQ',  name: 'Vanguard REIT'   },
+    { key: 'o',    sym: 'O',    name: 'Realty Income'    },
+    { key: 'pld',  sym: 'PLD',  name: 'Prologis'         },
+    { key: 'amt',  sym: 'AMT',  name: 'American Tower'   },
+    { key: 'spg',  sym: 'SPG',  name: 'Simon Property'   },
+    { key: 'well', sym: 'WELL', name: 'Welltower'        },
+];
+
+async function loadRealEstatePrices() {
+    try {
+        await Promise.all(REIT_SYMBOLS.map(async s => {
+            const res = await fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${FINNHUB_KEY}`
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const d = await res.json();
+            if (d.c) setTickerRow(s.key, d.c, d.dp, 2);
+        }));
+    } catch (err) {
+        console.warn('Real Estate ticker error:', err.message);
+    }
+}
 
 // ================================================================
 // FOREX — frankfurter.app (free, no key)
@@ -439,6 +463,8 @@ const CHART_COLORS = {
     eth:  { border: '#627eea', fill: 'rgba(98,126,234,0.08)'  },
     bnb:  { border: '#f3ba2f', fill: 'rgba(243,186,47,0.08)'  },
     sol:  { border: '#9945ff', fill: 'rgba(153,69,255,0.08)'  },
+    usdt: { border: '#2775ca', fill: 'rgba(39,117,202,0.08)'  },
+    ada:  { border: '#e84142', fill: 'rgba(232,65,66,0.08)'   },
     ltc:  { border: '#a0a0a0', fill: 'rgba(160,160,160,0.08)' },
     doge: { border: '#c2a633', fill: 'rgba(194,166,51,0.08)'  },
     xrp:  { border: '#00aae4', fill: 'rgba(0,170,228,0.08)'   },
