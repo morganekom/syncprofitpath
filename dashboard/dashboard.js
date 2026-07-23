@@ -1034,6 +1034,18 @@ function buildActiveInvCard(inv) {
             <span class="active-inv-daily">+${fmtMoney(dailyProfit)}/day</span>
         </div>
         <div class="active-inv-ref">Ref: ${escapeHtml(inv.reference || inv.id.slice(0,8).toUpperCase())}</div>
+        ${!isMatured ? `
+        <button class="active-inv-topup-btn"
+            onclick="openTopUpModal({
+                id: '${inv.id}',
+                plan: '${escapeHtml(inv.method || 'Investment')}',
+                coin: '${escapeHtml(coinKey)}',
+                amount: ${amount},
+                dailyRate: ${dailyRate},
+                reference: '${escapeHtml(inv.reference || inv.id.slice(0,8).toUpperCase())}'
+            })">
+            <i class="uil uil-plus-circle"></i> Top Up
+        </button>` : ''}
     </div>`;
 }
 
@@ -1160,3 +1172,151 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTradePlans();
     document.getElementById('tradePlan')?.addEventListener('change', updateTradeHint);
 });
+
+
+// ================================================================
+// TOP UP — Add funds to an active investment
+// ================================================================
+
+let _topUpInv = {};   // holds the investment being topped up
+
+function openTopUpModal(inv) {
+    _topUpInv = inv;
+
+    // Populate modal with investment details
+    document.getElementById('topupPlanName').textContent    = inv.plan;
+    document.getElementById('topupCurrentAmt').textContent  = fmtMoney(inv.amount);
+    document.getElementById('topupDailyRate').textContent   = inv.dailyRate + '% / day';
+    document.getElementById('topupRef').textContent         = inv.reference;
+
+    // Reset input + state
+    document.getElementById('topupAmount').value    = '';
+    document.getElementById('topupError').textContent = '';
+    document.getElementById('topupNewDaily').textContent  = '—';
+    document.getElementById('topupConfirmBtn').disabled  = true;
+    document.getElementById('topupSuccess').classList.remove('show');
+    document.getElementById('topupFooter').style.display = 'flex';
+
+    document.getElementById('topupOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTopUpModal(e) {
+    if (e && e.target !== document.getElementById('topupOverlay')) return;
+    document.getElementById('topupOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function closeTopUpModalBtn() {
+    document.getElementById('topupOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function validateTopUpAmount() {
+    const input   = document.getElementById('topupAmount');
+    const errorEl = document.getElementById('topupError');
+    const btn     = document.getElementById('topupConfirmBtn');
+    const preview = document.getElementById('topupNewDaily');
+    const amount  = parseFloat(input.value);
+
+    errorEl.textContent = '';
+    btn.disabled        = true;
+    preview.textContent = '—';
+
+    if (!input.value || isNaN(amount) || amount <= 0) return;
+    if (amount < 10) {
+        errorEl.textContent = 'Minimum top-up is $10.';
+        return;
+    }
+
+    // Show new daily profit preview
+    const newTotal      = _topUpInv.amount + amount;
+    const newDailyProfit = newTotal * (_topUpInv.dailyRate / 100);
+    preview.textContent  = fmtMoney(newDailyProfit) + '/day';
+
+    btn.disabled = false;
+}
+
+async function confirmTopUp() {
+    const btn     = document.getElementById('topupConfirmBtn');
+    const errorEl = document.getElementById('topupError');
+    const amount  = parseFloat(document.getElementById('topupAmount').value);
+
+    if (!amount || amount <= 0) return;
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.id) { errorEl.textContent = 'Session expired. Please log in again.'; return; }
+
+    btn.disabled    = true;
+    btn.textContent = 'Checking balance…';
+    errorEl.textContent = '';
+
+    try {
+        // 1. Check live balance
+        const { data: userData, error: balErr } = await db
+            .from('users')
+            .select('balance')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (balErr || !userData) throw new Error('Could not verify balance.');
+
+        const available = parseFloat(userData.balance || 0);
+        if (amount > available) {
+            errorEl.textContent = `Insufficient balance. Available: ${fmtMoney(available)}`;
+            btn.disabled    = false;
+            btn.textContent = 'Confirm Top Up';
+            return;
+        }
+
+        btn.textContent = 'Processing…';
+
+        const newAmount = _topUpInv.amount + amount;
+        const topupRef  = 'TOP-' + Date.now().toString(36).toUpperCase();
+
+        // 2. Update the investment transaction amount
+        const { error: updateErr } = await db
+            .from('transactions')
+            .update({ amount: newAmount })
+            .eq('id', _topUpInv.id)
+            .eq('user_id', currentUser.id);
+
+        if (updateErr) throw updateErr;
+
+        // 3. Deduct from user balance
+        const { error: balUpdateErr } = await db
+            .from('users')
+            .update({ balance: available - amount })
+            .eq('id', currentUser.id);
+
+        if (balUpdateErr) throw balUpdateErr;
+
+        // 4. Insert audit trail transaction
+        await db.from('transactions').insert([{
+            user_id:   currentUser.id,
+            type:      'topup',
+            amount,
+            coin:      _topUpInv.coin,
+            status:    'completed',
+            note:      `Top-up on ${_topUpInv.plan} (Ref: ${_topUpInv.reference})`,
+            method:    _topUpInv.plan,
+            reference: topupRef,
+        }]);
+
+        // 5. Show success
+        document.getElementById('topupFooter').style.display = 'none';
+        document.getElementById('topupSuccess').classList.add('show');
+
+        // Refresh investments + balance after 1.5s
+        setTimeout(() => {
+            loadActiveInvestments();
+            loadBalances();
+        }, 1500);
+
+    } catch (err) {
+        console.error('Top-up error:', err.message);
+        errorEl.textContent = 'Something went wrong. Please try again.';
+        btn.disabled    = false;
+        btn.textContent = 'Confirm Top Up';
+    }
+}

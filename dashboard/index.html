@@ -450,5 +450,74 @@
     <script src="../chat-widget.js"></script>
     <script src="./dashboard.js"></script>
     <script src="../notify-inapp.js"></script>
+    <!-- ==================== TOP UP MODAL ==================== -->
+    <div class="modal-overlay topup-overlay" id="topupOverlay" onclick="closeTopUpModal(event)">
+        <div class="modal topup-modal">
+
+            <div class="modal-header">
+                <h3>Top Up Investment</h3>
+                <button class="modal-close-btn" onclick="closeTopUpModalBtn()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+
+            <!-- Investment summary -->
+            <div class="topup-summary">
+                <div class="topup-summary-row">
+                    <span>Plan</span>
+                    <span id="topupPlanName">—</span>
+                </div>
+                <div class="topup-summary-row">
+                    <span>Current Amount</span>
+                    <span id="topupCurrentAmt">—</span>
+                </div>
+                <div class="topup-summary-row">
+                    <span>Daily Rate</span>
+                    <span id="topupDailyRate">—</span>
+                </div>
+                <div class="topup-summary-row">
+                    <span>Reference</span>
+                    <span id="topupRef" style="font-size:1rem;color:var(--color-gray-light);">—</span>
+                </div>
+            </div>
+
+            <!-- Amount input -->
+            <div class="modal-field">
+                <label>Top Up Amount (USD)</label>
+                <div class="modal-input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="topupAmount" class="modal-input"
+                        placeholder="0.00" min="10" step="1"
+                        oninput="validateTopUpAmount()">
+                </div>
+                <p class="modal-range-hint">Minimum top-up: $10. Deducted from your wallet balance.</p>
+                <p class="topup-error" id="topupError"></p>
+            </div>
+
+            <!-- New daily profit preview -->
+            <div class="topup-preview">
+                <span>New daily profit after top-up:</span>
+                <span class="topup-preview-val" id="topupNewDaily">—</span>
+            </div>
+
+            <!-- Success state -->
+            <div class="modal-success" id="topupSuccess">
+                <div class="modal-success-icon"><i class="uil uil-check-circle"></i></div>
+                <h3>Top Up Successful!</h3>
+                <p>Your investment has been updated. The new amount will be reflected in tomorrow's daily return.</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer" id="topupFooter">
+                <button class="modal-cancel-btn" onclick="closeTopUpModalBtn()">Cancel</button>
+                <button class="modal-confirm-btn" id="topupConfirmBtn"
+                    onclick="confirmTopUp()" disabled>
+                    Confirm Top Up
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 </body>
 </html>
