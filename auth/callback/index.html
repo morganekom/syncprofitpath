@@ -67,6 +67,11 @@
                         opacity 0.4s ease;
         }
     </style>
+    <style>
+        /* Anti-FOUC: applied instantly before external CSS loads */
+        html { background: #f0eff5; }
+        html.dark-theme { background: #0d242c; }
+    </style>
 </head>
 
 <body>
