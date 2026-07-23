@@ -447,7 +447,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.4rem 2vw;
+    padding: 1.5rem 4vw 1.5rem 2vw;
     width: 100%;
     background: transparent;
     border: none;
@@ -455,35 +455,34 @@ nav {
     font-family: "Poppins", sans-serif;
     transition: var(--transition);
     color: var(--color-gray-dark);
+    border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .sidebar-dropdown-btn h5 {
-    font-size: 1.15rem;
+    font-size: inherit;
     font-weight: 500;
     color: inherit;
 }
 
 .sidebar-dropdown-btn i:first-child {
-    font-size: 1.6rem;
+    font-size: 2rem;
     color: inherit;
 }
 
 .sidebar-dropdown-arrow {
     margin-left: auto;
-    font-size: 1.4rem;
+    font-size: 2rem;
     transition: transform 0.3s ease;
     color: inherit;
 }
 
 .sidebar-dropdown-btn:hover {
     background: var(--color-white);
-    color: var(--color-dark);
+    color: var(--color-primary);
 }
 
 .sidebar-dropdown-btn.active {
     background: var(--color-white);
-    border-left: 0.5rem solid var(--color-primary);
-    padding-left: calc(2vw - 0.5rem);
     color: var(--color-primary);
 }
 
@@ -494,7 +493,6 @@ nav {
 .sidebar-dropdown-items {
     display: none;
     flex-direction: column;
-    background: var(--color-light);
     overflow: hidden;
 }
 
@@ -505,34 +503,30 @@ nav {
 .sidebar-dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    padding: 0.75rem 1rem 0.75rem 3.2rem;
-    font-size: 1.05rem;
+    gap: 1rem;
+    padding: 1.5rem 4vw 1.5rem 2vw;
     font-weight: 500;
     color: var(--color-gray-dark);
     text-decoration: none;
     transition: var(--transition);
-    border-left: 0.4rem solid transparent;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: transparent;
 }
 
 .sidebar-dropdown-item i {
-    font-size: 1.2rem;
+    font-size: 2rem;
+    color: inherit;
     flex-shrink: 0;
 }
 
 .sidebar-dropdown-item:hover {
+    background: var(--color-white);
     color: var(--color-primary);
-    background: rgba(0,226,123,0.07);
 }
 
 .sidebar-dropdown-item.active {
-    color: var(--color-primary);
-    font-weight: 600;
-    border-left-color: var(--color-primary);
     background: var(--color-white);
+    color: var(--color-primary);
 }
 
 .sidebar_close-btn {
