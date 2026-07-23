@@ -351,12 +351,93 @@
     </section>
 
 
+    <!-- ==================== LIVE MARKET OVERVIEW ==================== -->
+    <section class="land-section land-section--tint" id="live-overview">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Real-Time Data</span>
+                <h2>Live Market Overview</h2>
+                <p>The same real-time crypto, stock, and real estate charts you'll see inside your SyncProfitPath dashboard.</p>
+            </div>
+
+            <div class="land-overview-card">
+                <div class="land-chart-asset-tabs" id="landChartAssetTabs">
+                    <button class="land-chart-asset-tab active" onclick="switchLandChartAsset('crypto', this)">
+                        <i class="uil uil-bitcoin-circle"></i> Crypto
+                    </button>
+                    <button class="land-chart-asset-tab" onclick="switchLandChartAsset('stocks', this)">
+                        <i class="uil uil-chart-line"></i> Stocks
+                    </button>
+                    <button class="land-chart-asset-tab" onclick="switchLandChartAsset('realestate', this)">
+                        <i class="uil uil-home-alt"></i> Real Estate
+                    </button>
+                </div>
+
+                <div class="land-chart-controls">
+                    <div class="land-chart-tabs" id="landChartTabs"></div>
+                    <div class="land-chart-range-tabs" id="landChartRangeTabs"></div>
+                </div>
+
+                <p class="land-chart-note" id="landChartNote" style="display:none;"></p>
+                <div class="land-chart-status" id="landChartStatus"></div>
+
+                <div class="land-chart-canvas-wrap" id="landChartCanvasWrap">
+                    <canvas id="landChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== EXPERT MARKET ANALYSIS ==================== -->
+    <section class="land-section" id="market-analysis">
+        <div class="land-container">
+            <div class="land-section__header">
+                <span class="land-eyebrow">Expert Insight</span>
+                <h2>Expert Market Analysis &amp; Insights</h2>
+                <p>Stay ahead with real-time market data, curated updates, and the tools to act on them.</p>
+            </div>
+            <div class="land-features">
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(0,226,123,0.12)">
+                        <i class="uil uil-newspaper" style="color:rgb(0,226,123)"></i>
+                    </div>
+                    <h3>Daily Market Updates</h3>
+                    <p>Receive daily market analysis directly to your inbox. Our team breaks down what moved the markets and why.</p>
+                    <a href="#markets" class="land-feature__link">Read more <i class="uil uil-arrow-right"></i></a>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(160,99,245,0.12)">
+                        <i class="uil uil-wrench" style="color:rgb(160,99,245)"></i>
+                    </div>
+                    <h3>Premium Trading Tools</h3>
+                    <p>Access advanced tools designed for every experience level — live charts, plan calculators, and portfolio tracking.</p>
+                    <a href="#markets" class="land-feature__link">Read more <i class="uil uil-arrow-right"></i></a>
+                </div>
+                <div class="land-feature">
+                    <div class="land-feature__icon" style="background:rgba(0,110,255,0.12)">
+                        <i class="uil uil-shield-check" style="color:rgb(0,110,255)"></i>
+                    </div>
+                    <h3>Funds Protection</h3>
+                    <p>Your security is our priority. We provide industry-leading safeguards to keep your capital and data protected.</p>
+                    <a href="#why-us" class="land-feature__link">Read more <i class="uil uil-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="land-market-cta">
+                <a href="#why-us" class="land-btn land-btn--primary">
+                    Learn more about our services <i class="uil uil-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+
     <!-- ==================== MARKETS ==================== -->
     <section class="land-section land-section--tint" id="markets">
         <div class="land-container">
             <div class="land-section__header">
                 <span class="land-eyebrow">Live Markets</span>
-                <h2>Trade Across 4 Asset Classes</h2>
+                <h2>Trade Across Diverse Asset Classes</h2>
                 <p>Real-time prices updated every 60 seconds. Invest in what moves the world.</p>
             </div>
 
@@ -368,11 +449,8 @@
                 <button class="land-market-tab" data-tab="stocks" onclick="switchLandMarketTab('stocks', this)">
                     <i class="uil uil-chart-line"></i> Stocks
                 </button>
-                <button class="land-market-tab" data-tab="forex" onclick="switchLandMarketTab('forex', this)">
-                    <i class="uil uil-dollar-sign"></i> Forex
-                </button>
-                <button class="land-market-tab" data-tab="energy" onclick="switchLandMarketTab('energy', this)">
-                    <i class="uil uil-fire"></i> Energy
+                <button class="land-market-tab" data-tab="realestate" onclick="switchLandMarketTab('realestate', this)">
+                    <i class="uil uil-home-alt"></i> Real Estate
                 </button>
             </div>
 
@@ -399,25 +477,12 @@
                 </div>
             </div>
 
-            <div class="land-market-panel" id="landMarket-forex">
+            <div class="land-market-panel" id="landMarket-realestate">
                 <div class="land-market-grid">
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#003ea615;color:#003ea6;">€/$</div><div><span class="land-mkt-name">EUR / USD</span><small>EURUSD</small></div></div><div class="land-mkt-right"><span id="lEurusdPrice">—</span><small id="lEurusdChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#01244615;color:#012446;">£/$</div><div><span class="land-mkt-name">GBP / USD</span><small>GBPUSD</small></div></div><div class="land-mkt-right"><span id="lGbpusdPrice">—</span><small id="lGbpusdChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#bc002d15;color:#bc002d;">¥</div><div><span class="land-mkt-name">USD / JPY</span><small>USDJPY</small></div></div><div class="land-mkt-right"><span id="lUsdjpyPrice">—</span><small id="lUsdjpyChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00832515;color:#008325;">₦</div><div><span class="land-mkt-name">USD / NGN</span><small>USDNGN</small></div></div><div class="land-mkt-right"><span id="lUsdngnPrice">—</span><small id="lUsdngnChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#00008b15;color:#00008b;">A$</div><div><span class="land-mkt-name">AUD / USD</span><small>AUDUSD</small></div></div><div class="land-mkt-right"><span id="lAudusdPrice">—</span><small id="lAudusdChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#d8000015;color:#d80000;">C$</div><div><span class="land-mkt-name">USD / CAD</span><small>USDCAD</small></div></div><div class="land-mkt-right"><span id="lUsdcadPrice">—</span><small id="lUsdcadChange" class="land-mkt-change">—</small></div></div>
-                </div>
-            </div>
-
-            <div class="land-market-panel" id="landMarket-energy">
-                <div class="land-market-grid">
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#1a1a1a15;color:#333;font-size:1rem;">OIL</div><div><span class="land-mkt-name">Crude Oil</span><small>USOIL</small></div></div><div class="land-mkt-right"><span id="lUsoilPrice">—</span><small id="lUsoilChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#4169e115;color:#4169e1;font-size:1rem;">GAS</div><div><span class="land-mkt-name">Natural Gas</span><small>NATGAS</small></div></div><div class="land-mkt-right"><span id="lNatgasPrice">—</span><small id="lNatgasChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#ffd70015;color:#b8860b;">AU</div><div><span class="land-mkt-name">Gold</span><small>XAUUSD</small></div></div><div class="land-mkt-right"><span id="lXauusdPrice">—</span><small id="lXauusdChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#c0c0c015;color:#999;">AG</div><div><span class="land-mkt-name">Silver</span><small>XAGUSD</small></div></div><div class="land-mkt-right"><span id="lXagusdPrice">—</span><small id="lXagusdChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#006eff15;color:#006eff;font-size:1rem;">BRT</div><div><span class="land-mkt-name">Brent Oil</span><small>UKOIL</small></div></div><div class="land-mkt-right"><span id="lUkoilPrice">—</span><small id="lUkoilChange" class="land-mkt-change">—</small></div></div>
-                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#b8733415;color:#b87334;">CU</div><div><span class="land-mkt-name">Copper</span><small>COPPER</small></div></div><div class="land-mkt-right"><span id="lCopperPrice">—</span><small id="lCopperChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#27ae6022;color:#27ae60;font-size:1rem;">VNQ</div><div><span class="land-mkt-name">Vanguard Real Estate ETF</span><small>VNQ</small></div></div><div class="land-mkt-right"><span id="lVnqPrice">—</span><small id="lVnqChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#2ecc7122;color:#2ecc71;font-size:1rem;">SPG</div><div><span class="land-mkt-name">Simon Property Group</span><small>SPG</small></div></div><div class="land-mkt-right"><span id="lSpgPrice">—</span><small id="lSpgChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#16a08522;color:#16a085;font-size:1rem;">PLD</div><div><span class="land-mkt-name">Prologis</span><small>PLD</small></div></div><div class="land-mkt-right"><span id="lPldPrice">—</span><small id="lPldChange" class="land-mkt-change">—</small></div></div>
+                    <div class="land-mkt-row"><div class="land-mkt-left"><div class="land-mkt-icon" style="background:#1abc9c22;color:#1abc9c;font-size:1rem;">AMT</div><div><span class="land-mkt-name">American Tower</span><small>AMT</small></div></div><div class="land-mkt-right"><span id="lAmtPrice">—</span><small id="lAmtChange" class="land-mkt-change">—</small></div></div>
                 </div>
             </div>
 
@@ -554,6 +619,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.1/chart.min.js"></script>
     <script src="./landing.js"></script>
 </body>
 </html>

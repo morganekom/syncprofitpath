@@ -222,7 +222,7 @@ if (currentUser) {
 // ================================================================
 
 const LAND_FINNHUB_KEY  = 'd9fesbhr01qu5nhe7j1gd9fesbhr01qu5nhe7j20';
-const landMarketLoaded  = { crypto: false, stocks: false, forex: false, energy: false };
+const landMarketLoaded  = { crypto: false, stocks: false, realestate: false };
 const landMarketTimers  = {};
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -246,10 +246,9 @@ function switchLandMarketTab(tab, btn) {
 }
 
 function loadLandMarket(tab) {
-    if (tab === 'crypto') loadLandCryptoPrices();
-    if (tab === 'stocks') loadLandStockPrices();
-    if (tab === 'forex')  loadLandForexPrices();
-    if (tab === 'energy') loadLandEnergyPrices();
+    if (tab === 'crypto')     loadLandCryptoPrices();
+    if (tab === 'stocks')     loadLandStockPrices();
+    if (tab === 'realestate') loadLandRealEstatePrices();
 }
 
 // ── Crypto ──
@@ -287,56 +286,19 @@ async function loadLandStockPrices() {
     } catch (err) { console.warn('Land stocks error:', err.message); }
 }
 
-// ── Forex ──
-async function loadLandForexPrices() {
-    const pairs = [
-        { base: 'EUR', quote: 'USD', key: 'lEurusd', dec: 4 },
-        { base: 'GBP', quote: 'USD', key: 'lGbpusd', dec: 4 },
-        { base: 'USD', quote: 'JPY', key: 'lUsdjpy', dec: 2 },
-        { base: 'USD', quote: 'NGN', key: 'lUsdngn', dec: 2 },
-        { base: 'AUD', quote: 'USD', key: 'lAudusd', dec: 4 },
-        { base: 'USD', quote: 'CAD', key: 'lUsdcad', dec: 4 },
+// ── Real Estate (REITs — same tickers as the dashboard's Real Estate chart) ──
+async function loadLandRealEstatePrices() {
+    const reits = [
+        { sym: 'VNQ', key: 'lVnq' }, { sym: 'SPG', key: 'lSpg' },
+        { sym: 'PLD', key: 'lPld' }, { sym: 'AMT', key: 'lAmt' },
     ];
     try {
-        const yest = new Date(); yest.setDate(yest.getDate() - 1);
-        const yStr = yest.toISOString().split('T')[0];
-        const bases = [...new Set(pairs.map(p => p.base))];
-        const ratesMap = {};
-        await Promise.all(bases.map(async base => {
-            const quotes = pairs.filter(p => p.base === base).map(p => p.quote).join(',');
-            const [t, y] = await Promise.all([
-                fetch(`https://api.frankfurter.app/latest?from=${base}&to=${quotes}`).then(r => r.json()),
-                fetch(`https://api.frankfurter.app/${yStr}?from=${base}&to=${quotes}`).then(r => r.json()),
-            ]);
-            ratesMap[base] = { today: t.rates, yesterday: y.rates };
-        }));
-        pairs.forEach(p => {
-            const rate = ratesMap[p.base]?.today?.[p.quote];
-            const prev = ratesMap[p.base]?.yesterday?.[p.quote];
-            if (!rate) return;
-            const chg = prev ? ((rate - prev) / prev) * 100 : 0;
-            setLandTicker(p.key, rate, chg, p.dec);
-        });
-    } catch (err) { console.warn('Land forex error:', err.message); }
-}
-
-// ── Energy ──
-async function loadLandEnergyPrices() {
-    const items = [
-        { sym: 'USOIL',         key: 'lUsoil'  },
-        { sym: 'NATGAS',        key: 'lNatgas' },
-        { sym: 'OANDA:XAU_USD', key: 'lXauusd' },
-        { sym: 'OANDA:XAG_USD', key: 'lXagusd' },
-        { sym: 'UKOIL',         key: 'lUkoil'  },
-        { sym: 'COPPER',        key: 'lCopper' },
-    ];
-    try {
-        await Promise.all(items.map(async s => {
+        await Promise.all(reits.map(async s => {
             const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=${LAND_FINNHUB_KEY}`);
             const d   = await res.json();
             if (d.c) setLandTicker(s.key, d.c, d.dp, 2);
         }));
-    } catch (err) { console.warn('Land energy error:', err.message); }
+    } catch (err) { console.warn('Land real estate error:', err.message); }
 }
 
 // ── Shared setter ──
@@ -349,3 +311,312 @@ function setLandTicker(key, price, changePct, decimals) {
     changeEl.textContent = (pos ? '+' : '') + Number(changePct || 0).toFixed(2) + '%';
     changeEl.className   = 'land-mkt-change ' + (pos ? 'land-mkt-up' : 'land-mkt-down');
 }
+
+
+// ================================================================
+// LIVE MARKET OVERVIEW — chart widget (mirrors the dashboard chart:
+// real Binance data for crypto, simulated trend for stocks/real estate,
+// since those need a paid market-data subscription to be truly live)
+// ================================================================
+
+const LAND_CHART_ASSETS = {
+    crypto: [
+        { key: 'btc',  ticker: 'BTC',  symbol: 'BTCUSDT',  color: '#f7931a' },
+        { key: 'eth',  ticker: 'ETH',  symbol: 'ETHUSDT',  color: '#627eea' },
+        { key: 'bnb',  ticker: 'BNB',  symbol: 'BNBUSDT',  color: '#f3ba2f' },
+        { key: 'sol',  ticker: 'SOL',  symbol: 'SOLUSDT',  color: '#9945ff' },
+        { key: 'usdt', ticker: 'USDT', symbol: 'USDCUSDT', color: '#2775ca' },
+        { key: 'ada',  ticker: 'ADA',  symbol: 'ADAUSDT',  color: '#e84142' },
+    ],
+    stocks: [
+        { key: 'aapl',  ticker: 'AAPL',  color: '#555555', base: 196 },
+        { key: 'tsla',  ticker: 'TSLA',  color: '#cc0000', base: 248 },
+        { key: 'amzn',  ticker: 'AMZN',  color: '#ff9900', base: 185 },
+        { key: 'msft',  ticker: 'MSFT',  color: '#00a4ef', base: 415 },
+        { key: 'googl', ticker: 'GOOGL', color: '#4285f4', base: 176 },
+        { key: 'meta',  ticker: 'META',  color: '#1877f2', base: 492 },
+    ],
+    realestate: [
+        { key: 'vnq', ticker: 'VNQ', color: '#27ae60', base: 87  },
+        { key: 'spg', ticker: 'SPG', color: '#2ecc71', base: 148 },
+        { key: 'pld', ticker: 'PLD', color: '#16a085', base: 118 },
+        { key: 'amt', ticker: 'AMT', color: '#1abc9c', base: 195 },
+    ],
+};
+
+const LAND_TIME_RANGES = [
+    { key: '1h',  label: '1H',  interval: '1m', limit: 60 },
+    { key: '24h', label: '24H', interval: '1h', limit: 24 },
+    { key: '7d',  label: '7D',  interval: '1d', limit: 7  },
+    { key: '30d', label: '30D', interval: '1d', limit: 30 },
+];
+
+let activeLandAsset = 'crypto';
+let activeLandCoin  = 'btc';
+let activeLandRange = '30d';
+let landChartInstance = null;
+
+const landChartCache = {};
+const LAND_CACHE_TTL = 5 * 60 * 1000;
+let landAbortCtrl  = null;
+let landDebounce   = null;
+
+function initLandChart() {
+    renderLandCoinTabs('crypto');
+    renderLandRangeTabs();
+    scheduleLandChartLoad();
+}
+
+function renderLandCoinTabs(asset) {
+    const coins = LAND_CHART_ASSETS[asset] || LAND_CHART_ASSETS.crypto;
+    const tabsEl = document.getElementById('landChartTabs');
+    if (!tabsEl) return;
+    tabsEl.innerHTML = coins.map((c, i) => `
+        <button class="land-chart-tab${i === 0 ? ' active' : ''}"
+            data-coin="${c.key}"
+            style="--tab-color:${c.color}"
+            onclick="switchLandChartCoin('${c.key}', this)"
+        >${c.ticker}</button>
+    `).join('');
+}
+
+function renderLandRangeTabs() {
+    const tabsEl = document.getElementById('landChartRangeTabs');
+    if (!tabsEl) return;
+    tabsEl.innerHTML = LAND_TIME_RANGES.map(r => `
+        <button class="land-chart-range-tab${r.key === activeLandRange ? ' active' : ''}"
+            data-range="${r.key}"
+            onclick="switchLandChartRange('${r.key}', this)"
+        >${r.label}</button>
+    `).join('');
+}
+
+function switchLandChartAsset(asset, btn) {
+    document.querySelectorAll('.land-chart-asset-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    activeLandAsset = asset;
+
+    const coins = LAND_CHART_ASSETS[asset] || LAND_CHART_ASSETS.crypto;
+    activeLandCoin = coins[0].key;
+    renderLandCoinTabs(asset);
+
+    const noteEl = document.getElementById('landChartNote');
+    if (noteEl) {
+        const notes = {
+            stocks:     'Stock chart data is simulated. Live stock data requires a market data subscription.',
+            realestate: 'REIT chart data is simulated. Live real estate data requires a market data subscription.',
+        };
+        const note = notes[asset] || '';
+        noteEl.textContent  = note;
+        noteEl.style.display = note ? '' : 'none';
+    }
+
+    scheduleLandChartLoad();
+}
+
+function switchLandChartCoin(coinKey, btn) {
+    document.querySelectorAll('.land-chart-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    activeLandCoin = coinKey;
+    scheduleLandChartLoad();
+}
+
+function switchLandChartRange(rangeKey, btn) {
+    document.querySelectorAll('.land-chart-range-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    activeLandRange = rangeKey;
+    scheduleLandChartLoad();
+}
+
+function scheduleLandChartLoad() {
+    clearTimeout(landDebounce);
+    landDebounce = setTimeout(() => {
+        if (activeLandAsset === 'crypto') {
+            loadLandChartData(activeLandCoin, activeLandRange);
+        } else {
+            loadLandSimulatedChart(activeLandAsset, activeLandCoin, activeLandRange);
+        }
+    }, 150);
+}
+
+async function loadLandChartData(coinKey, rangeKey) {
+    const cacheKey = `${coinKey}_${rangeKey}`;
+    const cached   = landChartCache[cacheKey];
+    const now      = Date.now();
+
+    if (cached && (now - cached.ts) < LAND_CACHE_TTL) {
+        renderLandChart(coinKey, cached.labels, cached.prices, rangeKey);
+        clearLandChartStatus();
+        return;
+    }
+    if (cached) {
+        renderLandChart(coinKey, cached.labels, cached.prices, rangeKey);
+        setLandChartStatus('Refreshing…', 'muted');
+    } else {
+        setLandChartStatus('Loading…', 'loading');
+        dimLandCanvas(true);
+    }
+
+    if (landAbortCtrl) landAbortCtrl.abort();
+    landAbortCtrl = new AbortController();
+    const { signal } = landAbortCtrl;
+
+    const range = LAND_TIME_RANGES.find(r => r.key === rangeKey) || LAND_TIME_RANGES[3];
+    const coin  = LAND_CHART_ASSETS.crypto.find(c => c.key === coinKey) || LAND_CHART_ASSETS.crypto[0];
+    const url   = `https://api.binance.com/api/v3/klines?symbol=${coin.symbol}&interval=${range.interval}&limit=${range.limit}`;
+
+    try {
+        const res = await fetch(url, { signal });
+        if (signal.aborted) return;
+        if (!res.ok) throw new Error(`Binance HTTP ${res.status}`);
+
+        const candles = await res.json();
+        if (!Array.isArray(candles) || candles.length === 0) throw new Error('No data');
+
+        const labels = candles.map(c => {
+            const d = new Date(c[0]);
+            return (rangeKey === '1h' || rangeKey === '24h')
+                ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        const prices = candles.map(c => parseFloat(c[4]));
+
+        landChartCache[cacheKey] = { ts: now, labels, prices };
+        renderLandChart(coinKey, labels, prices, rangeKey);
+        clearLandChartStatus();
+
+    } catch (err) {
+        if (err.name === 'AbortError') return;
+        console.warn('Land chart error:', err.message);
+        if (cached) {
+            setLandChartStatus('Using cached data', 'muted');
+        } else {
+            setLandChartStatus('Failed to load. Tap a coin to retry.', 'error');
+        }
+    } finally {
+        dimLandCanvas(false);
+    }
+}
+
+function loadLandSimulatedChart(asset, coinKey, rangeKey) {
+    const coins = LAND_CHART_ASSETS[asset] || LAND_CHART_ASSETS.stocks;
+    const coin  = coins.find(c => c.key === coinKey) || coins[0];
+    const range = LAND_TIME_RANGES.find(r => r.key === rangeKey) || LAND_TIME_RANGES[3];
+    const points = range.limit || 30;
+
+    const prices = [];
+    let price = coin.base * (0.92 + Math.random() * 0.16);
+    for (let i = 0; i < points; i++) {
+        price = price * (1 + (Math.random() - 0.495) * 0.025);
+        prices.push(parseFloat(price.toFixed(2)));
+    }
+
+    const now = new Date();
+    const labels = Array.from({ length: points }, (_, i) => {
+        const d = new Date(now);
+        if (rangeKey === '1h' || rangeKey === '24h') {
+            d.setHours(d.getHours() - (points - 1 - i));
+            return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+        d.setDate(d.getDate() - (points - 1 - i));
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    renderLandChart(coinKey, labels, prices, rangeKey, coin.color);
+    clearLandChartStatus();
+}
+
+function renderLandChart(coinKey, labels, prices, rangeKey, colorOverride) {
+    const canvas = document.getElementById('landChart');
+    if (!canvas) return;
+
+    const coins  = LAND_CHART_ASSETS[activeLandAsset] || LAND_CHART_ASSETS.crypto;
+    const coin   = coins.find(c => c.key === coinKey) || coins[0];
+    const color  = colorOverride || coin.color;
+    const range  = LAND_TIME_RANGES.find(r => r.key === rangeKey);
+    const label  = `${coin.ticker} · ${range?.label || ''}`;
+    const maxTicks = (rangeKey === '1h' || rangeKey === '24h') ? 6 : 8;
+
+    if (landChartInstance) { landChartInstance.destroy(); landChartInstance = null; }
+
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, color + '33');
+    gradient.addColorStop(1, color + '00');
+
+    landChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data:                 prices,
+                borderColor:          color,
+                backgroundColor:      gradient,
+                borderWidth:          2,
+                tension:              0.35,
+                fill:                 true,
+                pointRadius:          rangeKey === '1h' ? 0 : 1.5,
+                pointHoverRadius:     5,
+                pointBackgroundColor: color,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 250 },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { usePointStyle: true, padding: 16, color: '#56555e', font: { size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', {
+                            minimumFractionDigits: 2, maximumFractionDigits: 4
+                        })
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#86848c', maxTicksLimit: maxTicks, maxRotation: 0 }
+                },
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#86848c',
+                        callback: val => {
+                            if (val < 1)  return '$' + val.toFixed(4);
+                            if (val < 10) return '$' + val.toFixed(2);
+                            return '$' + val.toLocaleString('en-US', { maximumFractionDigits: 0 });
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function setLandChartStatus(msg, type) {
+    const el = document.getElementById('landChartStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.className   = 'land-chart-status land-chart-status--' + (type || 'muted');
+}
+
+function clearLandChartStatus() {
+    const el = document.getElementById('landChartStatus');
+    if (el) { el.textContent = ''; el.className = 'land-chart-status'; }
+}
+
+function dimLandCanvas(on) {
+    const wrap = document.getElementById('landChartCanvasWrap');
+    if (wrap) wrap.classList.toggle('dimmed', on);
+}
+
+document.addEventListener('DOMContentLoaded', initLandChart);
