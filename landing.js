@@ -731,3 +731,102 @@ document.addEventListener('themechange', () => {
         loadLandSimulatedChart(activeLandAsset, activeLandCoin, activeLandRange);
     }
 });
+
+
+// ════════════════════════════════
+// LIVE TRADING ACTIVITY TOAST
+// ════════════════════════════════
+(function () {
+    const SHOW_DELAY   = 3500;   // ms before first toast
+    const VISIBLE_TIME = 6000;   // ms toast stays visible
+    const BETWEEN_TIME = 12000;  // ms gap between toasts
+    const DURATION_CSS = '6s';   // must match VISIBLE_TIME
+
+    const activities = [
+        { loc: 'London',       action: 'invested',  amt: '$1,250',  asset: 'Bitcoin'   },
+        { loc: 'New York',     action: 'invested',  amt: '$3,500',  asset: 'Ethereum'  },
+        { loc: 'Dubai',        action: 'invested',  amt: '$5,000',  asset: 'the Premium Plan' },
+        { loc: 'Toronto',      action: 'deposited', amt: '$800',    asset: 'Standard Plan' },
+        { loc: 'Lagos',        action: 'invested',  amt: '$2,200',  asset: 'Forex'     },
+        { loc: 'Singapore',    action: 'invested',  amt: '$10,000', asset: 'Gold'      },
+        { loc: 'Sydney',       action: 'deposited', amt: '$600',    asset: 'Basic Plan'},
+        { loc: 'Johannesburg', action: 'invested',  amt: '$4,750',  asset: 'Silver'    },
+        { loc: 'Berlin',       action: 'invested',  amt: '$1,800',  asset: 'Bitcoin'   },
+        { loc: 'Mumbai',       action: 'deposited', amt: '$950',    asset: 'Ethereum'  },
+        { loc: 'Paris',        action: 'invested',  amt: '$3,000',  asset: 'the Premium Plan' },
+        { loc: 'Nairobi',      action: 'invested',  amt: '$500',    asset: 'Basic Plan'},
+        { loc: 'Tokyo',        action: 'invested',  amt: '$7,500',  asset: 'Forex'     },
+        { loc: 'São Paulo',    action: 'deposited', amt: '$1,100',  asset: 'Standard Plan' },
+        { loc: 'Cairo',        action: 'invested',  amt: '$2,600',  asset: 'Gold'      },
+    ];
+
+    const toast   = document.getElementById('ltaToast');
+    const closeBtn= document.getElementById('ltaClose');
+    const bodyEl  = document.getElementById('ltaBody');
+    const locEl   = document.getElementById('ltaLoc');
+    const amtEl   = document.getElementById('ltaAmt');
+    const assetEl = document.getElementById('ltaAsset');
+    const timeEl  = document.getElementById('ltaTime');
+    const barEl   = document.getElementById('ltaBar');
+
+    if (!toast) return;
+
+    let lastIndex = -1;
+    let hideTimer, nextTimer;
+    let dismissed = false;
+
+    function pick() {
+        let idx;
+        do { idx = Math.floor(Math.random() * activities.length); } while (idx === lastIndex);
+        lastIndex = idx;
+        return activities[idx];
+    }
+
+    function timeAgo() {
+        const mins = Math.floor(Math.random() * 4);
+        return mins === 0 ? 'just now' : `${mins} min ago`;
+    }
+
+    function showToast() {
+        if (dismissed) return;
+        const a = pick();
+
+        locEl.textContent   = a.loc;
+        amtEl.textContent   = `${a.action} ${a.amt}`;
+        assetEl.textContent = a.asset;
+        timeEl.textContent  = timeAgo();
+
+        // Restart progress bar animation
+        toast.style.setProperty('--lta-duration', DURATION_CSS);
+        barEl.style.animation = 'none';
+        void barEl.offsetWidth; // reflow
+        barEl.style.animation = '';
+
+        toast.classList.add('lta-visible');
+
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(hideToast, VISIBLE_TIME);
+    }
+
+    function hideToast() {
+        toast.classList.remove('lta-visible');
+        if (!dismissed) {
+            nextTimer = setTimeout(showToast, BETWEEN_TIME);
+        }
+    }
+
+    closeBtn.addEventListener('click', () => {
+        dismissed = true;
+        clearTimeout(hideTimer);
+        clearTimeout(nextTimer);
+        toast.classList.remove('lta-visible');
+    });
+
+    // Pause on hover
+    toast.addEventListener('mouseenter', () => { clearTimeout(hideTimer); });
+    toast.addEventListener('mouseleave', () => {
+        if (!dismissed) hideTimer = setTimeout(hideToast, 2000);
+    });
+
+    setTimeout(showToast, SHOW_DELAY);
+})();

@@ -648,6 +648,26 @@
     </footer>
 
 
+
+    <!-- ==================== LIVE TRADING ACTIVITY TOAST ==================== -->
+    <div class="lta-toast" id="ltaToast" role="alert" aria-live="polite">
+        <button class="lta-close" id="ltaClose" aria-label="Dismiss"><i class="uil uil-multiply"></i></button>
+        <div class="lta-header">
+            <i class="uil uil-chart-line lta-icon"></i>
+            <span class="lta-title">Live Trading Activity</span>
+            <span class="lta-live"><span class="lta-live-dot"></span> Live</span>
+        </div>
+        <p class="lta-body" id="ltaBody">
+            Trader from <strong class="lta-loc" id="ltaLoc">London</strong> just
+            <strong class="lta-amt" id="ltaAmt">invested $1,250</strong> in
+            <span id="ltaAsset">Bitcoin</span>
+        </p>
+        <div class="lta-footer">
+            <span class="lta-time" id="ltaTime">just now</span>
+            <div class="lta-bar" id="ltaBar"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.1/chart.min.js"></script>
