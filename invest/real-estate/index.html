@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.2.0/css/line.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../invest.css">
+    <style>
+        /* Anti-FOUC: applied instantly before external CSS loads */
+        html { background: #f0eff5; }
+        html.dark-theme { background: #0d242c; }
+        @media (min-width: 1024px) {
+            body { display: grid; grid-template-columns: 17rem auto; }
+        }
+    </style>
 </head>
 <body data-asset="real-estate">
 
