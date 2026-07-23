@@ -295,6 +295,128 @@
 
 
 /* ========================= RECENT TRANSACTIONS LIST ========================= */
+
+/* ── Admin overview item rows (pending deposits/withdrawals/KYC, recent signups) ── */
+.admin-item-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--color-light);
+    flex-wrap: wrap;
+}
+
+.admin-item-row:last-child { border-bottom: none; }
+
+.admin-item-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.admin-item-avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--color-dark);
+    flex-shrink: 0;
+}
+
+.admin-item-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-item-meta {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.admin-item-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    white-space: nowrap;
+}
+
+.admin-action-btns {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.admin-approve-btn,
+.admin-reject-btn {
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-1);
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.admin-approve-btn {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.admin-approve-btn:hover { background: var(--color-success); color: #fff; }
+
+.admin-reject-btn {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.admin-reject-btn:hover { background: var(--color-danger); color: #fff; }
+
+.admin-approve-btn:disabled,
+.admin-reject-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Status badge for KYC in recent signups */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.verified    { background: var(--color-success-light); color: var(--color-success); }
+.status-badge.pending     { background: rgba(234,181,7,0.15); color: var(--color-warning); }
+.status-badge.rejected    { background: var(--color-danger-light); color: var(--color-danger); }
+.status-badge.unsubmitted { background: var(--color-light); color: var(--color-gray-dark); }
+
+
 .recent-tx-list {
     display: flex;
     flex-direction: column;
