@@ -21,6 +21,14 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../admin.css">
     <link rel="stylesheet" href="./settings.css">
+    <style>
+        /* Anti-FOUC: applied instantly before external CSS loads */
+        html { background: #f0eff5; }
+        html.dark-theme { background: #0d242c; }
+        @media (min-width: 1024px) {
+            body { display: grid; grid-template-columns: 17rem auto; }
+        }
+    </style>
 </head>
 
 <body>
