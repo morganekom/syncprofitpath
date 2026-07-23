@@ -257,6 +257,19 @@ function switchMarketTab(tab, btn) {
     document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('marketPanel-' + tab).classList.add('active');
 
+    // Update chart note when on non-crypto tabs
+    const chartNote = document.getElementById('chartMarketNote');
+    if (chartNote) {
+        const notes = {
+            stocks:      'Chart shows crypto market overview. Stock chart data coming soon.',
+            forex:       'Chart shows crypto market overview. Forex chart data coming soon.',
+            energy:      'Chart shows crypto market overview. Commodities chart data coming soon.',
+        };
+        const note = notes[tab] || '';
+        chartNote.textContent = note;
+        chartNote.style.display = note ? '' : 'none';
+    }
+
     // Load data if first visit to this tab
     if (!marketLoaded[tab]) {
         marketLoaded[tab] = true;
@@ -516,6 +529,7 @@ function injectChartControls() {
             <div class="chart-tabs" id="chartTabs">${coinTabs}</div>
             <div class="chart-range-tabs" id="chartRangeTabs">${rangeTabs}</div>
         </div>
+        <p class="chart-market-note" id="chartMarketNote" style="display:none;"></p>
         <div class="chart-status" id="chartStatus"></div>
     `);
 }

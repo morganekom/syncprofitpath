@@ -1031,6 +1031,16 @@
     box-shadow: var(--box-shadow);
 }
 
+.chart-market-note {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    background: var(--color-light);
+    border-radius: var(--radius-1);
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
 .chart-status {
     display: none;
     align-items: center;
