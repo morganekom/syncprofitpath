@@ -4,7 +4,8 @@
 // ── STATE ──
 let activePlan = { name: '', rate: 0, roi: 0, min: 0, max: 0, duration: '' };
 let allPlansCache    = [];
-let activeAssetClass = 'crypto'; // overridden by each page on load
+// Read asset class from body data attribute set by each page
+const activeAssetClass = document.body.dataset.asset || 'crypto';
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
