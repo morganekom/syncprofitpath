@@ -17,7 +17,7 @@
     --color-primary-light: rgb(71, 7, 234, 0.2);
     --color-success-light: rgb(34, 202, 75, 0.2);
     --color-danger-light: rgb(255, 67, 54, 0.2);
-    --color-purple-light: rgb(160, 99, 245, 0.2);
+    --color-purple-light: rgba(160, 99, 245, 0.2);
 
     --card-padding: 1.6rem;
 
@@ -499,6 +499,11 @@ nav {
     display: none;
     flex-direction: column;
     overflow: hidden;
+    background: rgba(0,0,0,0.08);
+}
+
+.dark-theme .sidebar-dropdown-items {
+    background: rgba(0,0,0,0.15);
 }
 
 .sidebar-dropdown-items.open {
@@ -510,18 +515,22 @@ nav {
 .sidebar .sidebar-dropdown-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.2rem 4vw 1.2rem calc(2vw + 2rem);
+    gap: 0.8rem;
+    padding: 0.85rem 1rem 0.85rem 3.8rem;
+    font-size: 1.05rem;
     font-weight: 500;
     color: var(--color-gray-dark);
     text-decoration: none;
     transition: var(--transition);
     border-radius: 0 0.5rem 0.5rem 0;
     background: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar .sidebar-dropdown-item i {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     color: inherit;
     flex-shrink: 0;
 }
@@ -537,7 +546,8 @@ nav {
     background: var(--color-white);
     color: var(--color-primary);
     border-left: none;
-    padding-left: calc(2vw + 2rem);
+    padding-left: 3.8rem;
+    font-weight: 600;
 }
 
 .sidebar_close-btn {
