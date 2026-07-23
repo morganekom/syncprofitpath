@@ -129,7 +129,6 @@ function renderPlans() {
     }).join('');
 
     grid.style.display = '';
-    populateCalculator();
 }
 
 
@@ -286,55 +285,6 @@ async function confirmInvestment() {
 
     document.getElementById('modalFooter').style.display = 'none';
     document.getElementById('modalSuccess').classList.add('show');
-}
-
-
-// ================================================================
-// CALCULATOR
-// ================================================================
-let calcPlan = { name:'', rate:0, roi:0 };
-
-function populateCalculator() {
-    const dropdown = document.getElementById('calcDropdown');
-    if (!dropdown) return;
-    dropdown.innerHTML = allPlansCache.map(p =>
-        `<div class="calc-dropdown-item" onclick="selectCalcPlan('${escapeHtml(p.name||'')}',${p.daily_rate??0},${p.roi_multiplier??0})">
-            ${escapeHtml(p.name||'Plan')} <span>${p.daily_rate??0}% Daily</span>
-        </div>`
-    ).join('');
-}
-
-function toggleCalcDropdown() {
-    document.getElementById('calcDropdown').classList.toggle('open');
-    document.getElementById('calcChevron').classList.toggle('open');
-}
-
-function selectCalcPlan(name, rate, roi) {
-    calcPlan = { name, rate, roi };
-    document.getElementById('calcPlanLabel').textContent = name;
-    document.getElementById('calcDropdown').classList.remove('open');
-    document.getElementById('calcChevron').classList.remove('open');
-    calculateProfit();
-    checkCalculatorReady();
-}
-
-function calculateProfit() {
-    const amountInput = document.getElementById('calcAmount');
-    const profitEl    = document.getElementById('calcProfit');
-    const errorEl     = document.getElementById('calcError');
-    if (!profitEl||!errorEl) return;
-    const amount = parseFloat(amountInput.value);
-    errorEl.textContent = '';
-    if (!calcPlan.name||!amountInput.value) { profitEl.textContent='$0.00'; checkCalculatorReady(); return; }
-    if (isNaN(amount)||amount<=0) { errorEl.textContent='Please enter a valid amount.'; profitEl.textContent='$0.00'; return; }
-    profitEl.textContent = '$'+formatNum(amount*(calcPlan.rate/100)*30);
-    checkCalculatorReady();
-}
-
-function checkCalculatorReady() {
-    const amount = parseFloat(document.getElementById('calcAmount')?.value);
-    const btn = document.getElementById('calculateBtn');
-    if (btn) btn.disabled = !(calcPlan.name && amount > 0);
 }
 
 document.addEventListener('DOMContentLoaded', () => { loadPlans(); });
