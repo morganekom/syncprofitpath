@@ -487,6 +487,8 @@ nav {
 .sidebar-dropdown-btn.active {
     background: var(--color-white);
     color: var(--color-primary);
+    border-left: 0.5rem solid var(--color-primary);
+    padding-left: calc(2vw - 0.5rem);
 }
 
 .sidebar-dropdown-btn.open .sidebar-dropdown-arrow {
