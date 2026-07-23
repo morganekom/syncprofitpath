@@ -524,6 +524,17 @@ function injectChartControls() {
     `).join('');
 
     header.insertAdjacentHTML('afterend', `
+        <div class="chart-asset-tabs" id="chartAssetTabs">
+            <button class="chart-asset-tab active" onclick="switchChartAsset('crypto', this)">
+                <i class="uil uil-bitcoin-circle"></i> Crypto
+            </button>
+            <button class="chart-asset-tab" onclick="switchChartAsset('stocks', this)">
+                <i class="uil uil-chart-line"></i> Stocks
+            </button>
+            <button class="chart-asset-tab" onclick="switchChartAsset('realestate', this)">
+                <i class="uil uil-home-alt"></i> Real Estate
+            </button>
+        </div>
         <div class="chart-controls">
             <div class="chart-tabs" id="chartTabs">${coinTabs}</div>
             <div class="chart-range-tabs" id="chartRangeTabs">${rangeTabs}</div>
@@ -531,6 +542,167 @@ function injectChartControls() {
         <p class="chart-market-note" id="chartMarketNote" style="display:none;"></p>
         <div class="chart-status" id="chartStatus"></div>
     `);
+}
+
+// Asset classes for the chart
+const CHART_ASSET_COINS = {
+    crypto: [
+        { key: 'btc',  ticker: 'BTC',  symbol: 'BTCUSDT',  color: '#f7931a' },
+        { key: 'eth',  ticker: 'ETH',  symbol: 'ETHUSDT',  color: '#627eea' },
+        { key: 'bnb',  ticker: 'BNB',  symbol: 'BNBUSDT',  color: '#f3ba2f' },
+        { key: 'sol',  ticker: 'SOL',  symbol: 'SOLUSDT',  color: '#9945ff' },
+        { key: 'usdt', ticker: 'USDT', symbol: 'USDCUSDT', color: '#2775ca' },
+        { key: 'ada',  ticker: 'ADA',  symbol: 'ADAUSDT',  color: '#e84142' },
+    ],
+    stocks: [
+        { key: 'aapl', ticker: 'AAPL', symbol: 'AAPL', color: '#555555' },
+        { key: 'tsla', ticker: 'TSLA', symbol: 'TSLA', color: '#cc0000' },
+        { key: 'amzn', ticker: 'AMZN', symbol: 'AMZN', color: '#ff9900' },
+        { key: 'msft', ticker: 'MSFT', symbol: 'MSFT', color: '#00a4ef' },
+        { key: 'googl', ticker: 'GOOGL', symbol: 'GOOGL', color: '#4285f4' },
+        { key: 'meta', ticker: 'META', symbol: 'META', color: '#1877f2' },
+    ],
+    realestate: [
+        { key: 'vnq',  ticker: 'VNQ',  symbol: 'VNQ',  color: '#27ae60' },
+        { key: 'spg',  ticker: 'SPG',  symbol: 'SPG',  color: '#2ecc71' },
+        { key: 'pld',  ticker: 'PLD',  symbol: 'PLD',  color: '#16a085' },
+        { key: 'amt',  ticker: 'AMT',  symbol: 'AMT',  color: '#1abc9c' },
+    ],
+};
+
+let activeChartAsset = 'crypto';
+
+function switchChartAsset(asset, btn) {
+    // Update asset tab buttons
+    document.querySelectorAll('.chart-asset-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    activeChartAsset = asset;
+
+    // Rebuild coin tabs for this asset
+    const coins = CHART_ASSET_COINS[asset] || CHART_ASSET_COINS.crypto;
+    const firstCoin = coins[0];
+
+    const coinTabs = coins.map((coin, i) => `
+        <button class="chart-coin-tab${i === 0 ? ' active' : ''}"
+            data-coin="${coin.key}"
+            onclick="switchChartCoinAsset('${coin.key}', '${asset}', this)"
+            style="--tab-color:${coin.color}"
+        >${coin.ticker}</button>
+    `).join('');
+
+    document.getElementById('chartTabs').innerHTML = coinTabs;
+
+    // Show note for non-crypto
+    const chartNote = document.getElementById('chartMarketNote');
+    if (chartNote) {
+        const notes = {
+            stocks:     'Stock chart data is simulated. Live stock OHLC requires a market data subscription.',
+            realestate: 'REIT chart data is simulated. Live real estate data requires a market data subscription.',
+        };
+        const note = notes[asset] || '';
+        chartNote.textContent = note;
+        chartNote.style.display = note ? '' : 'none';
+    }
+
+    // Load chart for first coin of this asset
+    if (asset === 'crypto') {
+        activeChartCoin = firstCoin.key;
+        scheduleChartLoad(firstCoin.key, activeChartRange);
+    } else {
+        // For stocks/real estate: generate simulated price history
+        loadSimulatedChart(firstCoin);
+    }
+}
+
+function switchChartCoinAsset(coinKey, asset, btn) {
+    document.querySelectorAll('.chart-coin-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (asset === 'crypto') {
+        activeChartCoin = coinKey;
+        scheduleChartLoad(coinKey, activeChartRange);
+    } else {
+        const coins = CHART_ASSET_COINS[asset] || [];
+        const coin = coins.find(c => c.key === coinKey);
+        if (coin) loadSimulatedChart(coin);
+    }
+}
+
+function loadSimulatedChart(coin) {
+    // Generate realistic-looking price trend from a base price
+    const basePrices = {
+        aapl: 196, tsla: 248, amzn: 185, msft: 415, googl: 176, meta: 492,
+        vnq: 87, spg: 148, pld: 118, amt: 195,
+    };
+    const base = basePrices[coin.key] || 100;
+    const range = TIME_RANGES.find(r => r.key === activeChartRange) || TIME_RANGES[3];
+    const points = range.limit || 30;
+
+    // Simulate a believable random walk
+    const prices = [];
+    let price = base * (0.92 + Math.random() * 0.16);
+    for (let i = 0; i < points; i++) {
+        price = price * (1 + (Math.random() - 0.495) * 0.025);
+        prices.push(parseFloat(price.toFixed(2)));
+    }
+
+    const now = new Date();
+    const labels = Array.from({ length: points }, (_, i) => {
+        const d = new Date(now);
+        d.setDate(d.getDate() - (points - 1 - i));
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    // Render using the existing renderChart but with the coin color
+    const canvas = document.getElementById('chart');
+    if (!canvas) return;
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, coin.color + '33');
+    gradient.addColorStop(1, coin.color + '00');
+
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: coin.ticker,
+                data: prices,
+                borderColor: coin.color,
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.4,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => '$' + ctx.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+                    },
+                },
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 6, color: '#888' } },
+                y: {
+                    grid: { color: 'rgba(128,128,128,0.1)' },
+                    ticks: {
+                        color: '#888',
+                        callback: v => '$' + v.toLocaleString(),
+                    },
+                },
+            },
+        },
+    });
+    clearChartStatus();
 }
 
 function scheduleChartLoad(coinKey, rangeKey) {
