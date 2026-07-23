@@ -1,3 +1,33 @@
+// ── THEME — follow OS / user preference (mirrors main.js logic) ──────────────
+(function () {
+    var PREF_KEY  = 'themePreference';
+    var SAVED_KEY = 'currrentTheme'; // intentional typo matches main.js
+    var osMq = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function isDark() {
+        var pref  = localStorage.getItem(PREF_KEY);
+        var saved = localStorage.getItem(SAVED_KEY);
+        if (pref === 'dark')   return true;
+        if (pref === 'light')  return false;
+        if (pref === 'system') return osMq.matches;
+        if (saved === 'dark-theme') return true;
+        if (saved === '')           return false;
+        return osMq.matches; // default: follow OS
+    }
+
+    function apply(dark) {
+        document.documentElement.classList.toggle('dark-theme', dark);
+    }
+
+    apply(isDark());
+
+    osMq.addEventListener('change', function (e) {
+        var pref  = localStorage.getItem(PREF_KEY);
+        var saved = localStorage.getItem(SAVED_KEY);
+        if (pref === 'system' || (pref == null && saved == null)) apply(e.matches);
+    });
+})();
+
 // ================================================================
 // LANDING.JS — Public page, no auth required
 // ================================================================

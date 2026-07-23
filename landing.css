@@ -27,6 +27,30 @@
     --shadow-sm: 0 2px 12px rgba(0,0,0,0.07);
     --shadow-md: 0 8px 32px rgba(0,0,0,0.12);
     --shadow-lg: 0 20px 60px rgba(0,0,0,0.18);
+
+    /* Stats bar — light mode uses a deep charcoal (same as before) */
+    --stats-bg:               #1a1b21;
+    --stats-label:            rgba(255,255,255,0.5);
+    --stats-divider:          rgba(255,255,255,0.1);
+
+    /* Plans section — light mode dark bg (same look as original) */
+    --section-dark-bg:        #27282f;
+    --section-dark-heading:   #ffffff;
+    --section-dark-sub:       rgba(255,255,255,0.55);
+    --plan-card-bg:           rgba(255,255,255,0.06);
+    --plan-card-border:       rgba(255,255,255,0.1);
+    --plan-rate-label:        rgba(255,255,255,0.5);
+    --plan-range-color:       #ffffff;
+    --plan-feature-color:     rgba(255,255,255,0.75);
+
+    /* Testimonials — light mode: visible on the dark section bg */
+    --testimonial-bg:         rgba(255,255,255,0.05);
+    --testimonial-border:     rgba(255,255,255,0.08);
+    --testimonial-hover-bg:   rgba(255,255,255,0.08);
+    --testimonial-text:       rgba(255,255,255,0.7);
+    --testimonial-author-name:#ffffff;
+    --testimonial-author-sub: rgba(255,255,255,0.45);
+
 }
 
 :root.dark-theme,
@@ -35,6 +59,30 @@
     --light:     #0d242c;
     --white:     #0a191e;
     --gray-dark: #adacb5;
+
+    /* Stats bar */
+    --stats-bg:               #0d1f27;
+    --stats-label:            rgba(255,255,255,0.45);
+    --stats-divider:          rgba(255,255,255,0.08);
+
+    /* Plans section */
+    --section-dark-bg:        #060f12;
+    --section-dark-heading:   #e8e8e8;
+    --section-dark-sub:       rgba(255,255,255,0.45);
+    --plan-card-bg:           rgba(255,255,255,0.04);
+    --plan-card-border:       rgba(255,255,255,0.08);
+    --plan-rate-label:        rgba(255,255,255,0.45);
+    --plan-range-color:       #e0e0e0;
+    --plan-feature-color:     rgba(255,255,255,0.65);
+
+    /* Testimonials */
+    --testimonial-bg:         rgba(255,255,255,0.04);
+    --testimonial-border:     rgba(255,255,255,0.07);
+    --testimonial-hover-bg:   rgba(255,255,255,0.07);
+    --testimonial-text:       rgba(255,255,255,0.65);
+    --testimonial-author-name:#ddd;
+    --testimonial-author-sub: rgba(255,255,255,0.4);
+
 }
 
 html { font-size: 12px; scroll-behavior: smooth; }
@@ -451,7 +499,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 
 /* Stats bar */
 .land-hero__stats {
-    background: var(--dark-2);
+    background: var(--stats-bg, #1a1b21);
     margin-top: 2rem;
 }
 
@@ -478,13 +526,13 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 
 .hero-stat p {
     font-size: 1.1rem;
-    color: rgba(255,255,255,0.5);
+    color: var(--stats-label, rgba(255,255,255,0.5));
 }
 
 .hero-stat-divider {
     width: 1px;
     height: 4rem;
-    background: rgba(255,255,255,0.1);
+    background: var(--stats-divider, rgba(255,255,255,0.1));
 }
 
 
@@ -496,18 +544,20 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 }
 
 .land-section--dark {
-    background: var(--dark);
+    background: var(--section-dark-bg, #27282f);
 }
 
 .land-section--dark .land-section__header h2,
-.land-section--dark .land-section__header p,
-.land-section--dark .land-plan__rate,
 .land-section--dark .land-plan h3 {
-    color: var(--white);
+    color: var(--section-dark-heading, #fff);
 }
 
 .land-section--dark .land-section__header p {
-    color: rgba(255,255,255,0.55);
+    color: var(--section-dark-sub, rgba(255,255,255,0.55));
+}
+
+.land-section--dark .land-plan__rate {
+    color: var(--section-dark-heading, #fff);
 }
 
 .land-section--tint {
@@ -634,8 +684,8 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 }
 
 .land-plan {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: var(--plan-card-bg, rgba(255,255,255,0.06));
+    border: 1px solid var(--plan-card-border, rgba(255,255,255,0.1));
     border-radius: var(--r3);
     overflow: hidden;
     transition: var(--transition);
@@ -669,7 +719,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 
 .land-plan__header {
     padding: 3rem 2.4rem 2.4rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid var(--plan-card-border, rgba(255,255,255,0.1));
     text-align: center;
 }
 
@@ -707,7 +757,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 
 .land-plan__rate-label {
     font-size: 1.1rem;
-    color: rgba(255,255,255,0.5);
+    color: var(--plan-rate-label, rgba(255,255,255,0.5));
 }
 
 .land-plan--featured .land-plan__rate-label { color: rgba(0,0,0,0.55); }
@@ -722,7 +772,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 .land-plan__range {
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--white);
+    color: var(--plan-range-color, #fff);
     text-align: center;
 }
 
@@ -740,7 +790,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
     align-items: center;
     gap: 0.8rem;
     font-size: 1.2rem;
-    color: rgba(255,255,255,0.75);
+    color: var(--plan-feature-color, rgba(255,255,255,0.75));
 }
 
 .land-plan--featured .land-plan__features li { color: rgba(0,0,0,0.7); }
@@ -858,8 +908,8 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 }
 
 .land-testimonial {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--testimonial-bg, rgba(255,255,255,0.05));
+    border: 1px solid var(--testimonial-border, rgba(255,255,255,0.08));
     border-radius: var(--r3);
     padding: 2.8rem 2.4rem;
     display: flex;
@@ -869,8 +919,8 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 }
 
 .land-testimonial:hover {
-    border-color: rgba(0,226,123,0.25);
-    background: rgba(255,255,255,0.07);
+    border-color: rgba(0,226,123,0.35);
+    background: var(--testimonial-hover-bg, rgba(255,255,255,0.07));
 }
 
 .land-testimonial__stars {
@@ -882,7 +932,7 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 .land-testimonial p {
     font-size: 1.2rem;
     line-height: 1.8;
-    color: rgba(255,255,255,0.7);
+    color: var(--testimonial-text, rgba(255,255,255,0.7));
     flex: 1;
 }
 
@@ -908,12 +958,12 @@ h1,h2,h3,h4,h5 { color: var(--dark); line-height: 1.15; }
 .land-testimonial__author strong {
     display: block;
     font-size: 1.2rem;
-    color: var(--white);
+    color: var(--testimonial-author-name, #fff);
 }
 
 .land-testimonial__author span {
     font-size: 1.05rem;
-    color: rgba(255,255,255,0.45);
+    color: var(--testimonial-author-sub, rgba(255,255,255,0.45));
 }
 
 
