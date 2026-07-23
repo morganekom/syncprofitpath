@@ -1149,52 +1149,26 @@
 
 
 /* ================================================================
-   TOP UP BUTTON (on active investment card)
+   MODAL — shared styles (overlay, header, input, footer, success)
    ================================================================ */
-.active-inv-topup-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 1rem;
-    margin-top: 0.4rem;
-    background: rgba(0, 226, 123, 0.1);
-    color: var(--color-primary);
-    border: 1.5px solid rgba(0, 226, 123, 0.3);
-    border-radius: var(--radius-2);
-    font-size: 1.1rem;
-    font-weight: 600;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-    transition: var(--transition);
-}
 
-.active-inv-topup-btn i { font-size: 1.4rem; }
-
-.active-inv-topup-btn:hover {
-    background: var(--color-primary);
-    color: var(--color-dark);
-    border-color: var(--color-primary);
-}
-
-
-/* ================================================================
-   TOP UP MODAL
-   ================================================================ */
-.topup-overlay {
+.modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 200;
+    background: rgba(0,0,0,0.55);
+    z-index: 100;
     place-items: center;
     backdrop-filter: blur(3px);
 }
+.modal-overlay.open { display: grid; }
 
-.topup-overlay.open { display: grid; }
+@keyframes slideUp {
+    from { transform: translateY(2rem); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
 
-.topup-modal {
+.modal {
     background: var(--color-white);
     border-radius: var(--radius-3);
     width: 100%;
@@ -1205,13 +1179,160 @@
     flex-direction: column;
     gap: 1.4rem;
     animation: slideUp 250ms ease;
+    max-height: 92vh;
+    overflow-y: auto;
+}
+@media (min-width: 600px) { .modal { max-width: 44rem; margin: 0; } }
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header h3 { color: var(--color-dark); }
+
+.modal-subtitle {
+    color: var(--color-gray-light);
+    font-size: 1.1rem;
+    margin-top: -0.5rem;
 }
 
-@media (min-width: 600px) {
-    .topup-modal { max-width: 42rem; margin: 0; }
+.modal-field { display: flex; flex-direction: column; gap: 0.6rem; }
+.modal-field label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
 }
 
-/* Summary rows */
+.modal-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--color-light);
+    border-radius: var(--radius-2);
+    padding: 1.2rem 1.4rem;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+.modal-input-wrapper:focus-within { border-color: var(--color-primary); }
+.modal-input-wrapper span {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+}
+
+.modal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: "Poppins", sans-serif;
+}
+
+.modal-range-hint {
+    font-size: 1rem;
+    color: var(--color-gray-light);
+    margin-top: 0.3rem;
+}
+
+.modal-error {
+    font-size: 1.1rem;
+    color: var(--color-danger);
+    min-height: 1.4rem;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+@media (min-width: 600px) { .modal-footer { flex-direction: row; } }
+
+.modal-cancel-btn {
+    flex: 1;
+    padding: 1.2rem;
+    border-radius: var(--radius-2);
+    background: var(--color-light);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+.modal-cancel-btn:hover {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.modal-confirm-btn {
+    flex: 2;
+    padding: 1.2rem;
+    border-radius: var(--radius-2);
+    background: var(--color-primary);
+    color: var(--color-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: "Poppins", sans-serif;
+}
+.modal-confirm-btn:hover:not(:disabled) {
+    box-shadow: 0 0.8rem 1.5rem rgba(0,226,123,0.35);
+}
+.modal-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.modal-success {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+}
+.modal-success.show { display: flex; }
+.modal-success-icon { font-size: 4rem; color: var(--color-primary); line-height: 1; }
+.modal-success h3   { color: var(--color-dark); }
+.modal-success p    { color: var(--color-gray-light); font-size: 1.1rem; }
+
+
+/* ================================================================
+   TOP UP BUTTON + MODAL
+   ================================================================ */
+
+.active-inv-topup-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.4rem;
+    background: rgba(0,226,123,0.1);
+    color: var(--color-primary);
+    border: 1.5px solid rgba(0,226,123,0.3);
+    border-radius: var(--radius-2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.active-inv-topup-btn i { font-size: 1.4rem; }
+.active-inv-topup-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+    border-color: var(--color-primary);
+}
+
+/* Top-up uses the same .modal-overlay but with higher z-index */
+.topup-overlay { z-index: 200; }
+
 .topup-summary {
     background: var(--color-light);
     border-radius: var(--radius-2);
@@ -1220,18 +1341,15 @@
     flex-direction: column;
     gap: 0.7rem;
 }
-
 .topup-summary-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1.2rem;
 }
-
 .topup-summary-row span:first-child { color: var(--color-gray-light); }
 .topup-summary-row span:last-child  { color: var(--color-dark); font-weight: 600; }
 
-/* Error */
 .topup-error {
     font-size: 1.1rem;
     color: var(--color-danger);
@@ -1239,19 +1357,17 @@
     margin-top: 0.4rem;
 }
 
-/* Preview */
 .topup-preview {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0, 226, 123, 0.08);
-    border: 1px solid rgba(0, 226, 123, 0.2);
+    background: rgba(0,226,123,0.08);
+    border: 1px solid rgba(0,226,123,0.2);
     border-radius: var(--radius-2);
     padding: 1rem 1.4rem;
     font-size: 1.1rem;
     color: var(--color-gray-light);
 }
-
 .topup-preview-val {
     font-size: 1.3rem;
     font-weight: 700;
