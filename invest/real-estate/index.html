@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../invest.css">
 </head>
-<body>
+<body data-asset="real-estate">
 
 <nav>
     <div class="container nav_container">
@@ -77,7 +77,6 @@
     <div class="inv-hero">
         <div class="inv-hero-left">
             <h1 class="realestate">
-                <span class="inv-hero-icon">🏠</span>
                 Real Estate Investment Plans
             </h1>
             <p class="inv-hero-tagline">Build wealth through strategic real estate investments with proven stable returns</p>
@@ -274,7 +273,6 @@
 <script src="../../notify.js"></script>
 <script src="../../notify-inapp.js"></script>
 <script>
-    activeAssetClass = 'real-estate';
     function toggleInvestDropdown(btn) {
         btn.classList.toggle('open');
         btn.nextElementSibling.classList.toggle('open');
