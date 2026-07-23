@@ -571,29 +571,7 @@ body { grid-template-columns: 1fr; }
 .sidebar-dropdown-arrow { margin-left: auto; font-size: 1.6rem; transition: transform 0.3s ease; }
 .sidebar-dropdown-btn.open .sidebar-dropdown-arrow { transform: rotate(180deg); }
 
-.sidebar-dropdown-items {
-    display: none;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding-left: 3.2rem;
-    padding-top: 0.3rem;
-}
-.sidebar-dropdown-items.open { display: flex; }
-
-.sidebar-dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.7rem 1rem;
-    border-radius: var(--radius-1);
-    font-size: 1.1rem;
-    color: var(--color-gray-light);
-    transition: var(--transition);
-    text-decoration: none;
-}
-.sidebar-dropdown-item:hover { color: var(--color-primary); background: rgba(0,226,123,0.07); }
-.sidebar-dropdown-item.active { color: var(--color-primary); font-weight: 600; }
-.sidebar-dropdown-item i { font-size: 1.3rem; }
+/* Sidebar dropdown styles are in style.css */
 
 
 /* ================================================================
