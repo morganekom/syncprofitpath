@@ -443,7 +443,38 @@ function renderGrid() {
 
     emptyEl.style.display = 'none';
     gridEl.style.display  = 'grid';
-    gridEl.innerHTML      = allPlans.map(p => buildPlanCard(p)).join('');
+
+    // Group plans by asset class in a fixed display order
+    const groups = [
+        { key: 'crypto',      label: 'Crypto',      icon: 'uil-bitcoin-circle', color: '#27ae60' },
+        { key: 'stocks',      label: 'Stocks',      icon: 'uil-chart-line',     color: '#a063f5' },
+        { key: 'real-estate', label: 'Real Estate', icon: 'uil-home-alt',       color: '#27ae60' },
+    ];
+
+    let html = '';
+    groups.forEach(group => {
+        const plans = allPlans.filter(p => (p.asset_class || 'crypto') === group.key);
+        if (plans.length === 0) return;
+
+        html += `
+            <div class="plan-group-header" style="--group-color:${group.color}">
+                <i class="uil ${group.icon}"></i>
+                <span>${group.label} Plans</span>
+                <span class="plan-group-count">${plans.length} plan${plans.length !== 1 ? 's' : ''}</span>
+            </div>
+        `;
+        html += plans.map(p => buildPlanCard(p)).join('');
+    });
+
+    // Any plans with unknown asset class at the end
+    const known = ['crypto', 'stocks', 'real-estate'];
+    const others = allPlans.filter(p => !known.includes(p.asset_class || 'crypto'));
+    if (others.length > 0) {
+        html += `<div class="plan-group-header"><i class="uil uil-layers"></i><span>Other Plans</span></div>`;
+        html += others.map(p => buildPlanCard(p)).join('');
+    }
+
+    gridEl.innerHTML = html;
     initDragSort();
 }
 
