@@ -335,9 +335,11 @@
 
 .tx-info-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 0.5rem;
+    flex-wrap: wrap;
+}
 }
 
 .tx-name {
@@ -363,6 +365,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.3rem;
     margin-top: 0.3rem;
 }
 
@@ -388,6 +392,8 @@
     transition: var(--transition);
     cursor: pointer;
     text-decoration: none;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .new-user-item:last-child { border-bottom: none; }
@@ -437,6 +443,8 @@
     color: var(--color-gray-light);
     white-space: nowrap;
     flex-shrink: 0;
+    max-width: 8rem;
+    text-align: right;
 }
 
 
@@ -458,6 +466,8 @@
     color: var(--color-dark);
     font-size: 1.1rem;
     font-weight: 600;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .quick-action-btn:hover {
