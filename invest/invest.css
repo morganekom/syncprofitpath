@@ -563,7 +563,11 @@ body { grid-template-columns: 1fr; }
 .sidebar-dropdown-btn:hover { background: var(--color-white); }
 .sidebar-dropdown-btn:hover h5,
 .sidebar-dropdown-btn:hover i { color: var(--color-primary); }
-.sidebar-dropdown-btn.active { background: var(--color-white); }
+.sidebar-dropdown-btn.active {
+    background: var(--color-white);
+    border-left: 0.5rem solid var(--color-primary);
+    padding-left: calc(2vw - 0.5rem);
+}
 .sidebar-dropdown-btn.active h5,
 .sidebar-dropdown-btn.active i { color: var(--color-primary); }
 
