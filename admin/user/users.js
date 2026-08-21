@@ -7,6 +7,8 @@ let allUsers      = [];
 let activeFilter  = 'all';
 let activeUserId  = null;
 let selectedUserIds = new Set();
+let composeImages = [];   // [{ id, file, previewUrl, uploadedUrl, uploading, error }]
+const MAX_EMAIL_IMAGES = 4;
 
 // ========================= INIT =========================
 document.addEventListener('DOMContentLoaded', () => {
@@ -198,6 +200,11 @@ function openComposeModal() {
     setEmailFeedback('', '');
     document.getElementById('emailSendBtn').disabled = false;
 
+    // Reset image attachments
+    composeImages.forEach(img => { if (img.previewUrl) URL.revokeObjectURL(img.previewUrl); });
+    composeImages = [];
+    renderEmailImagePreviews();
+
     document.getElementById('emailModalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     setTimeout(() => document.getElementById('emailSubject').focus(), 100);
@@ -224,6 +231,88 @@ function setEmailFeedback(msg, type) {
 }
 
 
+// ========================= EMAIL IMAGE ATTACHMENTS =========================
+function handleEmailImageSelect(event) {
+    const files = Array.from(event.target.files || []);
+    event.target.value = ''; // allow re-selecting the same file later
+
+    const remaining = MAX_EMAIL_IMAGES - composeImages.length;
+    if (remaining <= 0) {
+        setEmailFeedback(`You can attach up to ${MAX_EMAIL_IMAGES} images.`, 'error');
+        return;
+    }
+
+    files.slice(0, remaining).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const entry = {
+            id,
+            file,
+            previewUrl:  URL.createObjectURL(file),
+            uploadedUrl: null,
+            uploading:   true,
+            error:       null,
+        };
+        composeImages.push(entry);
+        renderEmailImagePreviews();
+        uploadEmailImage(entry);
+    });
+}
+
+async function uploadEmailImage(entry) {
+    try {
+        const ext      = (entry.file.name.split('.').pop() || 'jpg').toLowerCase();
+        const filePath = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+
+        const { error: uploadErr } = await db.storage
+            .from('admin-email-images')
+            .upload(filePath, entry.file, { upsert: false });
+
+        if (uploadErr) throw uploadErr;
+
+        const { data: urlData } = db.storage.from('admin-email-images').getPublicUrl(filePath);
+
+        entry.uploadedUrl = urlData.publicUrl;
+        entry.uploading   = false;
+
+    } catch (err) {
+        console.error('Email image upload error:', err.message);
+        entry.uploading = false;
+        entry.error      = 'Upload failed';
+    }
+    renderEmailImagePreviews();
+}
+
+function removeEmailImage(id) {
+    const entry = composeImages.find(img => img.id === id);
+    if (entry?.previewUrl) URL.revokeObjectURL(entry.previewUrl);
+    composeImages = composeImages.filter(img => img.id !== id);
+    renderEmailImagePreviews();
+}
+
+function renderEmailImagePreviews() {
+    const wrap = document.getElementById('emailImagePreviews');
+    const addBtn = document.getElementById('emailImageAddBtn');
+    if (!wrap) return;
+
+    wrap.innerHTML = composeImages.map(img => `
+        <div class="um-image-preview">
+            <img src="${img.previewUrl}" alt="Attachment">
+            ${img.uploading ? '<div class="um-image-preview-status"><i class="uil uil-spinner-alt spin"></i></div>' : ''}
+            ${img.error ? `<div class="um-image-preview-status error">${escapeHtml(img.error)}</div>` : ''}
+            <button type="button" class="um-image-preview-remove" onclick="removeEmailImage('${img.id}')">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+    `).join('');
+
+    if (addBtn) {
+        addBtn.classList.toggle('um-image-add-btn--disabled', composeImages.length >= MAX_EMAIL_IMAGES);
+    }
+}
+
+
 // ========================= SEND EMAILS =========================
 async function sendBroadcastEmails() {
     const subject = document.getElementById('emailSubject').value.trim();
@@ -231,6 +320,17 @@ async function sendBroadcastEmails() {
 
     if (!subject) { setEmailFeedback('Please enter a subject.', 'error'); return; }
     if (!body)    { setEmailFeedback('Please write a message.', 'error'); return; }
+
+    if (composeImages.some(img => img.uploading)) {
+        setEmailFeedback('Still uploading images — please wait a moment.', 'error');
+        return;
+    }
+    if (composeImages.some(img => img.error)) {
+        setEmailFeedback('One or more images failed to upload. Remove them or try again.', 'error');
+        return;
+    }
+
+    const imageUrls = composeImages.map(img => img.uploadedUrl).filter(Boolean);
 
     const recipients = allUsers.filter(u => selectedUserIds.has(u.id));
     if (!recipients.length) { closeComposeModal(); return; }
@@ -252,7 +352,7 @@ async function sendBroadcastEmails() {
                         'apikey':        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cWR3b3R0enJocGNsbnZ6ZG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzQyMzAsImV4cCI6MjA5MzIxMDIzMH0.YCVOAparA-_MxBrn-O_pXdZgdeFpPXGUeWdu1TkeMz0',
                         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cWR3b3R0enJocGNsbnZ6ZG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzQyMzAsImV4cCI6MjA5MzIxMDIzMH0.YCVOAparA-_MxBrn-O_pXdZgdeFpPXGUeWdu1TkeMz0',
                     },
-                    body: JSON.stringify({ to: user.email, name: user.full_name || 'User', subject, body }),
+                    body: JSON.stringify({ to: user.email, name: user.full_name || 'User', subject, body, imageUrls }),
                 }
             );
             res.ok ? sent++ : failed++;

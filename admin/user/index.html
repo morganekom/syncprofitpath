@@ -255,6 +255,15 @@
                 <div class="um-char-count"><span id="charCount">0</span> / 3000</div>
             </div>
 
+            <div class="um-modal-section">
+                <label class="um-label">Images <span class="um-note">(optional, up to 4)</span></label>
+                <div class="um-image-previews" id="emailImagePreviews"></div>
+                <label class="um-image-add-btn" id="emailImageAddBtn" for="emailImageInput">
+                    <i class="uil uil-image-plus"></i> Add image
+                </label>
+                <input type="file" id="emailImageInput" accept="image/*" multiple hidden onchange="handleEmailImageSelect(event)">
+            </div>
+
             <p class="um-feedback" id="emailFeedback"></p>
 
             <div class="um-modal-footer">
