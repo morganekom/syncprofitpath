@@ -6,7 +6,7 @@
 // Set to false when ready to open notifications to all users.
 // ================================================================
 
-const NOTIF_ADMIN_ONLY = true; // ← flip to false to enable for all users
+const NOTIF_ADMIN_ONLY = false; // ← flip to false to enable for all users
 
 // ── Config ──────────────────────────────────────────────────────
 const NOTIF_LAST_SEEN_KEY = 'notif_last_seen';

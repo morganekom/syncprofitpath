@@ -13,6 +13,7 @@
     let lastMsgCount = 0;
     let userId       = null;
     let pendingFile  = null;   // { file, name, type } staged for next send
+    let cachedMessages = [];  // last-rendered messages, so sends can append locally
 
 
     // ================================================================
@@ -61,6 +62,7 @@
                 <!-- File preview bar — visible only when a file is staged -->
                 <div class="chat-file-preview" id="chatFilePreview" style="display:none;">
                     <div class="chat-file-preview-inner">
+                        <img class="chat-file-thumb" id="chatFileThumb" style="display:none;" alt="">
                         <i class="uil uil-file-alt chat-file-icon" id="chatFileIcon"></i>
                         <span class="chat-file-name" id="chatFileName"></span>
                     </div>
@@ -132,15 +134,18 @@
 
         const panel = document.getElementById('chatWidgetPanel');
         const icon  = document.getElementById('chatWidgetIcon');
+        const isMobileLayout = window.matchMedia('(max-width: 599px)').matches;
 
         if (isOpen) {
             panel.classList.add('open');
             icon.className = 'uil uil-multiply';
             markAdminMessagesRead();
             scrollToBottom();
+            if (isMobileLayout) document.body.style.overflow = 'hidden';
         } else {
             panel.classList.remove('open');
             icon.className = 'uil uil-comment-dots';
+            document.body.style.overflow = '';
         }
     }
 
@@ -168,12 +173,24 @@
         pendingFile = { file, name: file.name, type: file.type };
 
         const iconEl  = document.getElementById('chatFileIcon');
+        const thumbEl = document.getElementById('chatFileThumb');
         const nameEl  = document.getElementById('chatFileName');
         const preview = document.getElementById('chatFilePreview');
 
-        iconEl.className = file.type === 'application/pdf'
-            ? 'uil uil-file-alt chat-file-icon chat-file-icon--pdf'
-            : 'uil uil-image chat-file-icon chat-file-icon--img';
+        const isImage = file.type !== 'application/pdf';
+
+        if (isImage) {
+            if (thumbEl.dataset.blobUrl) URL.revokeObjectURL(thumbEl.dataset.blobUrl);
+            const blobUrl = URL.createObjectURL(file);
+            thumbEl.src            = blobUrl;
+            thumbEl.dataset.blobUrl = blobUrl;
+            thumbEl.style.display   = 'block';
+            iconEl.style.display    = 'none';
+        } else {
+            thumbEl.style.display = 'none';
+            iconEl.style.display  = '';
+            iconEl.className = 'uil uil-file-alt chat-file-icon chat-file-icon--pdf';
+        }
 
         nameEl.textContent    = file.name;
         preview.style.display = 'flex';
@@ -184,9 +201,57 @@
 
     function removeFile() {
         pendingFile = null;
+        const thumbEl = document.getElementById('chatFileThumb');
+        if (thumbEl.dataset.blobUrl) { URL.revokeObjectURL(thumbEl.dataset.blobUrl); delete thumbEl.dataset.blobUrl; }
+        thumbEl.style.display = 'none';
+        thumbEl.src = '';
         document.getElementById('chatFilePreview').style.display = 'none';
         document.getElementById('chatFileName').textContent       = '';
+        document.getElementById('chatFileIcon').style.display     = '';
         document.getElementById('chatFileIcon').className         = 'uil uil-file-alt chat-file-icon';
+    }
+
+
+    // ================================================================
+    // COMPRESS IMAGE BEFORE UPLOAD
+    // Phone camera photos and screenshots can be several MB; resizing
+    // and re-encoding client-side before upload is the single biggest
+    // speed win on mobile data. Skips GIFs (would lose animation) and
+    // non-images (PDFs). Falls back to the original file if anything
+    // goes wrong or compression doesn't actually help.
+    // ================================================================
+
+    function compressImage(file, maxDim = 1600, quality = 0.82) {
+        return new Promise(resolve => {
+            if (!file.type.startsWith('image/') || file.type === 'image/gif') {
+                resolve(file);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+                        else                 { width  = Math.round(width  * maxDim / height); height = maxDim; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(blob => {
+                        if (!blob || blob.size >= file.size) { resolve(file); return; }
+                        resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }));
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = () => resolve(file);
+                img.src = e.target.result;
+            };
+            reader.onerror = () => resolve(file);
+            reader.readAsDataURL(file);
+        });
     }
 
 
@@ -196,12 +261,13 @@
     // ================================================================
 
     async function uploadFile(file) {
-        const ext  = file.name.split('.').pop().toLowerCase();
+        const toUpload = await compressImage(file);
+        const ext  = toUpload.name.split('.').pop().toLowerCase();
         const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
         const { error: uploadError } = await db.storage
             .from('chat-attachments')
-            .upload(path, file, { cacheControl: '3600', upsert: false });
+            .upload(path, toUpload, { cacheControl: '3600', upsert: false });
 
         if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
@@ -211,7 +277,7 @@
 
         if (!data?.publicUrl) throw new Error('Could not get public URL for uploaded file');
 
-        return { publicUrl: data.publicUrl, fileName: file.name, fileType: file.type };
+        return { publicUrl: data.publicUrl, fileName: file.name, fileType: toUpload.type };
     }
 
 
@@ -254,6 +320,7 @@
             // Only re-render if message count changed (avoids flicker)
             if (data.length !== lastMsgCount) {
                 lastMsgCount = data.length;
+                cachedMessages = data;
                 renderMessages(data);
 
                 const unreadAdmin = data.filter(m => m.sender === 'admin' && !m.read);
@@ -278,15 +345,20 @@
 
         messages.forEach(msg => {
             const isUser = msg.sender === 'user';
-            const time   = msg.created_at
-                ? new Date(msg.created_at).toLocaleString('en-US', {
+            let time;
+            if (msg._pending)     time = 'Sending…';
+            else if (msg._failed) time = 'Failed to send — tap to remove';
+            else if (msg.created_at) {
+                time = new Date(msg.created_at).toLocaleString('en-US', {
                     hour: '2-digit', minute: '2-digit',
                     month: 'short',  day: 'numeric'
-                  })
-                : '';
+                });
+            } else time = '';
 
             const el = document.createElement('div');
             el.className = `widget-msg ${isUser ? 'from-user' : 'from-admin'}`;
+            if (msg._pending) el.classList.add('is-pending');
+            if (msg._failed)  { el.classList.add('is-failed'); el.onclick = () => removeFailedMessage(msg._localId); }
 
             // Build bubble — text and/or attachment
             let bubbleHtml = '';
@@ -336,32 +408,51 @@
         const input   = document.getElementById('chatPanelInput');
         const sendBtn = document.getElementById('chatPanelSend');
         const message = input.value.trim();
+        const fileToSend = pendingFile;
 
         // Need at least text or a file
-        if (!message && !pendingFile) return;
+        if (!message && !fileToSend) return;
 
-        input.disabled   = true;
-        sendBtn.disabled = true;
+        // Clear the input immediately — feels instant even while upload/insert run in background
+        input.value        = '';
+        input.style.height = 'auto';
+        if (fileToSend) removeFile();
+
+        // Optimistic bubble: shows right away, image preview via local blob URL if present
+        const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const optimisticMsg = {
+            _localId:  localId,
+            _pending:  true,
+            sender:    'user',
+            message:   message || null,
+            file_url:  fileToSend ? URL.createObjectURL(fileToSend.file) : null,
+            file_name: fileToSend ? fileToSend.name : null,
+            file_type: fileToSend ? fileToSend.type : null,
+            created_at: null,
+        };
+        cachedMessages = [...cachedMessages, optimisticMsg];
+        lastMsgCount = cachedMessages.length;
+        document.getElementById('chatPanelWelcome').style.display = 'none';
+        renderMessages(cachedMessages);
 
         try {
             let fileUrl  = null;
             let fileName = null;
             let fileType = null;
 
-            if (pendingFile) {
+            if (fileToSend) {
                 try {
-                    const result = await uploadFile(pendingFile.file);
+                    const result = await uploadFile(fileToSend.file);
                     fileUrl  = result.publicUrl;
                     fileName = result.fileName;
                     fileType = result.fileType;
                 } catch (uploadErr) {
                     // If storage bucket isn't set up yet, still send the text message
                     console.warn('File upload failed (has the SQL migration been run?):', uploadErr.message);
-                    fileUrl = null;
                 }
             }
 
-            const { error } = await db
+            const { data: inserted, error } = await db
                 .from('messages')
                 .insert([{
                     user_id:   userId,
@@ -371,26 +462,32 @@
                     file_name: fileName,
                     file_type: fileType,
                     read:      false,
-                }]);
+                }])
+                .select()
+                .single();
 
             if (error) throw error;
 
-            input.value        = '';
-            input.style.height = 'auto';
-            input.disabled     = false;
-            sendBtn.disabled   = false;
-            input.focus();
-
-            if (pendingFile) removeFile();
-
-            await loadMessages(false);
+            // Swap the optimistic bubble for the real DB row (same array length, no full refetch)
+            cachedMessages = cachedMessages.map(m =>
+                m._localId === localId ? (inserted || { ...m, _pending: false }) : m
+            );
+            renderMessages(cachedMessages);
 
         } catch (err) {
             console.error('Chat send error:', err.message);
-            input.disabled   = false;
-            sendBtn.disabled = false;
-            alert('Failed to send. Please try again.');
+            cachedMessages = cachedMessages.map(m =>
+                m._localId === localId ? { ...m, _pending: false, _failed: true } : m
+            );
+            renderMessages(cachedMessages);
         }
+    }
+
+    // Tap a failed bubble to dismiss it and try again
+    function removeFailedMessage(localId) {
+        cachedMessages = cachedMessages.filter(m => m._localId !== localId);
+        lastMsgCount = cachedMessages.length;
+        renderMessages(cachedMessages);
     }
 
 
