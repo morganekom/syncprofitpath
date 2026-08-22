@@ -169,8 +169,30 @@
                     <!-- Populated by JS -->
                 </div>
 
+                <!-- File preview bar — visible only when a file is staged -->
+                <div class="chat-file-preview" id="chatFilePreview" style="display:none;">
+                    <div class="chat-file-preview-inner">
+                        <i class="uil uil-file-alt chat-file-icon" id="chatFileIcon"></i>
+                        <span class="chat-file-name" id="chatFileName"></span>
+                    </div>
+                    <button class="chat-file-remove" onclick="removeFile()" title="Remove file">
+                        <i class="uil uil-times"></i>
+                    </button>
+                </div>
+
                 <!-- Reply box -->
                 <div class="chat-reply-box">
+                    <input
+                        type="file"
+                        id="chatFileInput"
+                        accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                        style="display:none;"
+                        onchange="stageFile(this)">
+
+                    <button class="chat-attach-btn" onclick="document.getElementById('chatFileInput').click()" title="Attach image or PDF">
+                        <i class="uil uil-paperclip"></i>
+                    </button>
+
                     <textarea
                         id="replyInput"
                         class="chat-reply-input"
@@ -178,7 +200,7 @@
                         rows="2"
                         onkeydown="handleReplyKey(event)">
                     </textarea>
-                    <button class="chat-send-btn" onclick="sendReply()">
+                    <button class="chat-send-btn" id="chatSendBtn" onclick="sendReply()">
                         <i class="uil uil-message"></i>
                     </button>
                 </div>
