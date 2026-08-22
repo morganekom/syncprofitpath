@@ -264,6 +264,14 @@
     min-width: 0;
 }
 
+.chat-file-thumb {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .chat-file-icon {
     font-size: 1.6rem;
     flex-shrink: 0;
@@ -349,6 +357,16 @@
 
 .chat-msg.from-user { align-self: flex-start; }
 .chat-msg.from-admin { align-self: flex-end; }
+
+.chat-msg.is-pending .chat-bubble { opacity: 0.55; }
+.chat-msg.is-pending .chat-meta   { font-style: italic; }
+
+.chat-msg.is-failed  { cursor: pointer; }
+.chat-msg.is-failed .chat-bubble {
+    opacity: 0.7;
+    outline: 1.5px solid var(--color-danger);
+}
+.chat-msg.is-failed .chat-meta { color: var(--color-danger); }
 
 .chat-bubble {
     padding: 1.1rem 1.4rem;

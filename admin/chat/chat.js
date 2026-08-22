@@ -8,6 +8,7 @@ let allConversations = [];    // list of unique users who have sent messages
 let activeConvoUserId = null; // currently open conversation
 let pollInterval      = null; // setInterval reference for message polling
 let pendingFile        = null; // { file, name, type } staged for next admin reply
+let cachedThreadMessages = []; // last-rendered messages for the active thread
 
 
 // ========================= INIT =========================
@@ -198,10 +199,12 @@ async function loadMessages(userId, silent = false) {
         if (error) throw error;
 
         if (!data || data.length === 0) {
+            cachedThreadMessages = [];
             container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--color-gray-light);">No messages yet.</div>';
             return;
         }
 
+        cachedThreadMessages = data;
         const html = data.map(msg => buildMessageBubble(msg)).join('');
 
         // Only update if content changed (avoid scroll jump on silent refresh)
@@ -217,11 +220,21 @@ async function loadMessages(userId, silent = false) {
     }
 }
 
+function renderThread() {
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.innerHTML = cachedThreadMessages.map(msg => buildMessageBubble(msg)).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
 function buildMessageBubble(msg) {
     const isAdmin = msg.sender === 'admin';
-    const time    = msg.created_at
-        ? new Date(msg.created_at).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
-        : '';
+    let time;
+    if (msg._pending)      time = 'Sending…';
+    else if (msg._failed)  time = 'Failed to send — tap to remove';
+    else if (msg.created_at) {
+        time = new Date(msg.created_at).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+    } else time = '';
 
     let bubbleHtml = '';
 
@@ -249,8 +262,11 @@ function buildMessageBubble(msg) {
         }
     }
 
+    const stateClass = msg._pending ? ' is-pending' : msg._failed ? ' is-failed' : '';
+    const clickAttr  = msg._failed ? ` onclick="removeFailedMessage('${msg._localId}')"` : '';
+
     return `
-        <div class="chat-msg ${isAdmin ? 'from-admin' : 'from-user'}">
+        <div class="chat-msg ${isAdmin ? 'from-admin' : 'from-user'}${stateClass}"${clickAttr}>
             ${bubbleHtml}
             <div class="chat-meta">${isAdmin ? 'You' : 'User'} · ${time}</div>
         </div>
@@ -278,12 +294,24 @@ function stageFile(input) {
     pendingFile = { file, name: file.name, type: file.type };
 
     const iconEl  = document.getElementById('chatFileIcon');
+    const thumbEl = document.getElementById('chatFileThumb');
     const nameEl  = document.getElementById('chatFileName');
     const preview = document.getElementById('chatFilePreview');
 
-    iconEl.className = file.type === 'application/pdf'
-        ? 'uil uil-file-alt chat-file-icon chat-file-icon--pdf'
-        : 'uil uil-image chat-file-icon chat-file-icon--img';
+    const isImage = file.type !== 'application/pdf';
+
+    if (isImage) {
+        if (thumbEl.dataset.blobUrl) URL.revokeObjectURL(thumbEl.dataset.blobUrl);
+        const blobUrl = URL.createObjectURL(file);
+        thumbEl.src             = blobUrl;
+        thumbEl.dataset.blobUrl = blobUrl;
+        thumbEl.style.display   = 'block';
+        iconEl.style.display    = 'none';
+    } else {
+        thumbEl.style.display = 'none';
+        iconEl.style.display  = '';
+        iconEl.className = 'uil uil-file-alt chat-file-icon chat-file-icon--pdf';
+    }
 
     nameEl.textContent    = file.name;
     preview.style.display = 'flex';
@@ -293,25 +321,64 @@ function stageFile(input) {
 
 function removeFile() {
     pendingFile = null;
+    const thumbEl = document.getElementById('chatFileThumb');
+    if (thumbEl.dataset.blobUrl) { URL.revokeObjectURL(thumbEl.dataset.blobUrl); delete thumbEl.dataset.blobUrl; }
+    thumbEl.style.display = 'none';
+    thumbEl.src = '';
     document.getElementById('chatFilePreview').style.display = 'none';
     document.getElementById('chatFileName').textContent       = '';
+    document.getElementById('chatFileIcon').style.display     = '';
     document.getElementById('chatFileIcon').className         = 'uil uil-file-alt chat-file-icon';
 }
 
+function compressImage(file, maxDim = 1600, quality = 0.82) {
+    return new Promise(resolve => {
+        if (!file.type.startsWith('image/') || file.type === 'image/gif') {
+            resolve(file);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+                    else                 { width  = Math.round(width  * maxDim / height); height = maxDim; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                canvas.toBlob(blob => {
+                    if (!blob || blob.size >= file.size) { resolve(file); return; }
+                    resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }));
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = () => resolve(file);
+            img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(file);
+        reader.readAsDataURL(file);
+    });
+}
+
 async function uploadFile(file) {
-    const ext  = file.name.split('.').pop().toLowerCase();
+    const toUpload = await compressImage(file);
+    const ext  = toUpload.name.split('.').pop().toLowerCase();
     const path = `${activeConvoUserId}/admin-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
     const { error: uploadError } = await db.storage
         .from('chat-attachments')
-        .upload(path, file, { cacheControl: '3600', upsert: false });
+        .upload(path, toUpload, { cacheControl: '3600', upsert: false });
 
     if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
     const { data } = db.storage.from('chat-attachments').getPublicUrl(path);
     if (!data?.publicUrl) throw new Error('Could not get public URL for uploaded file');
 
-    return { publicUrl: data.publicUrl, fileName: file.name, fileType: file.type };
+    return { publicUrl: data.publicUrl, fileName: file.name, fileType: toUpload.type };
 }
 
 
@@ -320,57 +387,81 @@ async function sendReply() {
     if (!activeConvoUserId) return;
 
     const input   = document.getElementById('replyInput');
-    const sendBtn = document.getElementById('chatSendBtn');
     const message = input.value.trim();
+    const fileToSend = pendingFile;
 
     // Need at least text or a file
-    if (!message && !pendingFile) return;
+    if (!message && !fileToSend) return;
 
-    input.disabled   = true;
-    sendBtn.disabled = true;
+    const convoUserId = activeConvoUserId; // guard against switching threads mid-send
+
+    input.value = '';
+    if (fileToSend) removeFile();
+
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimisticMsg = {
+        _localId:   localId,
+        _pending:   true,
+        sender:     'admin',
+        message:    message || null,
+        file_url:   fileToSend ? URL.createObjectURL(fileToSend.file) : null,
+        file_name:  fileToSend ? fileToSend.name : null,
+        file_type:  fileToSend ? fileToSend.type : null,
+        created_at: null,
+    };
+    cachedThreadMessages = [...cachedThreadMessages, optimisticMsg];
+    renderThread();
 
     try {
         let fileUrl  = null;
         let fileName = null;
         let fileType = null;
 
-        if (pendingFile) {
-            const result = await uploadFile(pendingFile.file);
+        if (fileToSend) {
+            const result = await uploadFile(fileToSend.file);
             fileUrl  = result.publicUrl;
             fileName = result.fileName;
             fileType = result.fileType;
         }
 
-        const { error } = await db
+        const { data: inserted, error } = await db
             .from('messages')
             .insert([{
-                user_id:   activeConvoUserId,
+                user_id:   convoUserId,
                 sender:    'admin',
                 message:   message || null,
                 file_url:  fileUrl,
                 file_name: fileName,
                 file_type: fileType,
                 read:      false,
-            }]);
+            }])
+            .select()
+            .single();
 
         if (error) throw error;
 
-        input.value    = '';
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-
-        if (pendingFile) removeFile();
-
-        // Reload messages to show new reply
-        await loadMessages(activeConvoUserId);
+        if (activeConvoUserId === convoUserId) {
+            cachedThreadMessages = cachedThreadMessages.map(m =>
+                m._localId === localId ? (inserted || { ...m, _pending: false }) : m
+            );
+            renderThread();
+        }
 
     } catch (err) {
         console.error('Send reply error:', err.message);
-        input.disabled   = false;
-        sendBtn.disabled = false;
-        alert('Failed to send message. Please try again.');
+        if (activeConvoUserId === convoUserId) {
+            cachedThreadMessages = cachedThreadMessages.map(m =>
+                m._localId === localId ? { ...m, _pending: false, _failed: true } : m
+            );
+            renderThread();
+        }
     }
+}
+
+// Tap a failed bubble to dismiss it and try again
+function removeFailedMessage(localId) {
+    cachedThreadMessages = cachedThreadMessages.filter(m => m._localId !== localId);
+    renderThread();
 }
 
 // Allow Ctrl+Enter or Cmd+Enter to send
