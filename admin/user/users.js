@@ -5,6 +5,7 @@
 
 let allUsers      = [];
 let activeFilter  = 'all';
+let activeSort    = 'newest'; // resets to this on every page load — not persisted
 let activeUserId  = null;
 let selectedUserIds = new Set();
 let composeImages = [];   // [{ id, file, previewUrl, uploadedUrl, uploading, error }]
@@ -52,13 +53,18 @@ function setFilter(filter, btn) {
     renderUsers();
 }
 
+function setSort(sort) {
+    activeSort = sort;
+    renderUsers();
+}
+
 function filterUsers() {
     renderUsers();
 }
 
 function getFilteredUsers() {
     const query = (document.getElementById('userSearch')?.value || '').toLowerCase().trim();
-    return allUsers.filter(u => {
+    const filtered = allUsers.filter(u => {
         const kycMatch    = activeFilter === 'all' || u.kyc_status === activeFilter;
         const searchMatch = !query ||
             (u.full_name || '').toLowerCase().includes(query) ||
@@ -66,6 +72,27 @@ function getFilteredUsers() {
             (u.country   || '').toLowerCase().includes(query);
         return kycMatch && searchMatch;
     });
+    return sortUsers(filtered);
+}
+
+function sortUsers(list) {
+    const arr = [...list];
+    switch (activeSort) {
+        case 'az':
+            arr.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
+            break;
+        case 'za':
+            arr.sort((a, b) => (b.full_name || '').localeCompare(a.full_name || ''));
+            break;
+        case 'oldest':
+            arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            break;
+        case 'newest':
+        default:
+            arr.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            break;
+    }
+    return arr;
 }
 
 

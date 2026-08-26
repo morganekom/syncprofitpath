@@ -140,6 +140,20 @@
             <button class="admin-filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
         </div>
 
+        <!-- Search & sort -->
+        <div class="um-search-sort-bar">
+            <div class="search-wrap">
+                <i class="uil uil-search"></i>
+                <input type="search" id="userSearch" placeholder="Search by name or email…" oninput="filterUsers()">
+            </div>
+            <select id="userSort" class="um-sort-select" onchange="setSort(this.value)">
+                <option value="newest">Newest sign up</option>
+                <option value="oldest">Oldest sign up</option>
+                <option value="az">Name A–Z</option>
+                <option value="za">Name Z–A</option>
+            </select>
+        </div>
+
         <!-- Email broadcast toolbar -->
         <div class="um-email-toolbar" id="emailToolbar">
             <div class="um-toolbar-left">
