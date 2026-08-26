@@ -132,26 +132,34 @@
             </div>
         </header>
 
-        <!-- Filter tabs -->
-        <div class="admin-filter-tabs">
-            <button class="admin-filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
-            <button class="admin-filter-tab" data-filter="verified" onclick="setFilter('verified', this)">Verified</button>
-            <button class="admin-filter-tab" data-filter="unsubmitted" onclick="setFilter('unsubmitted', this)">Unverified</button>
-            <button class="admin-filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
-        </div>
-
-        <!-- Search & sort -->
-        <div class="um-search-sort-bar">
-            <div class="search-wrap">
-                <i class="uil uil-search"></i>
-                <input type="search" id="userSearch" placeholder="Search by name or email…" oninput="filterUsers()">
+        <!-- Filter tabs, search & sort — one row -->
+        <div class="um-toolbar-row">
+            <div class="admin-filter-tabs">
+                <button class="admin-filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
+                <button class="admin-filter-tab" data-filter="verified" onclick="setFilter('verified', this)">Verified</button>
+                <button class="admin-filter-tab" data-filter="unsubmitted" onclick="setFilter('unsubmitted', this)">Unverified</button>
+                <button class="admin-filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
             </div>
-            <select id="userSort" class="um-sort-select" onchange="setSort(this.value)">
-                <option value="newest">Newest sign up</option>
-                <option value="oldest">Oldest sign up</option>
-                <option value="az">Name A–Z</option>
-                <option value="za">Name Z–A</option>
-            </select>
+
+            <div class="um-search-sort-group">
+                <div class="search-wrap um-search-compact">
+                    <i class="uil uil-search"></i>
+                    <input type="search" id="userSearch" placeholder="Name or email…" oninput="filterUsers()">
+                </div>
+
+                <div class="um-sort-dropdown" id="userSortDropdown">
+                    <button class="um-sort-btn" id="userSortBtn" onclick="toggleSortDropdown(event)">
+                        <span id="userSortLabel">Newest sign up</span>
+                        <i class="uil uil-angle-down um-sort-chevron" id="userSortChevron"></i>
+                    </button>
+                    <div class="um-sort-menu" id="userSortMenu">
+                        <button class="um-sort-option active" data-sort="newest" onclick="setSort('newest', this)">Newest sign up</button>
+                        <button class="um-sort-option" data-sort="oldest" onclick="setSort('oldest', this)">Oldest sign up</button>
+                        <button class="um-sort-option" data-sort="az" onclick="setSort('az', this)">Name A–Z</button>
+                        <button class="um-sort-option" data-sort="za" onclick="setSort('za', this)">Name Z–A</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Email broadcast toolbar -->

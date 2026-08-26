@@ -19,7 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetId = params.get('id');
         if (targetId) openUserModal(targetId);
     });
+
+    initSortDropdown();
 });
+
+function initSortDropdown() {
+    document.addEventListener('click', e => {
+        const dropdown = document.getElementById('userSortDropdown');
+        if (dropdown && !dropdown.contains(e.target)) closeSortDropdown();
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeSortDropdown();
+    });
+}
 
 
 // ========================= LOAD USERS =========================
@@ -53,8 +65,30 @@ function setFilter(filter, btn) {
     renderUsers();
 }
 
-function setSort(sort) {
+function toggleSortDropdown(event) {
+    event.stopPropagation();
+    document.getElementById('userSortDropdown').classList.toggle('open');
+}
+
+function closeSortDropdown() {
+    document.getElementById('userSortDropdown')?.classList.remove('open');
+}
+
+const SORT_LABELS = {
+    newest: 'Newest sign up',
+    oldest: 'Oldest sign up',
+    az:     'Name A–Z',
+    za:     'Name Z–A',
+};
+
+function setSort(sort, btn) {
     activeSort = sort;
+
+    document.getElementById('userSortLabel').textContent = SORT_LABELS[sort];
+    document.querySelectorAll('.um-sort-option').forEach(o => o.classList.remove('active'));
+    btn.classList.add('active');
+
+    closeSortDropdown();
     renderUsers();
 }
 
