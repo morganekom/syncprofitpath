@@ -947,6 +947,36 @@
     width: 100%;
 }
 
+.um-search-sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+}
+
+.um-search-sort-bar .search-wrap { flex: 1; min-width: 22rem; }
+
+.um-sort-select {
+    background: var(--color-light);
+    border: none;
+    border-radius: var(--radius-2);
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    color: var(--color-dark);
+    cursor: pointer;
+    outline: none;
+    flex-shrink: 0;
+}
+
+@media screen and (max-width: 600px) {
+    .um-search-sort-bar { flex-direction: column; align-items: stretch; }
+    .um-search-sort-bar .search-wrap { min-width: 0; }
+    .um-sort-select { width: 100%; }
+}
+
 .search-wrap input::placeholder { color: var(--color-gray-light); }
 
 
@@ -2405,4 +2435,80 @@
 
 @media (max-width: 540px) {
     .kyc-docs-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ========================= NAV QUICK SEARCH ========================= */
+.nav_search { position: relative; }
+
+.nav-search-dropdown {
+    position: absolute;
+    top: calc(100% + 0.8rem);
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    border-radius: var(--radius-2);
+    box-shadow: var(--box-shadow);
+    max-height: 32rem;
+    overflow-y: auto;
+    z-index: 300;
+    display: none;
+}
+
+.nav-search-dropdown.open { display: block; }
+
+.nav-search-result {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.nav-search-result:hover,
+.nav-search-result.active { background: var(--color-light); }
+
+.nav-search-result-avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.nav-search-result-info { min-width: 0; }
+
+.nav-search-result-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-search-result-email {
+    font-size: 0.95rem;
+    color: var(--color-gray-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-search-empty, .nav-search-loading {
+    padding: 1.6rem 1.2rem;
+    text-align: center;
+    color: var(--color-gray-light);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
 }

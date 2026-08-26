@@ -24,6 +24,93 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAll();
 });
 
+document.addEventListener('DOMContentLoaded', initNavSearch);
+
+
+// ================================================================
+// NAV QUICK SEARCH — jump to a user's profile from any admin page
+// ================================================================
+
+function initNavSearch() {
+    const input = document.getElementById('adminSearch');
+    if (!input) return;
+
+    const nav = input.closest('.nav_search');
+    const dropdown = document.createElement('div');
+    dropdown.className = 'nav-search-dropdown';
+    dropdown.id = 'navSearchDropdown';
+    nav.appendChild(dropdown);
+
+    let debounceTimer = null;
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = input.value.trim();
+
+        if (query.length < 2) {
+            dropdown.classList.remove('open');
+            dropdown.innerHTML = '';
+            return;
+        }
+
+        dropdown.classList.add('open');
+        dropdown.innerHTML = '<div class="nav-search-loading"><i class="uil uil-spinner-alt spin"></i> Searching…</div>';
+
+        debounceTimer = setTimeout(() => runNavSearch(query, dropdown), 300);
+    });
+
+    document.addEventListener('click', e => {
+        if (!nav.contains(e.target)) dropdown.classList.remove('open');
+    });
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { dropdown.classList.remove('open'); input.blur(); }
+    });
+}
+
+async function runNavSearch(query, dropdown) {
+    try {
+        // Strip characters that have special meaning in PostgREST's .or() filter syntax
+        const safeQuery = query.replace(/[,()]/g, ' ').trim();
+        if (!safeQuery) { dropdown.innerHTML = '<div class="nav-search-empty">No users found.</div>'; return; }
+
+        const { data, error } = await db
+            .from('users')
+            .select('id, full_name, email')
+            .neq('role', 'admin')
+            .or(`full_name.ilike.%${safeQuery}%,email.ilike.%${safeQuery}%`)
+            .limit(6);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            dropdown.innerHTML = '<div class="nav-search-empty">No users found.</div>';
+            return;
+        }
+
+        dropdown.innerHTML = data.map(u => `
+            <div class="nav-search-result" onclick="goToUser('${u.id}')">
+                <div class="nav-search-result-avatar">${getInitials(u)}</div>
+                <div class="nav-search-result-info">
+                    <div class="nav-search-result-name">${escapeHtml(u.full_name || '—')}</div>
+                    <div class="nav-search-result-email">${escapeHtml(u.email || '—')}</div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Nav search error:', err.message);
+        dropdown.innerHTML = '<div class="nav-search-empty">Search failed. Try again.</div>';
+    }
+}
+
+function goToUser(userId) {
+    const path = window.location.pathname;
+    const idx  = path.indexOf('/admin/');
+    const base = idx === -1 ? '' : path.slice(0, idx);
+    window.location.href = `${base}/admin/user/?id=${userId}`;
+}
+
 
 // ================================================================
 // SET DATE
