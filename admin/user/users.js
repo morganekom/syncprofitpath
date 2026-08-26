@@ -409,6 +409,115 @@ function openUserModal(userId) {
 
     document.getElementById('userModalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    loadUserActiveInvestments(userId);
+}
+
+// ========================= ACTIVE INVESTMENTS (read-only) =========================
+const ADMIN_COIN_ICONS = {
+    btc:  { symbol: '₿', bg: '#f7931a22', color: '#f7931a', label: 'Bitcoin'  },
+    eth:  { symbol: 'Ξ', bg: '#627eea22', color: '#627eea', label: 'Ethereum' },
+    usdt: { symbol: '₮', bg: '#26a17b22', color: '#26a17b', label: 'Tether'   },
+    bnb:  { symbol: 'B', bg: '#f3ba2f22', color: '#f3ba2f', label: 'BNB'      },
+    sol:  { symbol: '◎', bg: '#9945ff22', color: '#9945ff', label: 'Solana'   },
+    ltc:  { symbol: 'Ł', bg: '#bfbbbb22', color: '#bfbbbb', label: 'Litecoin' },
+    doge: { symbol: 'Ð', bg: '#c2a63322', color: '#c2a633', label: 'Dogecoin' },
+    xrp:  { symbol: '✕', bg: '#00aae422', color: '#00aae4', label: 'XRP'      },
+};
+
+function adminFmtMoney(n) {
+    return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function loadUserActiveInvestments(userId) {
+    const loadingEl = document.getElementById('userInvLoading');
+    const emptyEl   = document.getElementById('userInvEmpty');
+    const listEl    = document.getElementById('userInvList');
+
+    loadingEl.style.display = 'flex';
+    emptyEl.style.display   = 'none';
+    listEl.style.display    = 'none';
+    listEl.innerHTML        = '';
+
+    try {
+        const { data, error } = await db
+            .from('transactions')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('type', 'investment')
+            .eq('inv_active', true)
+            .order('start_date', { ascending: true });
+
+        if (error) throw error;
+
+        const investments = (data || []).filter(inv => inv.start_date && inv.end_date);
+        loadingEl.style.display = 'none';
+
+        // Only render if this is still the open user (modal may have been closed/switched while fetching)
+        if (activeUserId !== userId) return;
+
+        if (investments.length === 0) {
+            emptyEl.style.display = 'block';
+            return;
+        }
+
+        listEl.innerHTML   = investments.map(buildAdminInvCard).join('');
+        listEl.style.display = 'flex';
+
+    } catch (err) {
+        console.error('User active investments error:', err.message);
+        loadingEl.style.display = 'none';
+        if (activeUserId === userId) {
+            emptyEl.textContent    = 'Could not load investments.';
+            emptyEl.style.display  = 'block';
+        }
+    }
+}
+
+function buildAdminInvCard(inv) {
+    const today       = new Date(); today.setHours(0, 0, 0, 0);
+    const startDate    = new Date(inv.start_date); startDate.setHours(0, 0, 0, 0);
+    const duration     = inv.duration_days || 30;
+    const daysElapsed  = Math.min(Math.max(Math.floor((today - startDate) / 86400000), 0), duration);
+    const daysLeft     = Math.max(duration - daysElapsed, 0);
+    const progressPct  = Math.min(Math.round((daysElapsed / duration) * 100), 100);
+    const amount       = parseFloat(inv.amount) || 0;
+    const dailyRate    = parseFloat(inv.daily_rate) || 0;
+    const dailyProfit  = amount * (dailyRate / 100);
+    const totalProfit  = dailyProfit * daysElapsed;
+    const coinKey      = (inv.coin || '').toLowerCase();
+    const coinData     = ADMIN_COIN_ICONS[coinKey] || {
+        symbol: coinKey.toUpperCase().slice(0, 2) || '?',
+        bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)', label: coinKey.toUpperCase()
+    };
+    const isMatured = daysLeft === 0;
+    const startFmt   = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const endFmt     = new Date(inv.end_date).toLocaleDateString('en-US',   { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return `
+        <div class="um-inv-card">
+            <div class="um-inv-top">
+                <div class="um-inv-coin-icon" style="background:${coinData.bg};color:${coinData.color};">${coinData.symbol}</div>
+                <div class="um-inv-top-info">
+                    <div class="um-inv-plan">${escapeHtml(inv.method || 'Investment')}</div>
+                    <div class="um-inv-sub">${escapeHtml(coinData.label)} · ${startFmt} → ${endFmt}</div>
+                </div>
+                <span class="badge ${isMatured ? 'unsubmitted' : 'verified'}">${isMatured ? 'Matured' : 'Active'}</span>
+            </div>
+            <div class="um-inv-amounts">
+                <div><span>Invested</span><strong>${adminFmtMoney(amount)}</strong></div>
+                <div><span>Profit so far</span><strong class="success">${adminFmtMoney(totalProfit)}</strong></div>
+                <div><span>Daily</span><strong>+${adminFmtMoney(dailyProfit)}</strong></div>
+            </div>
+            <div class="um-inv-progress-track">
+                <div class="um-inv-progress-fill" style="width:${progressPct}%;background:${isMatured ? 'var(--color-gray-light)' : 'var(--color-primary)'};"></div>
+            </div>
+            <div class="um-inv-footer">
+                <span>${daysElapsed} of ${duration} days</span>
+                <span>Ref: ${escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase())}</span>
+            </div>
+        </div>
+    `;
 }
 
 function closeUserModal(event) {
