@@ -125,30 +125,28 @@
                 <h1>Users</h1>
                 <p class="admin-subtitle">Total: <strong id="userCountLabel">—</strong></p>
             </div>
-            <div class="admin-header-actions">
-                <button class="um-select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">
-                    <i class="uil uil-check-square"></i> Select All
-                </button>
-            </div>
+            <button class="refresh-btn um-select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">
+                <i class="uil uil-check-square"></i> Select All
+            </button>
         </header>
 
-        <!-- Filter tabs, search & sort — one row -->
-        <div class="um-toolbar-row">
-            <div class="admin-filter-tabs">
-                <button class="admin-filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
-                <button class="admin-filter-tab" data-filter="verified" onclick="setFilter('verified', this)">Verified</button>
-                <button class="admin-filter-tab" data-filter="unsubmitted" onclick="setFilter('unsubmitted', this)">Unverified</button>
-                <button class="admin-filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
+        <!-- Filter bar — same container pattern as KYC / Deposits -->
+        <div class="filter-bar">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
+                <button class="filter-tab" data-filter="verified" onclick="setFilter('verified', this)">Verified</button>
+                <button class="filter-tab" data-filter="unsubmitted" onclick="setFilter('unsubmitted', this)">Unverified</button>
+                <button class="filter-tab" data-filter="pending" onclick="setFilter('pending', this)">KYC Pending</button>
             </div>
 
             <div class="um-search-sort-group">
-                <div class="search-wrap um-search-compact">
+                <div class="search-wrap">
                     <i class="uil uil-search"></i>
                     <input type="search" id="userSearch" placeholder="Name or email…" oninput="filterUsers()">
                 </div>
 
                 <div class="um-sort-dropdown" id="userSortDropdown">
-                    <button class="um-sort-btn" id="userSortBtn" onclick="toggleSortDropdown(event)">
+                    <button class="um-sort-btn" id="userSortBtn">
                         <span id="userSortLabel">Newest sign up</span>
                         <i class="uil uil-angle-down um-sort-chevron" id="userSortChevron"></i>
                     </button>

@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initSortDropdown() {
+    const btn = document.getElementById('userSortBtn');
+    btn?.addEventListener('click', e => {
+        e.stopPropagation();
+        document.getElementById('userSortDropdown').classList.toggle('open');
+    });
+
     document.addEventListener('click', e => {
         const dropdown = document.getElementById('userSortDropdown');
         if (dropdown && !dropdown.contains(e.target)) closeSortDropdown();
@@ -60,14 +66,9 @@ async function loadUsers() {
 // ========================= FILTER & SEARCH =========================
 function setFilter(filter, btn) {
     activeFilter = filter;
-    document.querySelectorAll('.admin-filter-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderUsers();
-}
-
-function toggleSortDropdown(event) {
-    event.stopPropagation();
-    document.getElementById('userSortDropdown').classList.toggle('open');
 }
 
 function closeSortDropdown() {
