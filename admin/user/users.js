@@ -523,7 +523,7 @@ async function loadUserActiveInvestments(userId) {
             return;
         }
 
-        listEl.innerHTML   = investments.map(buildAdminInvCard).join('');
+        listEl.innerHTML   = investments.map(inv => inv.target_amount ? buildAdminGoalCard(inv) : buildAdminInvCard(inv)).join('');
         listEl.style.display = 'flex';
 
     } catch (err) {
@@ -534,6 +534,46 @@ async function loadUserActiveInvestments(userId) {
             emptyEl.style.display  = 'block';
         }
     }
+}
+
+// Goal-tracker rows (identified by having a target_amount) get an
+// amount-vs-target progress view instead of the normal days-vs-duration one.
+function buildAdminGoalCard(inv) {
+    const saved       = parseFloat(inv.amount) || 0;
+    const target      = parseFloat(inv.target_amount) || 0;
+    const progressPct = target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
+    const isComplete  = target > 0 && saved >= target;
+    const coinKey     = (inv.coin || '').toLowerCase();
+    const coinData    = ADMIN_COIN_ICONS[coinKey] || {
+        symbol: coinKey.toUpperCase().slice(0, 2) || '?',
+        bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)', label: coinKey.toUpperCase()
+    };
+    const startFmt = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return `
+        <div class="um-inv-card">
+            <div class="um-inv-top">
+                <div class="um-inv-coin-icon" style="background:${coinData.bg};color:${coinData.color};">${coinData.symbol}</div>
+                <div class="um-inv-top-info">
+                    <div class="um-inv-plan">${escapeHtml(inv.method || 'Savings Goal')}</div>
+                    <div class="um-inv-sub">${escapeHtml(coinData.label)} · Started ${startFmt}</div>
+                </div>
+                <span class="badge ${isComplete ? 'verified' : 'unsubmitted'}">${isComplete ? 'Goal Reached' : 'Active'}</span>
+            </div>
+            <div class="um-inv-amounts">
+                <div><span>Saved</span><strong>${adminFmtMoney(saved)}</strong></div>
+                <div><span>Goal</span><strong>${adminFmtMoney(target)}</strong></div>
+                <div><span>Remaining</span><strong>${adminFmtMoney(Math.max(target - saved, 0))}</strong></div>
+            </div>
+            <div class="um-inv-progress-track">
+                <div class="um-inv-progress-fill" style="width:${progressPct}%;background:var(--color-primary);"></div>
+            </div>
+            <div class="um-inv-footer">
+                <span>${progressPct}% of goal</span>
+                <span>Ref: ${escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase())}</span>
+            </div>
+        </div>
+    `;
 }
 
 function buildAdminInvCard(inv) {
