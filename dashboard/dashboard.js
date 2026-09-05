@@ -943,7 +943,7 @@ async function loadActiveInvestments() {
         grid.style.gridTemplateColumns = '1fr';
         grid.style.opacity             = '0';
         grid.style.transition          = 'opacity 300ms ease';
-        grid.innerHTML = investments.map(buildActiveInvCard).join('');
+        grid.innerHTML = investments.map(inv => inv.target_amount ? buildGoalTrackerCard(inv) : buildActiveInvCard(inv)).join('');
         requestAnimationFrame(() => { grid.style.opacity = '1'; });
 
     } catch (err) {
@@ -974,6 +974,73 @@ function fmtMoney(n) {
     return '$' + parseFloat(n).toLocaleString('en-US', {
         minimumFractionDigits: 2, maximumFractionDigits: 2
     });
+}
+
+// A "goal tracker" is any investment row with a target_amount set — used
+// for manually-managed savings goals (e.g. the house fund) rather than a
+// normal time-based investment plan. Reuses the same card classes/CSS as
+// buildActiveInvCard so it looks native; only the progress logic differs.
+function buildGoalTrackerCard(inv) {
+    const saved       = parseFloat(inv.amount) || 0;
+    const target      = parseFloat(inv.target_amount) || 0;
+    const progressPct = target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
+    const isComplete  = target > 0 && saved >= target;
+    const coinKey     = (inv.coin || '').toLowerCase();
+    const coinData    = COIN_ICONS[coinKey] || {
+        symbol: coinKey.toUpperCase().slice(0, 2) || '?',
+        bg: 'rgba(0,226,123,0.12)', color: 'var(--color-primary)',
+        label: coinKey.toUpperCase()
+    };
+    const startFmt = new Date(inv.start_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return `
+    <div class="active-inv-card">
+        <div class="active-inv-top">
+            <div class="active-inv-coin-icon" style="background:${coinData.bg};color:${coinData.color};">${coinData.symbol}</div>
+            <div class="active-inv-top-info">
+                <div class="active-inv-plan">${escapeHtml(inv.method || 'Savings Goal')}</div>
+                <div class="active-inv-coin-label">${escapeHtml(coinData.label)} · Started ${startFmt}</div>
+            </div>
+            <span class="active-inv-status ${isComplete ? 'status-matured' : 'status-active'}">${isComplete ? 'Goal Reached' : 'Active'}</span>
+        </div>
+        <div class="active-inv-amounts">
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Saved</span>
+                <span class="active-inv-value">${fmtMoney(saved)}</span>
+            </div>
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Goal</span>
+                <span class="active-inv-value">${fmtMoney(target)}</span>
+            </div>
+            <div class="active-inv-amount-row">
+                <span class="active-inv-label">Remaining</span>
+                <span class="active-inv-value">${fmtMoney(Math.max(target - saved, 0))}</span>
+            </div>
+        </div>
+        <div class="active-inv-footer">
+            <div class="active-inv-progress-wrap">
+                <div class="active-inv-progress-track">
+                    <div class="active-inv-progress-fill"
+                         style="width:${progressPct}%;background:${isComplete ? 'var(--color-primary)' : 'var(--color-primary)'};">
+                    </div>
+                </div>
+                <span class="active-inv-days-label">${fmtMoney(saved)} of ${fmtMoney(target)} · ${progressPct}%</span>
+            </div>
+        </div>
+        <div class="active-inv-ref">Ref: ${escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase())}</div>
+        ${!isComplete ? `
+        <button class="active-inv-topup-btn"
+            onclick="openTopUpModal({
+                id: '${inv.id}',
+                plan: '${escapeHtml(inv.method || 'Savings Goal')}',
+                coin: '${escapeHtml(coinKey)}',
+                amount: ${saved},
+                dailyRate: 0,
+                reference: '${escapeHtml(inv.reference || inv.id.slice(0, 8).toUpperCase())}'
+            })">
+            <i class="uil uil-plus-circle"></i> Top Up
+        </button>` : ''}
+    </div>`;
 }
 
 function buildActiveInvCard(inv) {
