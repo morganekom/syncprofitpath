@@ -113,7 +113,7 @@ function loadAllSavedData() {
 
     if (_currentUser.id) {
         db.from('users')
-          .select('avatar_url, totp_enabled, totp_secret')
+          .select('avatar_url, totp_enabled, totp_secret, withdrawal_bank_account_name, withdrawal_bank_name, withdrawal_bank_account_number, withdrawal_bank_routing_code, withdrawal_crypto_coin, withdrawal_crypto_wallet_address')
           .eq('id', _currentUser.id)
           .maybeSingle()
           .then(({ data }) => {
@@ -132,6 +132,22 @@ function loadAllSavedData() {
               fresh.totp_secret  = data.totp_secret  || null;
               localStorage.setItem('currentUser', JSON.stringify(fresh));
               init2FAState();
+
+              // Withdrawal bank details — server is now the source of truth
+              if (data.withdrawal_bank_name || data.withdrawal_bank_account_number) {
+                  document.getElementById('bankAccountName').value   = data.withdrawal_bank_account_name  || '';
+                  document.getElementById('bankName').value          = data.withdrawal_bank_name           || '';
+                  document.getElementById('bankAccountNumber').value = data.withdrawal_bank_account_number || '';
+                  document.getElementById('bankRoutingCode').value   = data.withdrawal_bank_routing_code    || '';
+                  document.getElementById('bankSavedBadge').style.display = 'inline-flex';
+              }
+
+              // Withdrawal crypto details
+              if (data.withdrawal_crypto_coin || data.withdrawal_crypto_wallet_address) {
+                  document.getElementById('withdrawCoin').value         = data.withdrawal_crypto_coin           || '';
+                  document.getElementById('cryptoWalletAddress').value  = data.withdrawal_crypto_wallet_address || '';
+                  document.getElementById('cryptoSavedBadge').style.display = 'inline-flex';
+              }
           })
           .catch(() => revealProfileSection());
     } else {
@@ -153,24 +169,6 @@ function loadAllSavedData() {
     }
     if (profile.email) {
         document.getElementById('profileDisplayEmail').textContent = profile.email;
-    }
-
-    // ── Bank details ──
-    const savedBank = JSON.parse(localStorage.getItem('withdrawalBank') || 'null');
-    if (savedBank) {
-        document.getElementById('bankAccountName').value   = savedBank.accountName   || '';
-        document.getElementById('bankName').value          = savedBank.bankName      || '';
-        document.getElementById('bankAccountNumber').value = savedBank.accountNumber || '';
-        document.getElementById('bankRoutingCode').value   = savedBank.routingCode   || '';
-        document.getElementById('bankSavedBadge').style.display = 'inline-flex';
-    }
-
-    // ── Crypto details ──
-    const savedCrypto = JSON.parse(localStorage.getItem('withdrawalCrypto') || 'null');
-    if (savedCrypto) {
-        document.getElementById('withdrawCoin').value          = savedCrypto.coinValue     || '';
-        document.getElementById('cryptoWalletAddress').value  = savedCrypto.walletAddress || '';
-        document.getElementById('cryptoSavedBadge').style.display = 'inline-flex';
     }
 
 }
@@ -888,11 +886,12 @@ async function submitKyc() {
 
 
 // ================================================================
-// BANK DETAILS SAVE — saves to localStorage only
-// (bank details are not stored in Supabase — only used on withdraw page)
+// BANK DETAILS SAVE — persisted to Supabase (users table) so admin
+// can see it when processing a withdrawal. localStorage kept only
+// as a fast local cache for this device.
 // ================================================================
 
-function saveBankDetails() {
+async function saveBankDetails() {
     const accountName   = document.getElementById('bankAccountName').value.trim();
     const bankName      = document.getElementById('bankName').value.trim();
     const accountNumber = document.getElementById('bankAccountNumber').value.trim();
@@ -908,29 +907,47 @@ function saveBankDetails() {
     if (!bankName)       { errorEl.textContent = 'Bank name is required.'; return; }
     if (!accountNumber)  { errorEl.textContent = 'Account number is required.'; return; }
 
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.id) { errorEl.textContent = 'Session expired. Please log in again.'; return; }
+
     btn.textContent = 'Saving...';
     btn.disabled    = true;
 
-    setTimeout(() => {
+    try {
+        const { error } = await db
+            .from('users')
+            .update({
+                withdrawal_bank_account_name:  accountName,
+                withdrawal_bank_name:          bankName,
+                withdrawal_bank_account_number: accountNumber,
+                withdrawal_bank_routing_code:  routingCode || null,
+            })
+            .eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        // Local cache — not the source of truth, just avoids a flash of
+        // empty fields if this page reloads before the network settles
         localStorage.setItem('withdrawalBank', JSON.stringify({
-            accountName,
-            bankName,
-            accountNumber,
-            routingCode
+            accountName, bankName, accountNumber, routingCode
         }));
 
         document.getElementById('bankSavedBadge').style.display = 'inline-flex';
-
-        btn.textContent       = 'Save Bank Details';
-        btn.disabled          = false;
         successEl.textContent = '✓ Bank details saved.';
         setTimeout(() => successEl.textContent = '', 3000);
-    }, 400);
+
+    } catch (err) {
+        console.error('Save bank details error:', err.message);
+        errorEl.textContent = 'Could not save. Please try again.';
+    } finally {
+        btn.textContent = 'Save Bank Details';
+        btn.disabled    = false;
+    }
 }
 
 
 // ================================================================
-// CRYPTO DETAILS SAVE — saves to localStorage only
+// CRYPTO DETAILS SAVE — persisted to Supabase (users table)
 // ================================================================
 
 const COIN_NAMES = {
@@ -940,7 +957,7 @@ const COIN_NAMES = {
 
 function updateCoinName() { }  // reserved for future use
 
-function saveCryptoDetails() {
+async function saveCryptoDetails() {
     const coinValue     = document.getElementById('withdrawCoin').value;
     const walletAddress = document.getElementById('cryptoWalletAddress').value.trim();
     const errorEl       = document.getElementById('cryptoError');
@@ -954,10 +971,23 @@ function saveCryptoDetails() {
     if (!walletAddress)           { errorEl.textContent = 'Wallet address is required.'; return; }
     if (walletAddress.length < 10) { errorEl.textContent = 'Please enter a valid wallet address.'; return; }
 
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.id) { errorEl.textContent = 'Session expired. Please log in again.'; return; }
+
     btn.textContent = 'Saving...';
     btn.disabled    = true;
 
-    setTimeout(() => {
+    try {
+        const { error } = await db
+            .from('users')
+            .update({
+                withdrawal_crypto_coin:           coinValue,
+                withdrawal_crypto_wallet_address: walletAddress,
+            })
+            .eq('id', currentUser.id);
+
+        if (error) throw error;
+
         localStorage.setItem('withdrawalCrypto', JSON.stringify({
             coinValue,
             coinName: COIN_NAMES[coinValue] || coinValue.toUpperCase(),
@@ -965,10 +995,14 @@ function saveCryptoDetails() {
         }));
 
         document.getElementById('cryptoSavedBadge').style.display = 'inline-flex';
-
-        btn.textContent       = 'Save Crypto Details';
-        btn.disabled          = false;
         successEl.textContent = '✓ Crypto details saved.';
         setTimeout(() => successEl.textContent = '', 3000);
-    }, 400);
+
+    } catch (err) {
+        console.error('Save crypto details error:', err.message);
+        errorEl.textContent = 'Could not save. Please try again.';
+    } finally {
+        btn.textContent = 'Save Crypto Details';
+        btn.disabled    = false;
+    }
 }

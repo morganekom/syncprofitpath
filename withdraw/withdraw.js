@@ -38,6 +38,11 @@ async function loadWithdrawalLimits() {
 let selectedMethod    = null;   // 'bank' or 'crypto'
 let withdrawalDetails = {};     // holds saved details from settings
 
+const COIN_NAMES_WD = {
+    btc: 'Bitcoin', eth: 'Ethereum', usdt: 'Tether',
+    bnb: 'BNB', sol: 'Solana', ltc: 'Litecoin'
+};
+
 
 const submitBtn   = document.getElementById('submitBtn');
 const amountInput = document.getElementById('withdrawAmount');
@@ -91,10 +96,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('availableBalance').textContent = '$' + formatNum(AVAILABLE_BALANCE);
     document.getElementById('amountMax').textContent        = 'Max: $' + formatNum(AVAILABLE_BALANCE);
 
-    // Read saved withdrawal details from localStorage
-    // (written by settings.js when user saves their withdrawal details)
-    const savedBank   = JSON.parse(localStorage.getItem('withdrawalBank')   || 'null');
-    const savedCrypto = JSON.parse(localStorage.getItem('withdrawalCrypto') || 'null');
+    // Read saved withdrawal details from the database
+    // (localStorage is only ever a stale local cache now — DB is source of truth)
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    let savedBank = null, savedCrypto = null;
+
+    if (currentUser.id) {
+        try {
+            const { data, error } = await db
+                .from('users')
+                .select('withdrawal_bank_account_name, withdrawal_bank_name, withdrawal_bank_account_number, withdrawal_bank_routing_code, withdrawal_crypto_coin, withdrawal_crypto_wallet_address')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (data?.withdrawal_bank_name || data?.withdrawal_bank_account_number) {
+                savedBank = {
+                    accountName:   data.withdrawal_bank_account_name  || '',
+                    bankName:      data.withdrawal_bank_name           || '',
+                    accountNumber: data.withdrawal_bank_account_number || '',
+                    routingCode:   data.withdrawal_bank_routing_code   || '',
+                };
+            }
+            if (data?.withdrawal_crypto_coin || data?.withdrawal_crypto_wallet_address) {
+                savedCrypto = {
+                    coinValue:     data.withdrawal_crypto_coin || '',
+                    coinName:      COIN_NAMES_WD[data.withdrawal_crypto_coin] || (data.withdrawal_crypto_coin || '').toUpperCase(),
+                    walletAddress: data.withdrawal_crypto_wallet_address || '',
+                };
+            }
+        } catch (err) {
+            console.error('Failed to load withdrawal details:', err.message);
+        }
+    }
 
     withdrawalDetails.bank   = savedBank;
     withdrawalDetails.crypto = savedCrypto;
@@ -262,14 +297,21 @@ async function confirmWithdrawal() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const amount      = parseFloat(amountInput.value);
 
-    // Build method label for the record
+    // Build method label + full destination for the record
     let methodLabel = selectedMethod;
     let coinLabel   = null;
+    let destination = null;
+
     if (selectedMethod === 'bank' && withdrawalDetails.bank) {
-        methodLabel = withdrawalDetails.bank.bankName;
+        const b = withdrawalDetails.bank;
+        methodLabel = b.bankName;
+        destination = `${b.bankName} • ${b.accountName} • Acct: ${b.accountNumber}` +
+                      (b.routingCode ? ` • Routing: ${b.routingCode}` : '');
     } else if (selectedMethod === 'crypto' && withdrawalDetails.crypto) {
-        methodLabel = withdrawalDetails.crypto.coinName;
-        coinLabel   = withdrawalDetails.crypto.coinValue;
+        const c = withdrawalDetails.crypto;
+        methodLabel = c.coinName;
+        coinLabel   = c.coinValue;
+        destination = `${c.coinName} • ${c.walletAddress}`;
     }
 
     const reference = 'WDR-' + Date.now().toString(36).toUpperCase();
@@ -277,14 +319,15 @@ async function confirmWithdrawal() {
     const { error } = await db
         .from('transactions')
         .insert([{
-            user_id:   currentUser.id,
-            type:      'withdrawal',
-            amount:    amount,
-            coin:      coinLabel,
-            status:    'pending',
-            note:      'Withdrawal request submitted',
-            method:    methodLabel,
-            reference: reference,
+            user_id:     currentUser.id,
+            type:        'withdrawal',
+            amount:      amount,
+            coin:        coinLabel,
+            status:      'pending',
+            note:        'Withdrawal request submitted',
+            method:      methodLabel,
+            reference:   reference,
+            destination: destination,
         }]);
 
     if (error) {
