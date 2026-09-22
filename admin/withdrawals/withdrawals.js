@@ -194,15 +194,22 @@ function openWdrModal(id) {
     // Destination box
     const destEl  = document.getElementById('mwDestination');
     const destBox = document.getElementById('mwDestinationBox');
-    if (w.coin) {
+    if (w.destination) {
+        destBox.innerHTML = `
+            <div class="dest-row"><span>${w.coin ? 'Wallet' : 'Bank Account'}</span><strong>${escapeHtml(w.destination)}</strong></div>
+        `;
+        destEl.style.display = 'block';
+    } else if (w.coin) {
         destBox.innerHTML = `
             <div class="dest-row"><span>Coin</span><strong>${escapeHtml(w.coin.toUpperCase())}</strong></div>
             <div class="dest-row"><span>Wallet / Method</span><strong>${escapeHtml(w.method || '—')}</strong></div>
+            <div class="dest-row"><span style="color:var(--color-warning);">⚠ No saved wallet address</span><strong>Contact user directly</strong></div>
         `;
         destEl.style.display = 'block';
     } else if (w.method) {
         destBox.innerHTML = `
             <div class="dest-row"><span>Bank / Method</span><strong>${escapeHtml(w.method)}</strong></div>
+            <div class="dest-row"><span style="color:var(--color-warning);">⚠ No saved account details</span><strong>Contact user directly</strong></div>
         `;
         destEl.style.display = 'block';
     } else {
