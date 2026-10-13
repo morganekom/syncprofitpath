@@ -27,6 +27,7 @@ const NOTIF_META = {
     kyc_approved:        { icon: 'uil-shield-check',    color: 'success', label: 'KYC Verified'        },
     kyc_rejected:        { icon: 'uil-shield-slash',    color: 'danger',  label: 'KYC Rejected'        },
     password_changed:    { icon: 'uil-lock-alt',        color: 'primary', label: 'Password Changed'    },
+    announcement:        { icon: 'uil-gift',            color: 'purple',  label: "What's New"         },
     // Admin notifications
     admin_deposit:       { icon: 'uil-arrow-circle-down', color: 'primary', label: 'New Deposit'      },
     admin_withdrawal:    { icon: 'uil-arrow-circle-up',   color: 'warning', label: 'New Withdrawal'   },
@@ -142,9 +143,31 @@ async function fetchUserNotifs() {
         });
     }
 
+    await addAnnouncementNotifs(items);
+
     // Sort by timestamp descending
     items.sort((a, b) => new Date(b.ts) - new Date(a.ts));
     return items;
+}
+
+// ── Feature announcements (What's New) ───────────────────────────
+async function addAnnouncementNotifs(items) {
+    try {
+        const { data, error } = await db
+            .from('announcements')
+            .select('id, title, body, created_at')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        if (error) return;
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        (data || []).forEach(a => items.push({
+            id:   'ann_' + a.id,
+            type: 'announcement',
+            ts:   a.created_at,
+            body: '<strong>' + esc(a.title) + '</strong> · ' + esc(a.body),
+        }));
+    } catch (e) { /* table not created yet */ }
 }
 
 function resolveUserTxType(tx) {
@@ -224,6 +247,8 @@ async function fetchAdminNotifs() {
             body: `${name} submitted their KYC documents for review.`,
         });
     });
+
+    await addAnnouncementNotifs(items);
 
     items.sort((a, b) => new Date(b.ts) - new Date(a.ts));
     return items;

@@ -1,0 +1,114 @@
+/* ================================================================
+   TOUR.CSS — guided tour + "what's new" banner
+   Uses theme variables so light and dark both work.
+   ================================================================ */
+
+/* ── Banner ───────────────────────────────────────────────────── */
+.whatsnew-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--color-white);
+    border: 1.5px solid var(--color-primary);
+    box-shadow: 0 6px 22px rgba(0, 226, 123, 0.12);
+    animation: wnIn 350ms ease both;
+}
+@keyframes wnIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+.whatsnew-icon {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    background: rgba(0, 226, 123, 0.16);
+    color: #00b862;
+    font-size: 22px;
+}
+.whatsnew-text { flex: 1 1 auto; min-width: 0; }
+.whatsnew-pill {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: #06281a;
+    font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    vertical-align: 1px;
+}
+.whatsnew-title { font-size: 14px; font-weight: 600; color: var(--color-dark); margin: 0; }
+.whatsnew-body  { font-size: 12.5px; line-height: 1.45; color: var(--color-gray-dark); margin: 3px 0 0; }
+.whatsnew-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.whatsnew-btn {
+    border: 0; cursor: pointer; text-decoration: none;
+    padding: 8px 14px; border-radius: 10px;
+    font: 600 12.5px/1 inherit; font-family: inherit;
+    background: var(--color-primary); color: #06281a;
+    white-space: nowrap;
+}
+.whatsnew-btn--ghost { background: transparent; color: var(--color-dark); border: 1.5px solid var(--color-gray-light); }
+.whatsnew-close {
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--color-gray-light); font-size: 20px; line-height: 1; padding: 4px;
+}
+.whatsnew-close:hover { color: var(--color-dark); }
+
+@media (max-width: 640px) {
+    .whatsnew-banner { flex-wrap: wrap; position: relative; padding-right: 40px; }
+    .whatsnew-actions { width: 100%; padding-left: 54px; }
+    .whatsnew-close { position: absolute; top: 8px; right: 8px; }
+}
+
+/* ── Take a tour link ────────────────────────────────────────── */
+.tour-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--color-gray-light);
+    background: transparent; color: var(--color-dark);
+    padding: 7px 12px; border-radius: 10px; cursor: pointer;
+    font: 600 12.5px/1 inherit; font-family: inherit;
+}
+.tour-link:hover { border-color: var(--color-primary); }
+
+/* ── Tour overlay ────────────────────────────────────────────── */
+.tour-layer { position: fixed; inset: 0; z-index: 10000; }
+.tour-block { position: absolute; inset: 0; }               /* swallows clicks */
+.tour-spot {
+    position: fixed;
+    border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(8, 14, 18, 0.72), 0 0 0 3px var(--color-primary);
+    transition: top 250ms ease, left 250ms ease, width 250ms ease, height 250ms ease;
+    pointer-events: none;
+}
+.tour-spot--none { box-shadow: 0 0 0 9999px rgba(8, 14, 18, 0.72); }
+
+.tour-tip {
+    position: fixed;
+    width: 320px; max-width: calc(100vw - 24px);
+    padding: 16px 16px 14px;
+    border-radius: 14px;
+    background: var(--color-white);
+    color: var(--color-dark);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    transition: top 250ms ease, left 250ms ease, opacity 150ms ease;
+    z-index: 10001;
+}
+.tour-tip h4 { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--color-dark); }
+.tour-tip p  { margin: 0; font-size: 13px; line-height: 1.5; color: var(--color-gray-dark); }
+.tour-foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.tour-count { margin-right: auto; font-size: 11.5px; color: var(--color-gray-light); }
+.tour-btn {
+    border: 0; cursor: pointer; padding: 8px 14px; border-radius: 10px;
+    font: 600 12.5px/1 inherit; font-family: inherit;
+    background: var(--color-primary); color: #06281a;
+}
+.tour-btn--ghost { background: transparent; color: var(--color-dark); border: 1.5px solid var(--color-gray-light); }
+.tour-skip {
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--color-gray-light); font: 600 12px/1 inherit; font-family: inherit; padding: 6px 4px;
+}
+.tour-skip:hover { color: var(--color-dark); }
+.tour-dots { display: flex; gap: 4px; margin-bottom: 10px; }
+.tour-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-gray-light); opacity: .4; }
+.tour-dots i.on { background: var(--color-primary); opacity: 1; width: 16px; border-radius: 4px; }

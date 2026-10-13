@@ -23,7 +23,7 @@
     function injectWidget() {
         const html = `
             <!-- Floating chat button — icon stays as comment-dots per spec -->
-            <button class="chat-widget-btn" id="chatWidgetBtn" onclick="ChatWidget.toggle()" title="Chat with Nova">
+            <button class="chat-widget-btn" id="chatWidgetBtn" data-tour="chat" onclick="ChatWidget.toggle()" title="Chat with Nova">
                 <i class="uil uil-comment-dots" id="chatWidgetIcon"></i>
                 <span class="chat-unread-badge" id="chatUnreadBadge"></span>
             </button>
