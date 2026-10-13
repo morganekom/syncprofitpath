@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../../chat-widget.css">
     <link rel="stylesheet" href="../invest.css">
+    <link rel="stylesheet" href="../../tour.css">
     <style>
         /* Anti-FOUC: applied instantly before external CSS loads */
         html { background: #f0eff5; }
@@ -21,7 +22,7 @@
         }
     </style>
 </head>
-<body data-asset="crypto">
+<body data-asset="crypto" data-tour-guide="invest">
 
 <!--==================== NAVBAR ====================-->
 <nav>
@@ -92,7 +93,7 @@
     </div>
 
     <!-- Hero -->
-    <div class="inv-hero">
+    <div class="inv-hero" data-tour="inv_hero">
         <div class="inv-hero-left">
             <h1 class="crypto">
                 Cryptocurrency Investment Plans
@@ -138,7 +139,7 @@
         <div class="plan-skel skeleton"></div>
         <div class="plan-skel skeleton"></div>
     </div>
-    <div class="plans-grid" id="plansGrid" style="display:none;"></div>
+    <div class="plans-grid" id="plansGrid" data-tour="inv_plans" style="display:none;"></div>
 
     <!-- Why Choose -->
     <div class="inv-why">
@@ -256,6 +257,7 @@
 <script src="../../chat-widget.js"></script>
 <script src="../../notify.js"></script>
 <script src="../../notify-inapp.js"></script>
+<script src="../../tour.js"></script>
 <script>
     function toggleInvestDropdown(btn) {
         btn.classList.toggle('open');
