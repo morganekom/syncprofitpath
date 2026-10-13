@@ -31,6 +31,19 @@
         nav_history:  { label: 'Menu: Transactions', sidebar: true },
         nav_refer:    { label: 'Menu: Refer & Earn', sidebar: true },
         nav_settings: { label: 'Menu: Settings', sidebar: true },
+        // Page walkthrough targets (deposit, invest, withdraw pages)
+        dep_coins:  { label: 'Deposit: coins' },
+        dep_wallet: { label: 'Deposit: wallet' },
+        dep_amount: { label: 'Deposit: amount' },
+        dep_proof:  { label: 'Deposit: proof' },
+        dep_submit: { label: 'Deposit: submit' },
+        inv_hero:   { label: 'Invest: header' },
+        inv_plans:  { label: 'Invest: plans' },
+        wd_empty:   { label: 'Withdraw: no details' },
+        wd_balance: { label: 'Withdraw: balance' },
+        wd_method:  { label: 'Withdraw: method' },
+        wd_amount:  { label: 'Withdraw: amount' },
+        wd_submit:  { label: 'Withdraw: submit' },
     };
 
     const WELCOME_STEPS = [
@@ -59,6 +72,66 @@
         { target: 'none',         title: 'You are all set',
           text: 'Start with a deposit, then choose a plan. You can replay this tour any time from the Take a tour button.' },
     ];
+
+    // Step-by-step guides for the deposit, invest and withdraw pages.
+    // Steps whose target is not on screen (for example the withdraw form when
+    // no payout details are saved) are skipped automatically.
+    const GUIDES = {
+        deposit: {
+            key: 'guide:deposit',
+            button: '.deposit-page-header p',
+            steps: [
+                { target: 'none',       title: 'How to make a deposit',
+                  text: 'Depositing takes four quick steps: choose a coin, send the payment, enter the amount, then upload your proof.' },
+                { target: 'dep_coins',  title: '1. Choose a coin',
+                  text: 'Pick the cryptocurrency you want to pay with. Choose one you already hold in your own wallet.' },
+                { target: 'dep_wallet', title: '2. Send your payment',
+                  text: 'After you pick a coin, its wallet address and QR code appear here. Copy the address or scan the code, then send the payment from your own wallet on the network shown.' },
+                { target: 'dep_amount', title: '3. Enter the amount',
+                  text: 'Type how much you sent. You can pick your own currency and we show the USD value that will be credited.' },
+                { target: 'dep_proof',  title: '4. Upload your proof',
+                  text: 'Attach a screenshot or receipt of the transaction (max 5MB). This lets us confirm your payment quickly.' },
+                { target: 'dep_submit', title: 'Submit',
+                  text: 'Review and submit. Your balance is credited once the payment is confirmed. You can follow its status under Transactions.' },
+            ],
+        },
+        invest: {
+            key: 'guide:invest',
+            button: '.inv-hero-tagline',
+            ready: () => { const g = document.getElementById('plansGrid'); return g && g.style.display !== 'none' && g.children.length > 0; },
+            steps: [
+                { target: 'none',      title: 'How to invest',
+                  text: 'Investing uses the balance in your account, so make a deposit first if your balance is empty.' },
+                { target: 'inv_hero',  title: 'Daily returns',
+                  text: 'Each category shows the range of daily returns its plans can earn.' },
+                { target: 'inv_plans', title: 'Choose a plan',
+                  text: 'Every card shows the minimum and maximum amount, the daily return and how long the plan runs. Pick the one that fits your budget.' },
+                { target: 'inv_plans', title: 'Start investing',
+                  text: 'Press the Invest button on a plan and enter your amount. A preview shows your daily return and total return before you confirm. Submitted investments are reviewed, then become active.' },
+                { target: 'none',      title: 'Follow your investment',
+                  text: 'Active investments appear on your Dashboard with their progress. When a plan matures, the capital and profit are paid to your balance.' },
+            ],
+        },
+        withdraw: {
+            key: 'guide:withdraw',
+            button: '.withdraw-section > h1',
+            ready: () => ['withdrawForm', 'withdrawEmpty'].some(id => { const e = document.getElementById(id); return e && e.getBoundingClientRect().height > 0; }),
+            steps: [
+                { target: 'none',       title: 'How to withdraw',
+                  text: 'Withdrawals go to the bank account or crypto wallet saved in your Settings.' },
+                { target: 'wd_empty',   title: 'Add your payout details first',
+                  text: 'You have not saved a bank account or wallet yet. Open Settings, add your details, then come back to withdraw.' },
+                { target: 'wd_balance', title: 'Your available balance',
+                  text: 'This is the most you can withdraw right now.' },
+                { target: 'wd_method',  title: 'Choose a method',
+                  text: 'Select Bank Account or Crypto Wallet. The saved details for each are shown so you can check them before sending.' },
+                { target: 'wd_amount',  title: 'Enter the amount',
+                  text: 'Type how much to withdraw. It cannot be more than your available balance.' },
+                { target: 'wd_submit',  title: 'Request the withdrawal',
+                  text: 'Review the summary and confirm. Requests are reviewed and processed within 1 to 3 business days, and you can track them under Transactions.' },
+            ],
+        },
+    };
 
     // ── helpers ─────────────────────────────────────────────────
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
@@ -318,6 +391,61 @@
         loadBanner(uid, progress, created);
     }
 
+    // ── page guides (deposit / invest / withdraw) ───────────────
+    async function waitReady(guide, ms) {
+        if (!guide.ready) return true;
+        const t0 = Date.now();
+        while (Date.now() - t0 < ms) {
+            try { if (guide.ready()) return true; } catch (e) {}
+            await sleep(200);
+        }
+        return false;
+    }
+
+    async function runGuide(name, auto) {
+        const g = GUIDES[name];
+        if (!g) return;
+        const uid = currentUserId();
+        const ok = await waitReady(g, 6000);
+        if (!ok && auto) return;
+        start(g.steps, { onEnd: () => { if (uid) markDone(uid, g.key); } });
+    }
+
+    async function initGuide(name) {
+        const g = GUIDES[name];
+        if (!g) return;
+
+        // "How does this work?" button under the page heading
+        const anchor = document.querySelector(g.button);
+        if (anchor && !document.getElementById('tourGuideBtn')) {
+            const b = document.createElement('button');
+            b.id = 'tourGuideBtn';
+            b.type = 'button';
+            b.className = 'tour-link';
+            b.style.marginTop = '8px';
+            b.innerHTML = '<i class="uil uil-question-circle"></i> How does this work?';
+            b.addEventListener('click', () => runGuide(name, false));
+            anchor.insertAdjacentElement('afterend', b);
+        }
+
+        // Auto-start once, for accounts created after launch only
+        const uid = currentUserId();
+        if (!uid) return;
+        const progress = await getProgress(uid);
+        if (!progress || progress.has(g.key)) return;
+        let created = null;
+        try {
+            const { data } = await db.from('users').select('created_at').eq('id', uid).maybeSingle();
+            created = data && data.created_at;
+        } catch (e) {}
+        if (created && new Date(created) > new Date(TOUR_AUTOSTART_AFTER)) {
+            setTimeout(() => runGuide(name, true), 1200);
+        }
+    }
+
     window.Tour = { start, startWelcome, TARGETS };
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        const guide = document.body && document.body.getAttribute('data-tour-guide');
+        if (guide) initGuide(guide); else init();
+    });
 })();

@@ -1331,6 +1331,20 @@ canvas {
     animation: notifSlideIn 0.18s ease;
 }
 
+/* Mobile / tablet: the bell sits mid-navbar, so anchoring the panel to it
+   pushes it off the left edge. Pin it to the viewport and centre it instead. */
+@media screen and (max-width: 1023px) {
+    .notif-dropdown {
+        position: fixed;
+        top: 6.4rem;
+        left: 0;
+        right: 0;
+        width: calc(100vw - 2.4rem);
+        max-width: 42rem;
+        margin: 0 auto;
+    }
+}
+
 @keyframes notifSlideIn {
     from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
