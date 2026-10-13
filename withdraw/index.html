@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../chat-widget.css">
     <link rel="stylesheet" href="./withdraw.css">
+    <link rel="stylesheet" href="../tour.css">
     <style>
         /* Anti-FOUC: applied instantly before external CSS loads */
         html { background: #f0eff5; }
@@ -29,7 +30,7 @@
     </style>
 </head>
 
-<body>
+<body data-tour-guide="withdraw">
 
     <!--==================== NAVBAR ====================-->
     <nav>
@@ -130,7 +131,7 @@
         <!-- ══ EMPTY STATE ══
              Shown when user has no withdrawal details saved in settings.
              JS checks localStorage for saved details on page load. -->
-        <div class="withdraw-empty" id="withdrawEmpty">
+        <div class="withdraw-empty" id="withdrawEmpty" data-tour="wd_empty">
             <div class="empty-icon">
                 <i class="uil uil-arrow-circle-up"></i>
             </div>
@@ -149,7 +150,7 @@
         <div id="withdrawForm" style="display:none;">
 
             <!-- Balance display -->
-            <div class="balance-card">
+            <div class="balance-card" data-tour="wd_balance">
                 <div class="balance-info">
                     <p>Available Balance</p>
                     <h1 id="availableBalance">$24,500.00</h1>
@@ -160,7 +161,7 @@
             </div>
 
             <!-- ── METHOD SELECTOR ── -->
-            <div class="form-card">
+            <div class="form-card" data-tour="wd_method">
                 <h3>Withdrawal Method</h3>
                 <div class="method-list">
 
@@ -202,7 +203,7 @@
 
 
             <!-- ── AMOUNT ── -->
-            <div class="form-card">
+            <div class="form-card" data-tour="wd_amount">
                 <h3>Amount (USD)</h3>
                 <div class="amount-wrapper">
                     <span>$</span>
@@ -217,7 +218,7 @@
 
             <!-- ── SUBMIT ── -->
             <!-- Disabled until method is selected and valid amount is entered -->
-            <button class="submit-btn" id="submitBtn" disabled>
+            <button class="submit-btn" id="submitBtn" data-tour="wd_submit" disabled>
                 Request Withdrawal
             </button>
 
@@ -289,6 +290,7 @@
     <script src="../chat-widget.js"></script>
     <script src="../notify.js"></script>
     <script src="../notify-inapp.js"></script>
+    <script src="../tour.js"></script>
     <script src="./withdraw.js"></script>
 </body>
 
