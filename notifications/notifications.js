@@ -83,6 +83,7 @@ function buildFullNotifItem(n) {
         kyc_approved:        { icon: 'uil-shield-check',      color: 'success', label: 'KYC Verified'         },
         kyc_rejected:        { icon: 'uil-shield-slash',      color: 'danger',  label: 'KYC Rejected'         },
         password_changed:    { icon: 'uil-lock-alt',          color: 'primary', label: 'Password Changed'     },
+        announcement:        { icon: 'uil-gift',              color: 'purple',  label: "What's New"           },
         admin_deposit:       { icon: 'uil-arrow-circle-down', color: 'primary', label: 'New Deposit'          },
         admin_withdrawal:    { icon: 'uil-arrow-circle-up',   color: 'warning', label: 'New Withdrawal'       },
         admin_investment:    { icon: 'uil-diamond',           color: 'purple',  label: 'New Investment'       },
