@@ -51,7 +51,7 @@ async function loadSettings() {
     if (refreshBtn) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
 
     try {
-        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings(), loadHeroSettings(), loadTestimonials()]);
+        await Promise.all([loadSiteSettings(), loadPlans(), loadFaqs(), loadFooterSettings(), loadHeroSettings(), loadTestimonials(), loadAnnouncements()]);
         contentEl.style.display = 'block';
     } catch (err) {
         console.error('loadSettings error:', err.message);
@@ -1541,4 +1541,240 @@ async function confirmDeleteTestimonial() {
         btn.disabled  = false;
         btn.innerHTML = '<i class="uil uil-trash-alt"></i> Delete';
     }
+}
+
+
+// ================================================================
+// ANNOUNCEMENTS (What's New banner + tour steps)
+// Targets here must match the data-tour keys in tour.js.
+// ================================================================
+
+const ANN_TARGETS = {
+    none:         'No highlight (centered message)',
+    balance:      'Account balance',
+    deposit:      'Deposit button',
+    withdraw:     'Withdraw button',
+    stats:        'Profit and deposit totals',
+    quickactions: 'Quick actions row',
+    markets:      'Live markets',
+    activeinv:    'Active investments',
+    bell:         'Notification bell',
+    chat:         'Support chat button',
+    nav_invest:   'Menu: Investment Plans',
+    nav_deposit:  'Menu: Deposit',
+    nav_withdraw: 'Menu: Withdraw',
+    nav_history:  'Menu: Transactions',
+    nav_refer:    'Menu: Refer & Earn',
+    nav_settings: 'Menu: Settings',
+};
+const ANN_MAX_STEPS = 6;
+
+let allAnns = [];
+let activeAnn = null;
+let pendingDeleteAnnId = null;
+
+async function loadAnnouncements() {
+    const loadingEl = document.getElementById('annLoading');
+    const emptyEl   = document.getElementById('annEmpty');
+    const listEl    = document.getElementById('annList');
+    if (!listEl) return;
+
+    loadingEl.style.display = 'flex';
+    emptyEl.style.display   = 'none';
+    listEl.style.display    = 'none';
+
+    const { data, error } = await db
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    loadingEl.style.display = 'none';
+
+    if (error) {
+        console.error('loadAnnouncements error:', error.message);
+        emptyEl.style.display = 'flex';
+        emptyEl.querySelector('p').textContent = 'Could not load announcements. The announcements table may not be set up yet.';
+        return;
+    }
+
+    allAnns = data || [];
+    if (!allAnns.length) {
+        emptyEl.style.display = 'flex';
+        emptyEl.querySelector('p').textContent = 'No announcements yet. Publish one when you ship a new feature.';
+        return;
+    }
+
+    listEl.style.display = 'flex';
+    listEl.innerHTML = allAnns.map(buildAnnCard).join('');
+}
+
+function buildAnnCard(a) {
+    const steps  = Array.isArray(a.steps) ? a.steps.length : 0;
+    const live   = a.is_active !== false;
+    const date   = new Date(a.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    const id     = escapeHtml(String(a.id));
+    return `
+    <div class="faq-admin-card ${live ? '' : 'faq-inactive'}" style="cursor:default;">
+        <div class="faq-admin-body">
+            <div class="faq-admin-question">${escapeHtml(a.title || '')}</div>
+            <div class="faq-admin-answer">${escapeHtml(a.body || '')}</div>
+            <span class="faq-admin-status ${live ? 'active' : 'inactive'}">
+                ${live ? 'Published' : 'Hidden'} · ${date} · ${steps} tour step${steps === 1 ? '' : 's'}
+            </span>
+        </div>
+        <div class="faq-admin-actions">
+            <button onclick="openAnnModal('${id}')" aria-label="Edit announcement"><i class="uil uil-pen"></i></button>
+            <button class="faq-admin-delete" onclick="requestDeleteAnn('${id}')" aria-label="Delete announcement"><i class="uil uil-trash-alt"></i></button>
+        </div>
+    </div>`;
+}
+
+// ── Step rows ──
+function annStepRow(step) {
+    step = step || {};
+    const opts = Object.entries(ANN_TARGETS).map(([k, label]) =>
+        `<option value="${k}"${(step.target || 'none') === k ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
+    return `
+    <div class="ann-step" style="border:1.5px solid var(--color-light);border-radius:1rem;padding:1rem;margin-bottom:.8rem;">
+        <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.6rem;">
+            <select class="plans-modal-input ann-step-target" style="flex:1;">${opts}</select>
+            <button type="button" class="faq-admin-delete" onclick="this.closest('.ann-step').remove();refreshAnnStepBtn();" aria-label="Remove step" style="background:none;border:0;cursor:pointer;font-size:1.8rem;">
+                <i class="uil uil-trash-alt"></i>
+            </button>
+        </div>
+        <input type="text" class="plans-modal-input ann-step-title" maxlength="60" placeholder="Step title" value="${escapeHtml(step.title || '')}" style="margin-bottom:.6rem;">
+        <textarea class="plans-modal-input ann-step-text" rows="2" maxlength="200" placeholder="What should the user know here?">${escapeHtml(step.text || '')}</textarea>
+    </div>`;
+}
+
+function addAnnStep(step) {
+    const wrap = document.getElementById('annSteps');
+    if (wrap.querySelectorAll('.ann-step').length >= ANN_MAX_STEPS) return;
+    wrap.insertAdjacentHTML('beforeend', annStepRow(step));
+    refreshAnnStepBtn();
+}
+
+function refreshAnnStepBtn() {
+    const n = document.querySelectorAll('#annSteps .ann-step').length;
+    document.getElementById('annAddStep').style.display = n >= ANN_MAX_STEPS ? 'none' : '';
+}
+
+// ── Modal ──
+function openAnnModal(id) {
+    activeAnn = id ? allAnns.find(a => String(a.id) === String(id)) : null;
+    document.getElementById('annModalTitle').textContent = activeAnn ? 'Edit Announcement' : 'New Announcement';
+    document.getElementById('annId').value        = activeAnn ? activeAnn.id : '';
+    document.getElementById('annTitle').value     = activeAnn?.title || '';
+    document.getElementById('annBody').value      = activeAnn?.body || '';
+    document.getElementById('annLinkLabel').value = activeAnn?.link_label || '';
+    document.getElementById('annLinkUrl').value   = activeAnn?.link_url || '';
+    document.getElementById('annActive').checked  = activeAnn ? activeAnn.is_active !== false : true;
+    document.getElementById('annError').textContent = '';
+
+    const wrap = document.getElementById('annSteps');
+    wrap.innerHTML = '';
+    (Array.isArray(activeAnn?.steps) ? activeAnn.steps : []).forEach(s => addAnnStep(s));
+    refreshAnnStepBtn();
+
+    document.getElementById('annModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAnnModal(event) {
+    if (event && event.target !== document.getElementById('annModal')) return;
+    document.getElementById('annModal').classList.remove('open');
+    document.body.style.overflow = '';
+    activeAnn = null;
+}
+
+async function saveAnn() {
+    const errorEl = document.getElementById('annError');
+    const saveBtn = document.getElementById('annSaveBtn');
+    errorEl.textContent = '';
+
+    const title = document.getElementById('annTitle').value.trim();
+    const body  = document.getElementById('annBody').value.trim();
+    const linkLabel = document.getElementById('annLinkLabel').value.trim();
+    const linkUrl   = document.getElementById('annLinkUrl').value.trim();
+
+    if (!title || !body) { errorEl.textContent = 'Title and message are required.'; return; }
+    if (linkUrl && !/^(https?:\/\/|\.{0,2}\/)/.test(linkUrl)) {
+        errorEl.textContent = 'Link must start with https://, http://, / or ../';
+        return;
+    }
+
+    const steps = [];
+    for (const row of document.querySelectorAll('#annSteps .ann-step')) {
+        const target = row.querySelector('.ann-step-target').value;
+        const st = row.querySelector('.ann-step-title').value.trim();
+        const tx = row.querySelector('.ann-step-text').value.trim();
+        if (!st || !tx) { errorEl.textContent = 'Every tour step needs a title and some text.'; return; }
+        steps.push({ target, title: st, text: tx });
+    }
+
+    saveBtn.disabled  = true;
+    saveBtn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Saving…';
+
+    const payload = {
+        title, body, steps,
+        link_label: linkLabel || null,
+        link_url:   linkUrl || null,
+        is_active:  document.getElementById('annActive').checked,
+        updated_at: new Date().toISOString(),
+    };
+
+    try {
+        const { error } = activeAnn
+            ? await db.from('announcements').update(payload).eq('id', activeAnn.id)
+            : await db.from('announcements').insert(payload);
+        if (error) throw error;
+
+        document.getElementById('annModal').classList.remove('open');
+        document.body.style.overflow = '';
+        activeAnn = null;
+        await loadAnnouncements();
+    } catch (err) {
+        console.error('saveAnn error:', err.message);
+        errorEl.textContent = err.message || 'Save failed. Please try again.';
+    }
+
+    saveBtn.disabled  = false;
+    saveBtn.innerHTML = '<i class="uil uil-check-circle"></i> Save';
+}
+
+// ── Delete ──
+function requestDeleteAnn(id) {
+    const a = allAnns.find(x => String(x.id) === String(id));
+    if (!a) return;
+    pendingDeleteAnnId = id;
+    document.getElementById('annDelTitle').textContent = a.title || 'this announcement';
+    document.getElementById('annDeleteModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAnnDelete(event) {
+    if (event && event.target !== document.getElementById('annDeleteModal')) return;
+    document.getElementById('annDeleteModal').classList.remove('open');
+    document.body.style.overflow = '';
+    pendingDeleteAnnId = null;
+}
+
+async function confirmDeleteAnn() {
+    if (!pendingDeleteAnnId) return;
+    const btn = document.getElementById('annDelBtn');
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="uil uil-spinner-alt spin"></i> Deleting…';
+    try {
+        const { error } = await db.from('announcements').delete().eq('id', pendingDeleteAnnId);
+        if (error) throw error;
+        document.getElementById('annDeleteModal').classList.remove('open');
+        document.body.style.overflow = '';
+        pendingDeleteAnnId = null;
+        await loadAnnouncements();
+    } catch (err) {
+        console.error('confirmDeleteAnn error:', err.message);
+        alert('Failed to delete: ' + err.message);
+    }
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="uil uil-trash-alt"></i> Yes, Delete';
 }

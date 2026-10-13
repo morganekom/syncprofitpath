@@ -148,6 +148,10 @@
                 <i class="uil uil-window-section"></i>
                 <span>Landing Page</span>
             </button>
+            <button class="settings-tab" data-tab="announce" onclick="switchTab('announce', this)">
+                <i class="uil uil-gift"></i>
+                <span>Announcements</span>
+            </button>
             <button class="settings-tab" data-tab="general" onclick="switchTab('general', this)">
                 <i class="uil uil-cog"></i>
                 <span>General</span>
@@ -555,6 +559,37 @@
 
 
             <!-- ════════════════════════════════════════════════════
+                 TAB: ANNOUNCEMENTS
+                 "What's New" banner + guided tour steps for users
+            ════════════════════════════════════════════════════ -->
+            <div class="settings-tab-panel" id="tab-announce">
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-icon">
+                            <i class="uil uil-gift"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-section-title">Feature Announcements</h2>
+                            <p class="settings-section-desc">Publish a "What's New" banner on every user's dashboard. Add tour steps and users get a "Show me" button that highlights the new feature.</p>
+                        </div>
+                        <button class="settings-action-btn" onclick="openAnnModal()">
+                            <i class="uil uil-plus"></i> New Announcement
+                        </button>
+                    </div>
+
+                    <div id="annLoading" class="admin-loading" style="padding: 2rem 0;">
+                        <i class="uil uil-spinner-alt spin"></i> Loading announcements…
+                    </div>
+                    <div id="annEmpty" class="admin-empty" style="display:none;">
+                        <i class="uil uil-gift"></i>
+                        <p>No announcements yet. Publish one when you ship a new feature.</p>
+                    </div>
+                    <div class="faqs-list" id="annList" style="display:none;"></div>
+                </div>
+            </div><!-- /tab-announce -->
+
+
+            <!-- ════════════════════════════════════════════════════
                  TAB: GENERAL
                  Email & Notifications, Site & General
             ════════════════════════════════════════════════════ -->
@@ -909,6 +944,98 @@
             <div class="modal-actions">
                 <button class="action-btn" onclick="closeDeleteConfirm()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
                 <button class="action-btn reject" onclick="confirmDeletePlan()">
+                    <i class="uil uil-trash-alt"></i> Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════
+         ANNOUNCEMENT ADD / EDIT MODAL
+    ══════════════════════════════════════════ -->
+    <div class="admin-modal-overlay" id="annModal" onclick="closeAnnModal(event)">
+        <div class="admin-modal plans-modal" style="max-height:90vh;overflow-y:auto;">
+            <div class="admin-modal-header">
+                <h3 id="annModalTitle">New Announcement</h3>
+                <button class="admin-modal-close" onclick="closeAnnModal()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+            <input type="hidden" id="annId">
+
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="annTitle">Title</label>
+                    <input type="text" id="annTitle" class="plans-modal-input" maxlength="80" placeholder="e.g. Track your house savings goal">
+                </div>
+            </div>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="annBody">Message</label>
+                    <textarea id="annBody" class="plans-modal-input" rows="3" maxlength="240" placeholder="One or two sentences on what changed and why it helps."></textarea>
+                </div>
+            </div>
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="annLinkLabel">Button label (optional)</label>
+                    <input type="text" id="annLinkLabel" class="plans-modal-input" maxlength="24" placeholder="e.g. Try it now">
+                </div>
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label" for="annLinkUrl">Button link (optional)</label>
+                    <input type="text" id="annLinkUrl" class="plans-modal-input" placeholder="../invest/crypto/ or https://…">
+                </div>
+            </div>
+
+            <div class="plans-modal-row">
+                <div class="plans-modal-field">
+                    <label class="plans-modal-label">Tour steps (optional, max 6)</label>
+                    <p style="font-size:1.15rem;color:var(--color-gray-light);margin:0 0 .6rem;">Users get a "Show me" button that walks through these on their dashboard. Pick what to highlight, then explain it.</p>
+                    <div id="annSteps"></div>
+                    <button type="button" class="action-btn" id="annAddStep" onclick="addAnnStep()" style="background:var(--color-light);color:var(--color-dark);margin-top:.6rem;">
+                        <i class="uil uil-plus"></i> Add step
+                    </button>
+                </div>
+            </div>
+
+            <label class="settings-toggle-label" style="margin-top: 0.4rem;">
+                <div class="settings-toggle-wrap">
+                    <input type="checkbox" id="annActive" class="settings-toggle-input" checked>
+                    <span class="settings-toggle-track">
+                        <span class="settings-toggle-thumb"></span>
+                    </span>
+                </div>
+                <span class="settings-toggle-text">Published (visible to users)</span>
+            </label>
+
+            <p class="plans-modal-error" id="annError"></p>
+
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeAnnModal()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
+                <button class="action-btn approve" id="annSaveBtn" onclick="saveAnn()">
+                    <i class="uil uil-check-circle"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANNOUNCEMENT DELETE CONFIRM -->
+    <div class="admin-modal-overlay" id="annDeleteModal" onclick="closeAnnDelete(event)">
+        <div class="admin-modal plans-modal plans-modal--narrow">
+            <div class="admin-modal-header">
+                <h3>Delete Announcement</h3>
+                <button class="admin-modal-close" onclick="closeAnnDelete()">
+                    <i class="uil uil-multiply"></i>
+                </button>
+            </div>
+            <div class="plans-delete-body">
+                <div class="plans-delete-icon"><i class="uil uil-exclamation-triangle"></i></div>
+                <p>You are about to permanently delete <strong id="annDelTitle">this announcement</strong>.</p>
+                <p class="plans-delete-warn">It disappears from every user's banner and bell. This cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="closeAnnDelete()" style="background:var(--color-light);color:var(--color-dark);">Cancel</button>
+                <button class="action-btn reject" id="annDelBtn" onclick="confirmDeleteAnn()">
                     <i class="uil uil-trash-alt"></i> Yes, Delete
                 </button>
             </div>
