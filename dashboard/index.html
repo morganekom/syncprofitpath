@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../chat-widget.css">
     <link rel="stylesheet" href="./dashboard.css">
+    <link rel="stylesheet" href="../tour.css">
     <style>
         /* Anti-FOUC: applied instantly before external CSS loads */
         html { background: #f0eff5; }
@@ -43,7 +44,7 @@
                 <input type="search" placeholder="Search...">
             </div>
             <div class="nav_profile-wrapper">
-                <div class="nav_bell-wrap" id="navBellWrap" style="display:none;">
+                <div class="nav_bell-wrap" id="navBellWrap" data-tour="bell" style="display:none;">
                     <button class="nav_bell-btn" id="navBellBtn" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
                         <i class="uil uil-bell"></i>
                         <span class="nav_bell-badge" id="navBellBadge" style="display:none;">0</span>
@@ -76,11 +77,11 @@
         <a href="./" class="active">
             <i class="uil uil-create-dashboard"></i><h5>Dashboard</h5>
         </a>
-        <a href="../deposit/">
+        <a href="../deposit/" data-tour="nav_deposit">
             <i class="uil uil-arrow-circle-down"></i><h5>Deposit</h5>
         </a>
         <div class="sidebar-dropdown">
-        <button class="sidebar-dropdown-btn" onclick="toggleInvestDropdown(this)">
+        <button class="sidebar-dropdown-btn" data-tour="nav_invest" onclick="toggleInvestDropdown(this)">
             <i class="uil uil-diamond"></i>
             <h5>Investment Plans</h5>
             <i class="uil uil-angle-down sidebar-dropdown-arrow"></i>
@@ -91,16 +92,16 @@
             <a href="../invest/real-estate/" class="sidebar-dropdown-item"><i class="uil uil-estate"></i> Real Estate</a>
         </div>
     </div>
-        <a href="../withdraw/">
+        <a href="../withdraw/" data-tour="nav_withdraw">
             <i class="uil uil-arrow-circle-up"></i><h5>Withdraw</h5>
         </a>
-        <a href="../transactions/">
+        <a href="../transactions/" data-tour="nav_history">
             <i class="uil uil-history"></i><h5>Transactions</h5>
         </a>
-        <a href="../refer/">
+        <a href="../refer/" data-tour="nav_refer">
             <i class="uil uil-user-plus"></i><h5>Refer & Earn</h5>
         </a>
-        <a href="../settings/">
+        <a href="../settings/" data-tour="nav_settings">
             <i class="uil uil-setting"></i><h5>Settings</h5>
         </a>
         <a href="../admin/" class="sidebar-admin-back" id="adminBackBtn" style="display:none;">
@@ -118,11 +119,15 @@
     <!--==================== DASHBOARD MAIN ====================-->
     <main class="dash-main">
 
+        <!-- What's New banner (filled by tour.js) -->
+        <div id="whatsNewSlot"></div>
+
         <!-- Greeting -->
         <div class="dash-greeting">
             <div>
                 <h1>Hello, <span id="greeting-name">Trader</span> 👋</h1>
                 <p class="greeting-date" id="greetingDate"></p>
+                <button class="tour-link" onclick="Tour.startWelcome()" style="margin-top:8px;"><i class="uil uil-compass"></i> Take a tour</button>
             </div>
             <div class="kyc-alert" id="kycAlert" style="display:none;">
                 <i class="uil uil-shield-exclamation"></i>
@@ -134,24 +139,24 @@
         <section class="dash-balance-section">
 
             <!-- Left: Available Balance -->
-            <div class="dash-balance-main">
+            <div class="dash-balance-main" data-tour="balance">
                 <p class="dash-balance-label">Account Balance</p>
                 <div class="dash-balance-amount-wrap">
                     <h1 class="dash-balance-amount" id="dashBalance">—</h1>
                 </div>
                 <p class="dash-balance-sub">Available for Withdrawal</p>
                 <div class="dash-balance-actions">
-                    <a href="../deposit/" class="dash-bal-btn dash-bal-btn--primary">
+                    <a href="../deposit/" class="dash-bal-btn dash-bal-btn--primary" data-tour="deposit">
                         <i class="uil uil-arrow-circle-down"></i> Deposit
                     </a>
-                    <a href="../withdraw/" class="dash-bal-btn dash-bal-btn--outline">
+                    <a href="../withdraw/" class="dash-bal-btn dash-bal-btn--outline" data-tour="withdraw">
                         <i class="uil uil-arrow-circle-up"></i> Withdraw
                     </a>
                 </div>
             </div>
 
             <!-- Right: 2×2 stat grid -->
-            <div class="dash-stat-grid">
+            <div class="dash-stat-grid" data-tour="stats">
 
                 <div class="dash-stat-tile">
                     <div class="dash-stat-tile__top">
@@ -202,7 +207,7 @@
         </section>
 
         <!-- Quick Actions -->
-        <section class="quick-actions">
+        <section class="quick-actions" data-tour="quickactions">
             <a href="../deposit/" class="quick-action">
                 <div class="quick-action-icon bg-primary-light">
                     <i class="uil uil-arrow-circle-down primary"></i>
@@ -275,7 +280,7 @@
     <aside class="dash-right">
 
         <!-- Market Tickers -->
-        <div class="dash-panel-card">
+        <div class="dash-panel-card" data-tour="markets">
             <div class="dash-panel-header">
                 <h2>Markets</h2>
                 <span class="live-dot"><span></span>Live</span>
@@ -385,7 +390,7 @@
         </div>
 
         <!-- Active Investments -->
-        <div class="dash-panel-card" id="activeInvestSection" style="display:none;">
+        <div class="dash-panel-card" id="activeInvestSection" data-tour="activeinv" style="display:none;">
             <div class="dash-panel-header">
                 <h2>Active Investments</h2>
                 <a href="../invest/" class="dash-see-all">New Investment</a>
@@ -451,6 +456,7 @@
     <script src="../chat-widget.js"></script>
     <script src="./dashboard.js"></script>
     <script src="../notify-inapp.js"></script>
+    <script src="../tour.js"></script>
     <!-- ==================== TOP UP MODAL ==================== -->
     <div class="modal-overlay topup-overlay" id="topupOverlay" onclick="closeTopUpModal(event)">
         <div class="modal topup-modal">
