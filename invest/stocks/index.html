@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../../chat-widget.css">
     <link rel="stylesheet" href="../invest.css">
+    <link rel="stylesheet" href="../../tour.css">
     <style>
         /* Anti-FOUC: applied instantly before external CSS loads */
         html { background: #f0eff5; }
@@ -21,7 +22,7 @@
         }
     </style>
 </head>
-<body data-asset="stocks">
+<body data-asset="stocks" data-tour-guide="invest">
 
 <nav>
     <div class="container nav_container">
@@ -83,7 +84,7 @@
         <span>Stock Market</span>
     </div>
 
-    <div class="inv-hero">
+    <div class="inv-hero" data-tour="inv_hero">
         <div class="inv-hero-left">
             <h1 class="stocks">
                 Stock Market Investment Plans
@@ -127,7 +128,7 @@
         <div class="plan-skel skeleton"></div>
         <div class="plan-skel skeleton"></div>
     </div>
-    <div class="plans-grid" id="plansGrid" style="display:none;"></div>
+    <div class="plans-grid" id="plansGrid" data-tour="inv_plans" style="display:none;"></div>
 
     <div class="inv-why">
         <h2 class="inv-section-title">Why Choose Stock Market Investment?</h2>
@@ -252,6 +253,7 @@
 <script src="../../chat-widget.js"></script>
 <script src="../../notify.js"></script>
 <script src="../../notify-inapp.js"></script>
+<script src="../../tour.js"></script>
 <script>
     function toggleInvestDropdown(btn) {
         btn.classList.toggle('open');
