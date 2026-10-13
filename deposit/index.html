@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../chat-widget.css">
     <link rel="stylesheet" href="./deposit.css">
+    <link rel="stylesheet" href="../tour.css">
     <style>
         /* Anti-FOUC: applied instantly before external CSS loads */
         html { background: #f0eff5; }
@@ -28,7 +29,7 @@
     </style>
 </head>
 
-<body>
+<body data-tour-guide="deposit">
 
     <!--==================== NAVBAR ====================-->
     <nav>
@@ -134,7 +135,7 @@
                 <div class="deposit-left">
 
                     <!-- Step 1: Choose crypto -->
-                    <div class="deposit-card crypto-card">
+                    <div class="deposit-card crypto-card" data-tour="dep_coins">
                         <div class="deposit-card-title">
                             <i class="uil uil-bitcoin-circle"></i> Choose Payment Method
                         </div>
@@ -181,7 +182,7 @@
 
                     <!-- WALLET CARD — lives here in the DOM (natural mobile position)
                          On desktop CSS moves it to right column via grid-area -->
-                    <div class="deposit-card wallet-card" id="walletCard">
+                    <div class="deposit-card wallet-card" id="walletCard" data-tour="dep_wallet">
                         <div class="deposit-card-title">
                             <i class="uil uil-wallet"></i> Wallet Details
                         </div>
@@ -220,7 +221,7 @@
                     </div>
 
                     <!-- Step 2: Amount -->
-                    <div class="deposit-card amount-card">
+                    <div class="deposit-card amount-card" data-tour="dep_amount">
                         <div class="deposit-card-title">
                             <i class="uil uil-dollar-sign"></i> Enter Deposit Amount
                         </div>
@@ -261,7 +262,7 @@
                     </div>
 
                     <!-- Step 3: Upload proof -->
-                    <div class="deposit-card upload-card">
+                    <div class="deposit-card upload-card" data-tour="dep_proof">
                         <div class="deposit-card-title">
                             <i class="uil uil-image-upload"></i> Upload Proof of Payment
                         </div>
@@ -283,7 +284,7 @@
                     </div>
 
                     <!-- Submit -->
-                    <button class="submit-btn" id="submitBtn" disabled>
+                    <button class="submit-btn" id="submitBtn" data-tour="dep_submit" disabled>
                         <i class="uil uil-check-circle"></i> Submit Deposit
                     </button>
 
@@ -340,6 +341,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="../notify.js"></script>
     <script src="../notify-inapp.js"></script>
+    <script src="../tour.js"></script>
     <script src="./deposit.js"></script>
 </body>
 </html>
