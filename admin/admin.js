@@ -153,21 +153,13 @@ async function loadAll() {
 // ================================================================
 // FILE STORAGE METER
 // Reads admin_storage_usage() (admin-only database function).
-// Supabase counts 1 GB as 1024 MB (MiB), so the limit below does too.
-// If you upgrade the plan, change STORAGE_LIMIT_BYTES and PLAN_LABEL.
+// Supabase counts 1 GB as 1024 MB, so the limit below does too.
+// If you upgrade the plan, change STORAGE_LIMIT_BYTES.
 // ================================================================
 
 const STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024;   // Free plan: 1 GB
-const STORAGE_PLAN_LABEL  = 'Free plan \u00b7 1 GB included';
-const STORAGE_WARN_PCT    = 70;                    // amber
-const STORAGE_DANGER_PCT  = 90;                    // red
-
-const STORAGE_BUCKET_LABELS = {
-    'kyc-documents':      'KYC documents',
-    'deposit-proofs':     'Deposit proofs',
-    'chat-attachments':   'Chat attachments',
-    'admin-email-images': 'Admin email images',
-};
+const STORAGE_WARN_PCT    = 70;                    // bar turns amber
+const STORAGE_DANGER_PCT  = 90;                    // bar turns red
 
 function formatBytes(bytes) {
     const b = Number(bytes) || 0;
@@ -181,76 +173,24 @@ async function loadStorageUsage() {
     const card = document.getElementById('storageCard');
     if (!card) return;                       // not on this page
 
-    const loadingEl = document.getElementById('storageLoading');
-    const bodyEl    = document.getElementById('storageBody');
-    const errorEl   = document.getElementById('storageError');
-    const planEl    = card.querySelector('.storage-plan');
-    if (planEl) planEl.textContent = STORAGE_PLAN_LABEL;
-
-    loadingEl.style.display = 'flex';
-    bodyEl.style.display    = 'none';
-    errorEl.style.display   = 'none';
-
     const { data, error } = await db.rpc('admin_storage_usage');
-    loadingEl.style.display = 'none';
-
     if (error || !data) {
         console.warn('loadStorageUsage error:', error && error.message);
-        errorEl.querySelector('p').textContent = 'Storage figures are unavailable right now. Refresh to try again.';
-        errorEl.style.display = 'flex';
-        return;
+        return;                              // keep the card hidden if figures are unavailable
     }
 
     const used = Number(data.total_bytes) || 0;
-    const pct  = Math.min(100, (used / STORAGE_LIMIT_BYTES) * 100);
-    const left = Math.max(0, STORAGE_LIMIT_BYTES - used);
+    const pct  = (used / STORAGE_LIMIT_BYTES) * 100;
 
-    let level = 'ok', pill = 'Healthy';
-    if (pct >= STORAGE_DANGER_PCT)    { level = 'danger'; pill = 'Almost full'; }
-    else if (pct >= STORAGE_WARN_PCT) { level = 'warn';   pill = 'Getting full'; }
-    if (used >= STORAGE_LIMIT_BYTES)  { level = 'danger'; pill = 'Over limit'; }
+    let level = 'ok';
+    if (pct >= STORAGE_DANGER_PCT)    level = 'danger';
+    else if (pct >= STORAGE_WARN_PCT) level = 'warn';
 
     card.setAttribute('data-level', level);
-    document.getElementById('storageUsed').textContent = formatBytes(used);
-    document.getElementById('storageOf').textContent   = ' of ' + formatBytes(STORAGE_LIMIT_BYTES) + ' used (' + pct.toFixed(1) + '%)';
-    document.getElementById('storagePill').textContent = pill;
-    document.getElementById('storageFill').style.width = pct.toFixed(1) + '%';
-    document.getElementById('storageLeft').textContent =
-        used >= STORAGE_LIMIT_BYTES
-            ? 'You are over the included storage by ' + formatBytes(used - STORAGE_LIMIT_BYTES) + '.'
-            : formatBytes(left) + ' left before the limit.';
-
-    const alertEl = document.getElementById('storageAlert');
-    if (level === 'danger') {
-        alertEl.textContent = 'Storage is nearly full. New KYC, deposit and chat uploads can start failing. Delete old or test files, or upgrade the plan.';
-        alertEl.style.display = 'block';
-    } else if (level === 'warn') {
-        alertEl.textContent = 'Storage is past ' + STORAGE_WARN_PCT + '%. Plan ahead: clear old files or upgrade before it fills.';
-        alertEl.style.display = 'block';
-    } else {
-        alertEl.style.display = 'none';
-    }
-
-    // Per-bucket breakdown (always list the known buckets, even when empty)
-    const rows = {};
-    Object.keys(STORAGE_BUCKET_LABELS).forEach(k => { rows[k] = { bucket: k, files: 0, bytes: 0 }; });
-    (data.buckets || []).forEach(b => { rows[b.bucket] = { bucket: b.bucket, files: Number(b.files) || 0, bytes: Number(b.bytes) || 0 }; });
-
-    const list = Object.values(rows).sort((a, b) => b.bytes - a.bytes);
-    document.getElementById('storageBuckets').innerHTML = list.map(r => {
-        const share = used > 0 ? (r.bytes / used) * 100 : 0;
-        const label = STORAGE_BUCKET_LABELS[r.bucket] || r.bucket;
-        return `
-        <li class="storage-bucket">
-            <div class="storage-bucket-top">
-                <span class="storage-bucket-name">${escapeHtml(label)}</span>
-                <span class="storage-bucket-size">${formatBytes(r.bytes)} <small>&middot; ${r.files} file${r.files === 1 ? '' : 's'}</small></span>
-            </div>
-            <div class="storage-mini-track"><div class="storage-mini-fill" style="width:${share.toFixed(1)}%"></div></div>
-        </li>`;
-    }).join('');
-
-    bodyEl.style.display = 'block';
+    document.getElementById('storageUsed').textContent =
+        formatBytes(used) + ' of ' + formatBytes(STORAGE_LIMIT_BYTES) + ' used (' + pct.toFixed(1) + '%)';
+    document.getElementById('storageFill').style.width = Math.min(100, pct).toFixed(1) + '%';
+    card.style.display = '';
 }
 
 
