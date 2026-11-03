@@ -222,6 +222,39 @@
         </div>
 
 
+        <!-- ── FILE STORAGE METER ── -->
+        <div class="admin-card storage-card" id="storageCard">
+            <div class="admin-card-header">
+                <h3>File Storage</h3>
+                <span class="storage-plan">Free plan &middot; 1 GB included</span>
+            </div>
+
+            <div id="storageLoading" class="admin-loading">
+                <i class="uil uil-spinner-alt spin"></i> Checking storage…
+            </div>
+
+            <div id="storageBody" style="display:none;">
+                <div class="storage-top">
+                    <div>
+                        <span class="storage-used" id="storageUsed">—</span>
+                        <span class="storage-of" id="storageOf"></span>
+                    </div>
+                    <span class="storage-pill" id="storagePill">OK</span>
+                </div>
+                <div class="storage-track"><div class="storage-fill" id="storageFill"></div></div>
+                <p class="storage-left" id="storageLeft"></p>
+                <p class="storage-alert" id="storageAlert" style="display:none;"></p>
+                <ul class="storage-buckets" id="storageBuckets"></ul>
+                <p class="storage-note">Counts every file in Supabase Storage. Supabase's own Usage page shows an average over the billing cycle, so it moves more slowly than this.</p>
+            </div>
+
+            <div id="storageError" class="admin-empty" style="display:none;">
+                <i class="uil uil-database"></i>
+                <p></p>
+            </div>
+        </div>
+
+
         <!-- ── BOTTOM GRID: recent activity + quick actions ── -->
         <div class="admin-grid">
 
