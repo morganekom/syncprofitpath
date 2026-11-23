@@ -6,7 +6,7 @@
             var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (isDark) {
                 document.documentElement.classList.add('dark-theme');
-                document.body.classList.add('dark-theme');
+                document.body && document.body.classList.add('dark-theme');
             }
         })();
     </script>

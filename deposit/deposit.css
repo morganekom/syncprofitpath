@@ -3,7 +3,7 @@
 /* Body override: deposit uses 2-col on desktop (no right panel) */
 @media screen and (min-width: 1024px) {
     body {
-        grid-template-columns: 17rem auto;
+        grid-template-columns: 17rem minmax(0, 1fr);
     }
 }
 

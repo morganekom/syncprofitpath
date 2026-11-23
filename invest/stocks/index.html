@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        /* Keep the page hidden until auth.js has verified the session, so users never see a half-loaded layout. */
+        document.documentElement.style.visibility = 'hidden';
+        setTimeout(function () { document.documentElement.style.visibility = ''; }, 8000); /* failsafe */
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        (function(){var s=localStorage.getItem('currrentTheme');var d=s==='dark-theme'||(s===null&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark-theme');document.body.classList.add('dark-theme');}})();
+        (function(){var s=localStorage.getItem('currrentTheme');var d=s==='dark-theme'||(s===null&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark-theme');document.body && document.body.classList.add('dark-theme');}})();
     </script>
     <title>Stock Market Investment Plans — SyncProfitPath</title>
     <link rel="icon" type="image/png" href="../../assets/favicon.png">
@@ -18,7 +23,7 @@
         html { background: #f0eff5; }
         html.dark-theme { background: #0d242c; }
         @media (min-width: 1024px) {
-            body { display: grid; grid-template-columns: 17rem auto; }
+            body { display: grid; grid-template-columns: 17rem minmax(0, 1fr); }
         }
     </style>
 </head>

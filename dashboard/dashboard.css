@@ -5,7 +5,7 @@
 /* Override body for dashboard — 2-col on desktop (no 3rd right column on mobile) */
 @media screen and (min-width: 1024px) {
     body {
-        grid-template-columns: 17rem auto 28rem;
+        grid-template-columns: 17rem minmax(0, 1fr) 28rem;
     }
 }
 

@@ -3,7 +3,7 @@
 */
 
 body { grid-template-columns: 1fr; }
-@media (min-width: 1024px) { body { grid-template-columns: 17rem auto; } }
+@media (min-width: 1024px) { body { grid-template-columns: 17rem minmax(0, 1fr); } }
 
 
 /* ================================================================
