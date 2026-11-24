@@ -63,9 +63,13 @@ async function handleGoogleCallback() {
                         .single();
 
                     if (linkError) {
-                        throw new Error('This email is already linked to another account. Please sign in with your password or contact support.');
+                        // Google already verified this email. Keep the person
+                        // signed in if RLS prevents this optional repair.
+                        console.warn('Profile ID repair deferred:', linkError.message);
+                        existingUser = existingByEmail;
+                    } else {
+                        existingUser = linkedUser;
                     }
-                    existingUser = linkedUser;
                 } else {
                     existingUser = existingByEmail;
                 }

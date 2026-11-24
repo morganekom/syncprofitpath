@@ -122,10 +122,18 @@ async function submitLogin() {
     btn.disabled  = true;
 
     // ── Step 1: Try Supabase Auth first (migrated + all new users) ──
-    const { data: authData, error: authError } = await db.auth.signInWithPassword({
-        email:    email.toLowerCase(),
-        password: password,
-    });
+    let authData, authError;
+    try {
+        ({ data: authData, error: authError } = await db.auth.signInWithPassword({
+            email:    email.toLowerCase(),
+            password: password,
+        }));
+    } catch (err) {
+        document.getElementById('loginError').textContent = 'Unable to reach the sign-in service. Please try again.';
+        btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+        btn.disabled = false;
+        return;
+    }
 
     // ── Step 2: Resolve the user profile ──
     let user = null;
@@ -138,13 +146,47 @@ async function submitLogin() {
             .eq('id', authData.user.id)
             .maybeSingle();
 
-        if (profileError || !profile) {
+        if (profileError) {
             document.getElementById('loginError').textContent = 'Account not found. Please contact support.';
             btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
             btn.disabled  = false;
             return;
         }
-        user = profile;
+
+        if (profile) {
+            user = profile;
+        } else {
+            // Older profiles can have a different users-row ID from their
+            // Supabase Auth ID. The verified Auth email recovers that profile.
+            const { data: emailProfile, error: emailProfileError } = await db
+                .from('users')
+                .select('*')
+                .ilike('email', email)
+                .maybeSingle();
+
+            if (emailProfileError || !emailProfile) {
+                document.getElementById('loginError').textContent = 'Your account profile could not be found. Please contact support.';
+                btn.innerHTML = 'Sign In <i class="uil uil-arrow-right"></i>';
+                btn.disabled  = false;
+                return;
+            }
+
+            if (emailProfile.id !== authData.user.id) {
+                const { data: repairedProfile, error: repairError } = await db.from('users')
+                    .update({ id: authData.user.id })
+                    .eq('id', emailProfile.id)
+                    .select()
+                    .single();
+                if (repairError) {
+                    console.warn('Profile ID repair deferred:', repairError.message);
+                    user = emailProfile;
+                } else {
+                    user = repairedProfile;
+                }
+            } else {
+                user = emailProfile;
+            }
+        }
 
     } else {
         // ── Fallback: check legacy users.password column ──
@@ -154,7 +196,7 @@ async function submitLogin() {
         const { data: legacyUser } = await db
             .from('users')
             .select('*')
-            .eq('email', email.toLowerCase())
+            .ilike('email', email)
             .eq('password', password)
             .maybeSingle();
 
