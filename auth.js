@@ -13,13 +13,20 @@
 (async function () {
     document.documentElement.style.visibility = 'hidden';
 
+    // A slow or unavailable role lookup must never leave the application blank.
+    // The page heads also have this fallback, but keeping it here makes route
+    // protection resilient when a page is added without the shared head block.
+    const revealPage = () => { document.documentElement.style.visibility = ''; };
+    const revealTimer = window.setTimeout(revealPage, 2500);
+
     const path        = window.location.pathname;
     const isAdminPage = path.includes('/admin/');
     const isAuthPage  = path.includes('/auth/');
 
     // Auth pages are always visible — no session needed
     if (isAuthPage) {
-        document.documentElement.style.visibility = '';
+        window.clearTimeout(revealTimer);
+        revealPage();
         return;
     }
 
@@ -71,7 +78,8 @@
         // Non-admin page but somehow ended up here as admin → allow through
         // (admins can still view user-facing pages if they want)
 
-        document.documentElement.style.visibility = '';
+        window.clearTimeout(revealTimer);
+        revealPage();
 
     } catch (err) {
         // Network error — fall back to cached role rather than locking everyone out
@@ -87,7 +95,8 @@
             return;
         }
 
-        document.documentElement.style.visibility = '';
+        window.clearTimeout(revealTimer);
+        revealPage();
     }
 
 })();
