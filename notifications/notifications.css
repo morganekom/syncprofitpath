@@ -5,13 +5,14 @@
 .notif-main {
     padding: 1.6rem;
     max-width: 72rem;
-    margin: 0 auto;
+    margin: 5rem auto 0;
 }
 
 @media screen and (min-width: 1024px) {
     .notif-main {
         padding: 2.4rem 2rem;
-        margin-left: 18rem;
+        max-width: none;
+        margin: 5rem 2rem 0 0;
     }
 }
 

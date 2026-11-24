@@ -2,8 +2,8 @@
    All variables, nav, sidebar from style.css
 */
 
-/* Override body for dashboard — 2-col on desktop (no 3rd right column on mobile) */
-@media screen and (min-width: 1024px) {
+/* Give the dashboard its right rail only once both columns have useful space. */
+@media screen and (min-width: 1280px) {
     body {
         grid-template-columns: 17rem minmax(0, 1fr) 28rem;
     }
@@ -481,11 +481,19 @@
     flex-direction: column;
     gap: 1.5rem;
 }
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 1280px) {
     .dash-right {
         margin-top: 5rem;
         margin-right: 2vw;
         padding: 2rem 0 6rem;
+    }
+}
+
+/* At tablet/small-desktop widths, keep the supporting panels beneath the
+   dashboard content instead of forcing a narrow third column. */
+@media screen and (min-width: 1024px) and (max-width: 1279px) {
+    .dash-right {
+        grid-column: 2;
     }
 }
 

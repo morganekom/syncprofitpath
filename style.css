@@ -111,11 +111,13 @@ body {
     user-select: none;
 }
 
-/* Desktop: 3-column grid with sidebar in flow */
+/* Desktop: keep the shared shell to a sidebar and a flexible content column.
+   Individual pages that genuinely need a right rail (the dashboard) opt into it
+   at a wider breakpoint. Reserving that rail at 1024px was compressing content. */
 @media screen and (min-width: 1024px) {
     body {
         display: grid;
-        grid-template-columns: 17rem minmax(0, 1fr) 30rem;
+        grid-template-columns: 17rem minmax(0, 1fr);
         gap: 2rem;
     }
 }
