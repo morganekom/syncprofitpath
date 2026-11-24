@@ -44,6 +44,7 @@ const themeBtn     = document.querySelector('.nav_theme-btn');
 const THEME_KEY    = 'currrentTheme';
 const THEME_PREF_KEY = 'themePreference';
 const systemDark   = window.matchMedia('(prefers-color-scheme: dark)');
+const APP_ROOT     = window.location.pathname.startsWith('/syncprofitpath/') ? '/syncprofitpath/' : '/';
 
 function applyTheme(isDark) {
     document.documentElement.classList.toggle('dark-theme', isDark);
@@ -163,12 +164,7 @@ const navProfile = document.querySelector('.nav_profile');
 if (navProfile) {
     navProfile.style.cursor = 'pointer';
     navProfile.addEventListener('click', () => {
-        const parts  = window.location.pathname.split('/').filter(Boolean);
-        // parts = segments of the path excluding empty strings
-        // last part is the filename, everything before it is directories
-        const depth  = parts.length;
-        const prefix = '../'.repeat(depth);
-        window.location.href = prefix + 'settings/';
+        window.location.href = APP_ROOT + 'settings/';
     });
 }
 
@@ -203,10 +199,7 @@ function logout() {
     if (remembered) localStorage.setItem('rememberedAccounts', remembered);
     if (remEmail)   localStorage.setItem('rememberedEmail', remEmail);
 
-    const parts  = window.location.pathname.split('/').filter(Boolean);
-    const depth  = parts.length;
-    const prefix = '../'.repeat(depth);
-    window.location.href = prefix + 'auth/login/';
+    window.location.href = APP_ROOT + 'auth/login/';
 }
 
 // ================================================================

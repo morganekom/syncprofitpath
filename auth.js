@@ -20,6 +20,10 @@
     const revealTimer = window.setTimeout(revealPage, 2500);
 
     const path        = window.location.pathname;
+    // In production the app is served at the domain root. During local
+    // development Live Server may serve the workspace instead, placing the
+    // app below /syncprofitpath/. Use one root for redirects in either case.
+    const appRoot     = path.startsWith('/syncprofitpath/') ? '/syncprofitpath/' : '/';
     const isAdminPage = path.includes('/admin/');
     const isAuthPage  = path.includes('/auth/');
 
@@ -35,9 +39,7 @@
 
     if (!cachedUser || !cachedUser.id) {
         // No session → redirect to login
-        const parts  = path.split('/').filter(Boolean);
-        const prefix = '../'.repeat(parts.length);
-        window.location.replace(prefix + 'auth/login/');
+        window.location.replace(appRoot + 'auth/login/');
         return;
     }
 
@@ -55,9 +57,7 @@
         if (error || !freshUser) {
             // User no longer exists in DB — clear session and send to login
             localStorage.clear();
-            const parts  = path.split('/').filter(Boolean);
-            const prefix = '../'.repeat(parts.length);
-            window.location.replace(prefix + 'auth/login/');
+            window.location.replace(appRoot + 'auth/login/');
             return;
         }
 
@@ -71,7 +71,7 @@
 
         // Admin page but role is not admin → send to dashboard
         if (isAdminPage && role !== 'admin') {
-            window.location.replace('../dashboard/');
+            window.location.replace(appRoot + 'dashboard/');
             return;
         }
 
@@ -89,9 +89,7 @@
         const role = cachedUser.role || 'user';
 
         if (isAdminPage && role !== 'admin') {
-            const parts  = path.split('/').filter(Boolean);
-            const prefix = '../'.repeat(parts.length);
-            window.location.replace(prefix + 'dashboard/');
+            window.location.replace(appRoot + 'dashboard/');
             return;
         }
 

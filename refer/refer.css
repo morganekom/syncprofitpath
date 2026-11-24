@@ -17,23 +17,24 @@ body {
 /* ========================= REFER SECTION ========================= */
 .refer-section {
     margin-top: 6rem;
-    margin-left: 2.9vw;
-    margin-right: 2.9vw;
+    margin-inline: 1rem;
     padding-bottom: 6rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    min-width: 0;
 }
 
 @media screen and (min-width: 600px) {
     .refer-section {
         margin-top: 7rem;
-        margin-left: 0;
+        margin-inline: 1.5rem;
     }
 }
 
 @media screen and (min-width: 1024px) {
     .refer-section {
+        margin-left: 0;
         margin-right: 2.9vw;
     }
 }
@@ -61,7 +62,7 @@ body {
     padding: var(--card-padding) 1rem;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 760px) {
     .how-it-works {
         flex-direction: row;
         align-items: center;
@@ -79,7 +80,7 @@ body {
     padding: 0.6rem 0;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 760px) {
     .how-step {
         flex-direction: column;
         align-items: center;
@@ -98,7 +99,7 @@ body {
     flex-shrink: 0;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 760px) {
     .how-icon {
         width: 5rem;
         height: 5rem;
@@ -130,7 +131,7 @@ body {
     margin-left: 1.8rem;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 760px) {
     .how-divider {
         font-size: 2.4rem;
         transform: none;
@@ -146,10 +147,14 @@ body {
     gap: 1.5rem;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 480px) {
     .refer-stats {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
+
+@media screen and (min-width: 900px) {
+    .refer-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .refer-stat-card {
@@ -203,16 +208,22 @@ body {
 /* ========================= MAIN GRID ========================= */
 .refer-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
     align-items: start;
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 1200px) {
     .refer-grid {
-        grid-template-columns: 1fr 38rem;
+        grid-template-columns: minmax(0, 1fr) minmax(24rem, 30rem);
     }
 }
+
+.refer-grid > *,
+.refer-stats > *,
+.how-step,
+.code-display,
+.link-row { min-width: 0; }
 
 .refer-left {
     display: flex;
@@ -279,6 +290,8 @@ body {
     color: var(--color-dark);
     letter-spacing: 0.2rem;
     flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 
@@ -558,6 +571,14 @@ body {
 .history-status.pending {
     background: rgba(234, 181, 7, 0.15);
     color: var(--color-warning);
+}
+
+/* Keep referral activity readable on very narrow phones. */
+@media screen and (max-width: 380px) {
+    .refer-card { padding: 1.2rem; }
+    .code-value { font-size: 1.6rem; }
+    .refer-history-item { align-items: flex-start; gap: 0.7rem; }
+    .history-status { padding-inline: 0.6rem; }
 }
 
 /* ========================= SKELETON LOADER ========================= */

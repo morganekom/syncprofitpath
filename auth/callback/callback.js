@@ -31,11 +31,46 @@ async function handleGoogleCallback() {
         }
 
         // ── CHECK IF PROFILE EXISTS IN USERS TABLE ──
-        const { data: existingUser } = await db
+        const { data: existingById, error: lookupError } = await db
             .from('users')
             .select('*')
             .eq('id', authUser.id)       // match by Auth UID, not email
             .maybeSingle();
+
+        if (lookupError) throw lookupError;
+
+        // Older Google sign-ins created a row without the Auth user ID. That
+        // leaves an account with the same email but makes every later OAuth
+        // sign-in try (and fail) to create it again. Reconnect that profile to
+        // the current Auth ID before treating this as a new user.
+        let existingUser = existingById;
+        if (!existingUser && authUser.email) {
+            const { data: existingByEmail, error: emailLookupError } = await db
+                .from('users')
+                .select('*')
+                .eq('email', authUser.email.toLowerCase())
+                .maybeSingle();
+
+            if (emailLookupError) throw emailLookupError;
+
+            if (existingByEmail) {
+                if (existingByEmail.id !== authUser.id) {
+                    const { data: linkedUser, error: linkError } = await db
+                        .from('users')
+                        .update({ id: authUser.id, last_login: new Date().toISOString() })
+                        .eq('id', existingByEmail.id)
+                        .select()
+                        .single();
+
+                    if (linkError) {
+                        throw new Error('This email is already linked to another account. Please sign in with your password or contact support.');
+                    }
+                    existingUser = linkedUser;
+                } else {
+                    existingUser = existingByEmail;
+                }
+            }
+        }
 
         if (existingUser) {
             // Returning Google user — update last login and redirect
@@ -46,7 +81,7 @@ async function handleGoogleCallback() {
 
             saveSession(existingUser);
             window.signInComplete && window.signInComplete();
-            setTimeout(() => redirectAfterLogin(existingUser.role), 1200);
+            setTimeout(() => redirectAfterLogin(existingUser.role), 250);
             return;
         }
 
@@ -67,6 +102,7 @@ async function handleGoogleCallback() {
                 first_name:       firstName,
                 last_name:        lastName,
                 full_name:        fullName,
+                id:               authUser.id,
                 email:            authUser.email,
                 phone:            '',
                 password:         null,   // Google users have no password
@@ -91,7 +127,7 @@ async function handleGoogleCallback() {
 
         // New Google users go to dashboard directly — email already verified by Google
         window.signInComplete && window.signInComplete();
-        setTimeout(() => redirectAfterLogin(newUser.role), 1200);
+        setTimeout(() => redirectAfterLogin(newUser.role), 250);
 
     } catch (err) {
         console.error('Callback error:', err.message);
@@ -145,7 +181,16 @@ function saveSession(user) {
 // ================================================================
 
 function showError(msg) {
-    document.getElementById('callbackState').innerHTML = `
+    // The callback design uses .cb-wrap rather than #callbackState. Guarding
+    // the host here ensures an authentication error is displayed, not replaced
+    // by a second JavaScript error.
+    const host = document.getElementById('callbackState') || document.querySelector('.cb-wrap');
+    if (!host) {
+        console.error('Callback error:', msg);
+        return;
+    }
+
+    host.innerHTML = `
         <div class="success-ring" style="background:var(--color-danger-light);border-color:var(--color-danger)">
             <i class="uil uil-times-circle" style="color:var(--color-danger)"></i>
         </div>
